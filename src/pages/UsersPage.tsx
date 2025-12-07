@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -33,6 +34,7 @@ import { useUsers } from '../hooks';
 import { format } from 'date-fns';
 
 const UsersPage: React.FC = () => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
@@ -87,7 +89,7 @@ const UsersPage: React.FC = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">
-          שגיאה בטעינת נתוני המשתמשים: {error.message}
+          {t('users.loadError')} {error.message}
         </Alert>
       </Box>
     );
@@ -97,23 +99,25 @@ const UsersPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1" fontWeight="bold">
-          ניהול משתמשים
+          {t('users.title')}
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           size="large"
         >
-          הוספת משתמש
+          {t('users.addUser')}
         </Button>
       </Box>
 
       {/* Debug Panel */}
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Debug:</strong> טוען: {isLoading ? 'כן' : 'לא'} | 
-          שגיאה: {error ? (error as any).message || 'יש שגיאה' : 'אין'} | 
-          נתונים: {usersData ? `${(usersData as any).users?.length || 0} מתוך ${(usersData as any).total || 0}` : 'אין'}
+          {t('users.debug', { 
+            loading: isLoading, 
+            error: error ? (error as any).message || t('common.error') : t('common.no'), 
+            data: usersData ? `${(usersData as any).users?.length || 0} מתוך ${(usersData as any).total || 0}` : t('common.no')
+          })}
         </Typography>
       </Alert>
 
@@ -134,17 +138,17 @@ const UsersPage: React.FC = () => {
           sx={{ maxWidth: 400 }}
         />
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>תפקיד</InputLabel>
+          <InputLabel>{t('users.filter.role')}</InputLabel>
           <Select
             value={roleFilter}
             onChange={handleRoleFilterChange}
             label="תפקיד"
           >
-            <MenuItem value="all">כל התפקידים</MenuItem>
-            <MenuItem value="admin">מנהל מערכת</MenuItem>
-            <MenuItem value="manager">מנהל</MenuItem>
-            <MenuItem value="volunteer">מתנדב</MenuItem>
-            <MenuItem value="user">משתמש</MenuItem>
+            <MenuItem value="all">{t('users.roles.all')}</MenuItem>
+            <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
+            <MenuItem value="manager">{t('users.roles.manager')}</MenuItem>
+            <MenuItem value="volunteer">{t('users.roles.volunteer')}</MenuItem>
+            <MenuItem value="user">{t('users.roles.user')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -154,13 +158,13 @@ const UsersPage: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>שם מלא</TableCell>
-              <TableCell>אימייל</TableCell>
-              <TableCell>טלפון</TableCell>
-              <TableCell>תפקיד</TableCell>
-              <TableCell>סטטוס</TableCell>
-              <TableCell>תאריך הצטרפות</TableCell>
-              <TableCell>פעולות</TableCell>
+              <TableCell>{t('users.fullName')}</TableCell>
+              <TableCell>{t('users.email')}</TableCell>
+              <TableCell>{t('users.phone')}</TableCell>
+              <TableCell>{t('users.role')}</TableCell>
+              <TableCell>{t('users.status')}</TableCell>
+              <TableCell>{t('users.joinDate')}</TableCell>
+              <TableCell>{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -173,7 +177,7 @@ const UsersPage: React.FC = () => {
             ) : (usersData as any)?.users?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
-                  לא נמצאו משתמשים
+                  {t('users.noUsers')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -227,7 +231,10 @@ const UsersPage: React.FC = () => {
       {(usersData as any)?.total && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <Typography variant="body2">
-            מציג {(usersData as any).users?.length || 0} מתוך {(usersData as any).total} משתמשים
+            {t('users.pagination', { 
+              showing: (usersData as any).users?.length || 0, 
+              total: (usersData as any).total 
+            })}
           </Typography>
         </Box>
       )}

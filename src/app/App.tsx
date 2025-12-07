@@ -1,12 +1,10 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import theme from './theme';
 import { AuthProvider } from '../features/auth/AuthContext';
 import { ConnectionStatus } from '../components/ConnectionStatus';
+import RTLThemeProvider from '../components/RTLThemeProvider';
 import AppRoutes from './routes';
 
 const queryClient = new QueryClient({
@@ -21,8 +19,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+      <RTLThemeProvider>
         <ConnectionStatus>
           <AuthProvider>
             <BrowserRouter>
@@ -30,7 +27,7 @@ function App() {
             </BrowserRouter>
           </AuthProvider>
         </ConnectionStatus>
-      </ThemeProvider>
+      </RTLThemeProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

@@ -1,0 +1,252 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "search": "Search",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "actions": "Actions",
+    "filter": "Filter",
+    "refresh": "Refresh",
+    "export": "Export",
+    "import": "Import",
+    "all": "All",
+    "none": "None",
+    "page": "Page",
+    "of": "of",
+    "clickHere": "Click here",
+    "total": "Total",
+    "showing": "Showing",
+    "entries": "entries",
+    "noData": "No data found",
+    "serverError": "Server connection error"
+  },
+  "connection": {
+    "waitingForServer": "Waiting for response from http://localhost:3001",
+    "connectionError": "❌ Server connection error",
+    "retryInfo": "Client will retry connection every 30 seconds",
+    "troubleshooting": "📋 Possible solutions:",
+    "solutions": {
+      "checkServer": "Ensure server is running on port 3001",
+      "runCommand": "Run the command:",
+      "commandText": "./run-dev.sh",
+      "checkEnv": "Check that .env file on server contains correct settings",
+      "checkFirewall": "Ensure no firewall is blocking the port"
+    }
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "users": "Users Management",
+    "products": "Products Management",
+    "loans": "Loans Management",
+    "volunteers": "Volunteers Management",
+    "audit": "Audit & Logs",
+    "logout": "Logout"
+  },
+  "descriptions": {
+    "dashboard": "Main screen and statistics",
+    "users": "System users management",
+    "products": "Products and instances management",
+    "loans": "Loans and returns management",
+    "volunteers": "Volunteers and activities management",
+    "audit": "Logs and system audit"
+  },
+  "auth": {
+    "welcomeTitle": "Welcome to Lev Hedva",
+    "welcomeSubtitle": "Please log in to your account to continue",
+    "email": "Email Address",
+    "password": "Password",
+    "login": "Login",
+    "logout": "Logout",
+    "loginError": "Login error:",
+    "logoutError": "Logout error:",
+    "pleaseLogin": "Please log in to the system",
+    "defaultCredentials": {
+      "email": "Email: admin@levhedva.org",
+      "password": "Password: Admin123!"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "dataError": "Error loading data",
+    "serverUrl": "Server: http://localhost:3001",
+    "debug": "Debug:",
+    "users": "Users",
+    "products": "Products",
+    "activeLoans": "Active Loans",
+    "overdue": "Overdue",
+    "debugInfo": "Users: {{userCount}}, Products: {{productCount}}, Loans: {{activeLoans}}"
+  },
+  "sidebar": {
+    "systemTitle": "Lev Hedva System",
+    "welcomeUser": "Welcome, {{firstName}} {{lastName}}",
+    "userRole": "Role: {{role}}",
+    "roleAdmin": "Admin",
+    "roleUser": "User"
+  },
+  "header": {
+    "systemTitle": "Lev Hedva Management System",
+    "notifications": "Notifications"
+  },
+  "loans": {
+    "title": "Loans Management",
+    "newLoan": "New Loan",
+    "borrower": "Borrower",
+    "product": "Product",
+    "loanDate": "Loan Date",
+    "returnDate": "Return Date",
+    "dueDate": "Due Date",
+    "status": {
+      "active": "Active",
+      "overdue": "Overdue",
+      "returned": "Returned",
+      "pending": "Pending",
+      "lost": "Lost"
+    },
+    "stats": {
+      "activeLoans": "Active Loans",
+      "overdue": "Overdue",
+      "returned": "Returned",
+      "lost": "Lost"
+    },
+    "filter": {
+      "status": "Status",
+      "allStatuses": "All Statuses"
+    },
+    "noLoans": "No loans found",
+    "loadError": "Error loading loans data:",
+    "pagination": "Showing {{showing}} of {{total}} loans"
+  },
+  "products": {
+    "title": "Products Management",
+    "addProduct": "Add Product",
+    "productName": "Product Name",
+    "category": "Category",
+    "manufacturer": "Manufacturer",
+    "instances": "Instances",
+    "availability": "Availability",
+    "available": "Available Now",
+    "borrowed": "Borrowed",
+    "categories": {
+      "all": "All Categories",
+      "mobility": "Mobility",
+      "medical_furniture": "Medical Furniture",
+      "hearing_aids": "Hearing Aids",
+      "vision_aids": "Vision Aids",
+      "bathing_aids": "Bathing Aids",
+      "other": "Other"
+    },
+    "stats": {
+      "totalProducts": "Total Products",
+      "productInstances": "Product Instances"
+    },
+    "filter": {
+      "category": "Category"
+    },
+    "noProducts": "No products found",
+    "loadError": "Error loading products data:",
+    "pagination": "Page {{page}} of {{totalPages}} | Total {{total}} products",
+    "debug": "Loading: {{loading}} | Error: {{error}} | Products: {{count}} | Instances: {{instances}}"
+  },
+  "users": {
+    "title": "Users Management",
+    "addUser": "Add User",
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "status": "Status",
+    "joinDate": "Join Date",
+    "roles": {
+      "all": "All Roles",
+      "admin": "System Administrator",
+      "manager": "Manager",
+      "volunteer": "Volunteer",
+      "user": "User"
+    },
+    "filter": {
+      "role": "Role"
+    },
+    "noUsers": "No users found",
+    "loadError": "Error loading users data:",
+    "pagination": "Showing {{showing}} of {{total}} users",
+    "debug": "Loading: {{loading}} | Error: {{error}} | Data: {{data}}"
+  },
+  "volunteers": {
+    "title": "Volunteers Management",
+    "addActivity": "Add Activity",
+    "volunteer": "Volunteer",
+    "activityType": "Activity Type",
+    "description": "Description",
+    "date": "Date",
+    "hours": "Hours",
+    "activities": {
+      "all": "All Activities",
+      "delivery": "Delivery",
+      "home_visit": "Home Visit",
+      "phone_call": "Phone Call",
+      "maintenance": "Maintenance",
+      "other": "Other"
+    },
+    "stats": {
+      "activeVolunteers": "Active Volunteers",
+      "yearActivities": "Year Activities",
+      "volunteerHours": "Volunteer Hours",
+      "goldVolunteers": "Gold Volunteers"
+    },
+    "filter": {
+      "activityType": "Activity Type"
+    },
+    "noActivities": "No volunteer activities found",
+    "loadError": "Error loading volunteers data:",
+    "pagination": "Page {{page}} of {{totalPages}} | Total {{total}} activities"
+  },
+  "audit": {
+    "title": "Audit Log",
+    "time": "Time",
+    "user": "User",
+    "action": "Action",
+    "entity": "Entity",
+    "description": "Description", 
+    "ipAddress": "IP Address",
+    "stats": {
+      "totalActions": "Total Actions",
+      "todayActions": "Today's Actions",
+      "activeUsers": "Active Users",
+      "actionTypes": "Action Types"
+    },
+    "actions": {
+      "all": "All Actions",
+      "login": "Login",
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "permissions": "Permissions"
+    },
+    "filter": {
+      "actionType": "Action Type"
+    },
+    "noAuditRecords": "No audit records found",
+    "loadError": "Error loading audit data:",
+    "pagination": "Page {{page}} of {{totalPages}} | Total {{total}} records"
+  },
+  "table": {
+    "actions": "Actions",
+    "noData": "No data to display",
+    "loading": "Loading data..."
+  }
+}

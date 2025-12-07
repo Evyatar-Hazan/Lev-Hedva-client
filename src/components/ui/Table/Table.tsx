@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Table as MuiTable,
   TableBody,
@@ -77,7 +78,7 @@ function Table<T = any>({
   columns,
   data,
   loading = false,
-  emptyMessage = 'אין נתונים להצגה',
+  emptyMessage,
   pagination = false,
   page = 0,
   rowsPerPage = 10,
@@ -94,6 +95,8 @@ function Table<T = any>({
   sortOrder = 'asc',
   onSortChange,
 }: TableProps<T>) {
+  const { t } = useTranslation();
+  const defaultEmptyMessage = emptyMessage || t('table.noData');
   const visibleColumns = columns.filter(col => !col.hidden);
 
   const handleSelectAll = (checked: boolean) => {
@@ -175,7 +178,7 @@ function Table<T = any>({
               ))}
               {renderActions && (
                 <TableCell align="center" style={{ width: 48 }}>
-                  פעולות
+                  {t('common.actions')}
                 </TableCell>
               )}
             </TableRow>
@@ -200,7 +203,7 @@ function Table<T = any>({
                 >
                   <Box p={2}>
                     <Typography variant="body2" color="text.secondary">
-                      {emptyMessage}
+                      {defaultEmptyMessage}
                     </Typography>
                   </Box>
                 </TableCell>

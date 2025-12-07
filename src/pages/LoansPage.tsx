@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -36,6 +37,7 @@ import { useLoans, useLoanStats, useReturnLoan } from '../hooks';
 import { format } from 'date-fns';
 
 const LoansPage: React.FC = () => {
+  // const { t } = useTranslation(); // Removed duplicate declaration
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -77,12 +79,14 @@ const LoansPage: React.FC = () => {
     }
   };
 
+  const { t } = useTranslation();
+  
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'active': return 'פעיל';
-      case 'overdue': return 'איחור';
-      case 'returned': return 'הוחזר';
-      case 'pending': return 'ממתין';
+      case 'active': return t('loans.status.active');
+      case 'overdue': return t('loans.status.overdue');
+      case 'returned': return t('loans.status.returned');
+      case 'pending': return 'ממתין'; // Add to translations if needed
       default: return status;
     }
   };
@@ -91,7 +95,7 @@ const LoansPage: React.FC = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">
-          שגיאה בטעינת נתוני ההשאלות: {error.message}
+          {t('loans.loadError')} {error.message}
         </Alert>
       </Box>
     );
@@ -101,14 +105,14 @@ const LoansPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1" fontWeight="bold">
-          ניהול השאלות
+          {t('loans.title')}
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           size="large"
         >
-          השאלה חדשה
+          {t('loans.newLoan')}
         </Button>
       </Box>
 
@@ -122,7 +126,7 @@ const LoansPage: React.FC = () => {
                 {loanStats?.active || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                השאלות פעילות
+                {t('loans.stats.activeLoans')}
               </Typography>
             </CardContent>
           </Card>
@@ -135,7 +139,7 @@ const LoansPage: React.FC = () => {
                 {loanStats?.overdue || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                איחורים
+                {t('loans.stats.overdue')}
               </Typography>
             </CardContent>
           </Card>
@@ -148,7 +152,7 @@ const LoansPage: React.FC = () => {
                 {loanStats?.returned || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                הוחזרו
+                {t('loans.stats.returned')}
               </Typography>
             </CardContent>
           </Card>
@@ -161,7 +165,7 @@ const LoansPage: React.FC = () => {
                 {loanStats?.lost || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                אבדו
+                {t('loans.stats.lost')}
               </Typography>
             </CardContent>
           </Card>
@@ -185,16 +189,16 @@ const LoansPage: React.FC = () => {
           sx={{ maxWidth: 400 }}
         />
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>סטטוס</InputLabel>
+          <InputLabel>{t('loans.filter.status')}</InputLabel>
           <Select
             value={statusFilter}
             onChange={handleStatusFilterChange}
-            label="סטטוס"
+            label={t('loans.filter.status')}
           >
-            <MenuItem value="all">כל הסטטוסים</MenuItem>
-            <MenuItem value="active">פעיל</MenuItem>
-            <MenuItem value="overdue">איחור</MenuItem>
-            <MenuItem value="returned">הוחזר</MenuItem>
+            <MenuItem value="all">{t('loans.filter.allStatuses')}</MenuItem>
+            <MenuItem value="active">{t('loans.status.active')}</MenuItem>
+            <MenuItem value="overdue">{t('loans.status.overdue')}</MenuItem>
+            <MenuItem value="returned">{t('loans.status.returned')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -204,12 +208,12 @@ const LoansPage: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>שואל</TableCell>
-              <TableCell>מוצר</TableCell>
-              <TableCell>תאריך השאלה</TableCell>
-              <TableCell>תאריך החזרה</TableCell>
-              <TableCell>סטטוס</TableCell>
-              <TableCell>פעולות</TableCell>
+              <TableCell>{t('loans.borrower')}</TableCell>
+              <TableCell>{t('loans.product')}</TableCell>
+              <TableCell>{t('loans.loanDate')}</TableCell>
+              <TableCell>{t('loans.returnDate')}</TableCell>
+              <TableCell>{t('common.status')}</TableCell>
+              <TableCell>{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -222,7 +226,7 @@ const LoansPage: React.FC = () => {
             ) : loansData?.data?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
-                  לא נמצאו השאלות
+                  {t('loans.noLoans')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -274,7 +278,10 @@ const LoansPage: React.FC = () => {
       {loansData?.pagination && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <Typography variant="body2">
-            מציג {loansData.data.length} מתוך {loansData.pagination.total} השאלות
+            {t('loans.pagination', { 
+              showing: loansData.data.length, 
+              total: loansData.pagination.total 
+            })}
           </Typography>
         </Box>
       )}

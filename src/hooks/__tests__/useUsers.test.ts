@@ -371,6 +371,8 @@ describe('👥 useUsers Hook Tests', () => {
       // Wait for both to complete
       await waitFor(() => {
         expect(result1.current.isLoading).toBe(false);
+      });
+      await waitFor(() => {
         expect(result2.current.isLoading).toBe(false);
       });
 

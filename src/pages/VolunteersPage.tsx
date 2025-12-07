@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -40,6 +41,7 @@ import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 
 const VolunteersPage: React.FC = () => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -86,7 +88,7 @@ const VolunteersPage: React.FC = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">
-          שגיאה בטעינת נתוני המתנדבים: {error.message}
+          {t('volunteers.loadError')} {error.message}
         </Alert>
       </Box>
     );
@@ -117,14 +119,14 @@ const VolunteersPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1" fontWeight="bold">
-          ניהול מתנדבים
+          {t('volunteers.title')}
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           size="large"
         >
-          הוספת פעילות
+          {t('volunteers.addActivity')}
         </Button>
       </Box>
 
@@ -138,7 +140,7 @@ const VolunteersPage: React.FC = () => {
                 {volunteerStatsArray.length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                מתנדבים פעילים
+                {t('volunteers.stats.activeVolunteers')}
               </Typography>
             </CardContent>
           </Card>
@@ -151,7 +153,7 @@ const VolunteersPage: React.FC = () => {
                 {activitiesData?.pagination?.total || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                פעילויות השנה
+                {t('volunteers.stats.yearActivities')}
               </Typography>
             </CardContent>
           </Card>
@@ -164,7 +166,7 @@ const VolunteersPage: React.FC = () => {
                 {volunteerStatsArray.reduce((sum, v) => sum + v.totalHours, 0)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                שעות התנדבות
+                {t('volunteers.stats.volunteerHours')}
               </Typography>
             </CardContent>
           </Card>
@@ -177,7 +179,7 @@ const VolunteersPage: React.FC = () => {
                 {volunteerStatsArray.filter(v => v.totalHours > 100).length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                מתנדבי זהב
+                {t('volunteers.stats.goldVolunteers')}
               </Typography>
             </CardContent>
           </Card>
@@ -200,18 +202,18 @@ const VolunteersPage: React.FC = () => {
           sx={{ minWidth: 300 }}
         />
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>סוג פעילות</InputLabel>
+          <InputLabel>{t('volunteers.filter.activityType')}</InputLabel>
           <Select
             value={statusFilter}
-            label="סוג פעילות"
+            label={t('volunteers.filter.activityType')}
             onChange={handleStatusFilterChange}
           >
-            <MenuItem value="all">כל הפעילויות</MenuItem>
-            <MenuItem value="delivery">משלוח</MenuItem>
-            <MenuItem value="home_visit">ביקור בית</MenuItem>
-            <MenuItem value="phone_call">שיחה טלפונית</MenuItem>
-            <MenuItem value="maintenance">תחזוקה</MenuItem>
-            <MenuItem value="other">אחר</MenuItem>
+            <MenuItem value="all">{t('volunteers.activities.all')}</MenuItem>
+            <MenuItem value="delivery">{t('volunteers.activities.delivery')}</MenuItem>
+            <MenuItem value="home_visit">{t('volunteers.activities.home_visit')}</MenuItem>
+            <MenuItem value="phone_call">{t('volunteers.activities.phone_call')}</MenuItem>
+            <MenuItem value="maintenance">{t('volunteers.activities.maintenance')}</MenuItem>
+            <MenuItem value="other">{t('volunteers.activities.other')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -221,12 +223,12 @@ const VolunteersPage: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>מתנדב</TableCell>
-              <TableCell>סוג פעילות</TableCell>
-              <TableCell>תיאור</TableCell>
-              <TableCell>תאריך</TableCell>
-              <TableCell align="center">שעות</TableCell>
-              <TableCell align="center">פעולות</TableCell>
+              <TableCell>{t('volunteers.volunteer')}</TableCell>
+              <TableCell>{t('volunteers.activityType')}</TableCell>
+              <TableCell>{t('volunteers.description')}</TableCell>
+              <TableCell>{t('volunteers.date')}</TableCell>
+              <TableCell align="center">{t('volunteers.hours')}</TableCell>
+              <TableCell align="center">{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -242,7 +244,7 @@ const VolunteersPage: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={6} align="center">
                   <Typography variant="body2" color="text.secondary">
-                    לא נמצאו פעילויות התנדבות
+                    {t('volunteers.noActivities')}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -305,8 +307,11 @@ const VolunteersPage: React.FC = () => {
       {activitiesData?.pagination && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            עמוד {activitiesData.pagination.page} מתוך {Math.ceil(activitiesData.pagination.total / activitiesData.pagination.limit)} |
-            סה"כ {activitiesData.pagination.total} פעילויות
+            {t('volunteers.pagination', { 
+              page: activitiesData.pagination.page, 
+              totalPages: Math.ceil(activitiesData.pagination.total / activitiesData.pagination.limit),
+              total: activitiesData.pagination.total 
+            })}
           </Typography>
         </Box>
       )}

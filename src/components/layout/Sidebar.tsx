@@ -22,6 +22,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks';
+import { useTranslation } from 'react-i18next';
 
 const drawerWidth = 280;
 
@@ -37,49 +38,50 @@ interface MenuItem {
   description: string;
 }
 
-const menuItems: MenuItem[] = [
-  {
-    label: 'דשבורד',
-    icon: <Dashboard />,
-    path: '/dashboard',
-    description: 'מסך ראשי וסטטיסטיקות',
-  },
-  {
-    label: 'ניהול משתמשים',
-    icon: <People />,
-    path: '/users',
-    description: 'ניהול משתמשי המערכת',
-  },
-  {
-    label: 'ניהול מוצרים',
-    icon: <Inventory />,
-    path: '/products',
-    description: 'ניהול מוצרים ומופעים',
-  },
-  {
-    label: 'ניהול השאלות',
-    icon: <Assignment />,
-    path: '/loans',
-    description: 'ניהול השאלות והחזרות',
-  },
-  {
-    label: 'ניהול מתנדבים',
-    icon: <VolunteerActivism />,
-    path: '/volunteers',
-    description: 'ניהול מתנדבים ופעילויות',
-  },
-  {
-    label: 'ביקורת ולוגים',
-    icon: <Assessment />,
-    path: '/audit',
-    description: 'לוגים וביקורת מערכת',
-  },
-];
-
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
+
+  const menuItems: MenuItem[] = [
+    {
+      label: t('navigation.dashboard'),
+      icon: <Dashboard />,
+      path: '/dashboard',
+      description: t('descriptions.dashboard'),
+    },
+    {
+      label: t('navigation.users'),
+      icon: <People />,
+      path: '/users',
+      description: t('descriptions.users'),
+    },
+    {
+      label: t('navigation.products'),
+      icon: <Inventory />,
+      path: '/products',
+      description: t('descriptions.products'),
+    },
+    {
+      label: t('navigation.loans'),
+      icon: <Assignment />,
+      path: '/loans',
+      description: t('descriptions.loans'),
+    },
+    {
+      label: t('navigation.volunteers'),
+      icon: <VolunteerActivism />,
+      path: '/volunteers',
+      description: t('descriptions.volunteers'),
+    },
+    {
+      label: t('navigation.audit'),
+      icon: <Assessment />,
+      path: '/audit',
+      description: t('descriptions.audit'),
+    },
+  ];
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -91,7 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       await logout();
       onClose();
     } catch (error) {
-      console.error('שגיאת יציאה:', error);
+      console.error(t('auth.logoutError'), error);
     }
   };
 
@@ -100,10 +102,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       <Toolbar sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           <Typography variant="h6" noWrap component="div">
-            מערכת לב חדוה
+            {t('sidebar.systemTitle')}
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.8 }}>
-            ברוך הבא, {user?.firstName} {user?.lastName}
+            {t('sidebar.welcomeUser', { firstName: user?.firstName, lastName: user?.lastName })}
           </Typography>
         </Box>
       </Toolbar>
@@ -160,8 +162,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               <Logout />
             </ListItemIcon>
             <ListItemText
-              primary="יציאה מהמערכת"
-              secondary={`תפקיד: ${user?.role === 'ADMIN' ? 'מנהל' : 'משתמש'}`}
+              primary={t('navigation.logout')}
+              secondary={t('sidebar.userRole', { 
+                role: user?.role === 'ADMIN' ? t('sidebar.roleAdmin') : t('sidebar.roleUser')
+              })}
             />
           </ListItemButton>
         </ListItem>

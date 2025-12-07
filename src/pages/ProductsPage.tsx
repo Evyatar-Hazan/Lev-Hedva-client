@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -33,9 +34,9 @@ import {
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import { useProducts, useProductInstances } from '../hooks';
-import { format } from 'date-fns';
 
 const ProductsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -85,7 +86,7 @@ const ProductsPage: React.FC = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">
-          שגיאה בטעינת נתוני המוצרים: {error.message}
+          {t('products.loadError')} {error.message}
         </Alert>
       </Box>
     );
@@ -108,24 +109,26 @@ const ProductsPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1" fontWeight="bold">
-          ניהול מוצרים
+          {t('products.title')}
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           size="large"
         >
-          הוספת מוצר
+          {t('products.addProduct')}
         </Button>
       </Box>
 
       {/* Debug Panel */}
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Debug:</strong> טוען: {isLoading ? 'כן' : 'לא'} | 
-          שגיאה: {error ? (error as any).message || 'יש שגיאה' : 'אין'} | 
-          מוצרים: {products.length} | 
-          מופעי מוצרים: {productInstances?.length || 0}
+          {t('products.debug', { 
+            loading: isLoading, 
+            error: error ? (error as any).message || t('common.error') : t('common.no'), 
+            count: products.length, 
+            instances: productInstances?.length || 0 
+          })}
         </Typography>
       </Alert>
 
@@ -139,7 +142,7 @@ const ProductsPage: React.FC = () => {
                 {(productsData as any)?.total || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                סה"כ מוצרים
+                {t('products.stats.totalProducts')}
               </Typography>
             </CardContent>
           </Card>
@@ -152,7 +155,7 @@ const ProductsPage: React.FC = () => {
                 {productInstances?.length || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                מופעי מוצרים
+                {t('products.stats.productInstances')}
               </Typography>
             </CardContent>
           </Card>
@@ -165,7 +168,7 @@ const ProductsPage: React.FC = () => {
                 {productInstances?.filter(i => i.isAvailable).length || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                זמינים כעת
+                {t('products.available')}
               </Typography>
             </CardContent>
           </Card>
@@ -178,7 +181,7 @@ const ProductsPage: React.FC = () => {
                 {productInstances?.filter(i => !i.isAvailable).length || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                מושאלים
+                {t('products.borrowed')}
               </Typography>
             </CardContent>
           </Card>
@@ -201,19 +204,19 @@ const ProductsPage: React.FC = () => {
           sx={{ minWidth: 300 }}
         />
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>קטגוריה</InputLabel>
+          <InputLabel>{t('products.filter.category')}</InputLabel>
           <Select
             value={categoryFilter}
             label="קטגוריה"
             onChange={handleCategoryFilterChange}
           >
-            <MenuItem value="all">כל הקטגוריות</MenuItem>
-            <MenuItem value="ניידות">ניידות</MenuItem>
-            <MenuItem value="ריהוט רפואי">ריהוט רפואי</MenuItem>
-            <MenuItem value="עזרי שמיעה">עזרי שמיעה</MenuItem>
-            <MenuItem value="עזרי ראייה">עזרי ראייה</MenuItem>
-            <MenuItem value="עזרי רחצה">עזרי רחצה</MenuItem>
-            <MenuItem value="אחר">אחר</MenuItem>
+            <MenuItem value="all">{t('products.categories.all')}</MenuItem>
+            <MenuItem value="ניידות">{t('products.categories.mobility')}</MenuItem>
+            <MenuItem value="ריהוט רפואי">{t('products.categories.medical_furniture')}</MenuItem>
+            <MenuItem value="עזרי שמיעה">{t('products.categories.hearing_aids')}</MenuItem>
+            <MenuItem value="עזרי ראייה">{t('products.categories.vision_aids')}</MenuItem>
+            <MenuItem value="עזרי רחצה">{t('products.categories.bathing_aids')}</MenuItem>
+            <MenuItem value="אחר">{t('products.categories.other')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -223,13 +226,13 @@ const ProductsPage: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>שם המוצר</TableCell>
-              <TableCell>קטגוריה</TableCell>
-              <TableCell>יצרן</TableCell>
-              <TableCell align="center">מופעים</TableCell>
-              <TableCell align="center">זמינות</TableCell>
-              <TableCell align="center">סטטוס</TableCell>
-              <TableCell align="center">פעולות</TableCell>
+              <TableCell>{t('products.productName')}</TableCell>
+              <TableCell>{t('products.category')}</TableCell>
+              <TableCell>{t('products.manufacturer')}</TableCell>
+              <TableCell align="center">{t('products.instances')}</TableCell>
+              <TableCell align="center">{t('products.availability')}</TableCell>
+              <TableCell align="center">{t('common.status')}</TableCell>
+              <TableCell align="center">{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -245,7 +248,7 @@ const ProductsPage: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={7} align="center">
                   <Typography variant="body2" color="text.secondary">
-                    לא נמצאו מוצרים
+                    {t('products.noProducts')}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -312,8 +315,11 @@ const ProductsPage: React.FC = () => {
       {productsData?.pagination && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            עמוד {productsData.pagination.page} מתוך {Math.ceil(productsData.pagination.total / productsData.pagination.limit)} |
-            סה"כ {productsData.pagination.total} מוצרים
+            {t('products.pagination', { 
+              page: productsData.pagination.page, 
+              totalPages: Math.ceil(productsData.pagination.total / productsData.pagination.limit),
+              total: productsData.pagination.total 
+            })}
           </Typography>
         </Box>
       )}

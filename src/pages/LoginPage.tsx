@@ -8,18 +8,20 @@ import {
 } from '@mui/material';
 import { Button, Input } from '../components/ui';
 import { useAuth } from '../features/auth/hooks';
+import { useTranslation } from 'react-i18next';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, isLoading, error } = useAuth();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await login(email, password);
     } catch (error) {
-      console.error('שגיאת התחברות:', error);
+      console.error(t('auth.loginError'), error);
     }
   };
 
@@ -28,10 +30,10 @@ function LoginPage() {
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Box textAlign="center" mb={3}>
           <Typography variant="h4" component="h1" gutterBottom>
-            ברוכים הבאים ללב חדוה
+            {t('auth.welcomeTitle')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            היכנסו לחשבון שלכם כדי להמשיך
+            {t('auth.welcomeSubtitle')}
           </Typography>
         </Box>
 
@@ -44,7 +46,7 @@ function LoginPage() {
         <Box component="form" onSubmit={handleSubmit}>
           <Input
             fullWidth
-            label="כתובת אימייל"
+            label={t('auth.email')}
             type="email"
             value={email}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
@@ -56,7 +58,7 @@ function LoginPage() {
           
           <Input
             fullWidth
-            label="סיסמה"
+            label={t('auth.password')}
             type="password"
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
@@ -74,7 +76,7 @@ function LoginPage() {
             loading={isLoading}
             sx={{ mt: 3, mb: 2 }}
           >
-            היכנס
+            {t('auth.login')}
           </Button>
         </Box>
       </Paper>

@@ -1,8 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AuditClient } from '../api/clients/audit.client';
 import { 
-  AuditLog, 
-  AuditLogResponseDto,
   CreateAuditLogDto,
   AuditLogsQueryDto 
 } from '../lib/types';

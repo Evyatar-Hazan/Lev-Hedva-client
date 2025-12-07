@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LoansClient } from '../api/clients/loans.client';
 import { 
-  Loan, 
   CreateLoanDto, 
   UpdateLoanDto, 
   LoansQueryDto

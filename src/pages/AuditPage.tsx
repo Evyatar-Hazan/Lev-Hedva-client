@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -37,6 +38,7 @@ import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 
 const AuditPage: React.FC = () => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -97,7 +99,7 @@ const AuditPage: React.FC = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">
-          שגיאה בטעינת נתוני הביקורת: {error.message}
+          {t('audit.loadError')} {error.message}
         </Alert>
       </Box>
     );
@@ -123,7 +125,7 @@ const AuditPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1" fontWeight="bold">
-          יומן ביקורת
+          {t('audit.title')}
         </Typography>
         <IconButton title="ייצוא נתונים">
           <GetAppIcon />
@@ -140,7 +142,7 @@ const AuditPage: React.FC = () => {
                 {auditData?.pagination?.total || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                פעולות כלל
+                {t('audit.stats.totalActions')}
               </Typography>
             </CardContent>
           </Card>
@@ -153,7 +155,7 @@ const AuditPage: React.FC = () => {
                 {entitiesToday.length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                פעולות היום
+                {t('audit.stats.todayActions')}
               </Typography>
             </CardContent>
           </Card>
@@ -166,7 +168,7 @@ const AuditPage: React.FC = () => {
                 {usersCount.size}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                משתמשים פעילים
+                {t('audit.stats.activeUsers')}
               </Typography>
             </CardContent>
           </Card>
@@ -179,7 +181,7 @@ const AuditPage: React.FC = () => {
                 {actionsCount.size}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                סוגי פעולות
+                {t('audit.stats.actionTypes')}
               </Typography>
             </CardContent>
           </Card>
@@ -202,18 +204,18 @@ const AuditPage: React.FC = () => {
           sx={{ minWidth: 300 }}
         />
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>סוג פעולה</InputLabel>
+          <InputLabel>{t('audit.filter.actionType')}</InputLabel>
           <Select
             value={actionFilter}
             label="סוג פעולה"
             onChange={handleActionFilterChange}
           >
-            <MenuItem value="all">כל הפעולות</MenuItem>
-            <MenuItem value="login">התחברות</MenuItem>
-            <MenuItem value="create">יצירה</MenuItem>
-            <MenuItem value="update">עדכון</MenuItem>
-            <MenuItem value="delete">מחיקה</MenuItem>
-            <MenuItem value="permission">הרשאות</MenuItem>
+            <MenuItem value="all">{t('audit.actions.all')}</MenuItem>
+            <MenuItem value="login">{t('audit.actions.login')}</MenuItem>
+            <MenuItem value="create">{t('audit.actions.create')}</MenuItem>
+            <MenuItem value="update">{t('audit.actions.update')}</MenuItem>
+            <MenuItem value="delete">{t('audit.actions.delete')}</MenuItem>
+            <MenuItem value="permission">{t('audit.actions.permissions')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -223,13 +225,13 @@ const AuditPage: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>זמן</TableCell>
-              <TableCell>משתמש</TableCell>
-              <TableCell>פעולה</TableCell>
-              <TableCell>ישות</TableCell>
-              <TableCell>תיאור</TableCell>
-              <TableCell>כתובת IP</TableCell>
-              <TableCell align="center">פעולות</TableCell>
+              <TableCell>{t('audit.time')}</TableCell>
+              <TableCell>{t('audit.user')}</TableCell>
+              <TableCell>{t('audit.action')}</TableCell>
+              <TableCell>{t('audit.entity')}</TableCell>
+              <TableCell>{t('audit.description')}</TableCell>
+              <TableCell>{t('audit.ipAddress')}</TableCell>
+              <TableCell align="center">{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -245,7 +247,7 @@ const AuditPage: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={7} align="center">
                   <Typography variant="body2" color="text.secondary">
-                    לא נמצאו רשומות ביקורת
+                    {t('audit.noAuditRecords')}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -312,8 +314,11 @@ const AuditPage: React.FC = () => {
       {auditData?.pagination && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            עמוד {auditData.pagination.page} מתוך {Math.ceil(auditData.pagination.total / auditData.pagination.limit)} |
-            סה"כ {auditData.pagination.total} רשומות
+            {t('audit.pagination', { 
+              page: auditData.pagination.page, 
+              totalPages: Math.ceil(auditData.pagination.total / auditData.pagination.limit),
+              total: auditData.pagination.total 
+            })}
           </Typography>
         </Box>
       )}

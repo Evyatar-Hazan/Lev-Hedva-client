@@ -13,6 +13,8 @@ import {
   Notifications,
 } from '@mui/icons-material';
 import { useAuth } from '../../features/auth/hooks';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from '../LanguageSelector';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -20,6 +22,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <AppBar 
@@ -41,11 +44,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </IconButton>
 
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          מערכת ניהול לב חדוה
+          {t('header.systemTitle')}
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Tooltip title="התראות">
+          <LanguageSelector />
+          
+          <Tooltip title={t('header.notifications')}>
             <IconButton color="inherit">
               <Notifications />
             </IconButton>

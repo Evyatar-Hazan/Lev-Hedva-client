@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Box, CircularProgress, Typography } from '@mui/material';
 import { apiClient } from '../api/axios';
+import { useTranslation } from 'react-i18next';
 
 interface ConnectionStatusProps {
   children: React.ReactNode;
@@ -9,6 +10,7 @@ interface ConnectionStatusProps {
 export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) => {
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'error'>('checking');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { t } = useTranslation();
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -67,7 +69,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
           🔍 בודק חיבור לשרת...
         </Typography>
         <Typography variant="body2" sx={{ mt: 1, color: '#999' }}>
-          ממתין לתגובה מ-http://localhost:3001
+          {t('connection.waitingForServer')}
         </Typography>
       </Box>
     );
@@ -86,7 +88,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
       >
         <Alert severity="error" sx={{ mb: 2, maxWidth: 600 }}>
           <Typography variant="h6" gutterBottom>
-            ❌ שגיאה בחיבור לשרת
+            {t('connection.connectionError')}
           </Typography>
           <Typography variant="body2" gutterBottom>
             {errorMessage}
@@ -94,18 +96,18 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
         </Alert>
         
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          הקליינט ינסה להתחבר מחדש כל 30 שניות
+          {t('connection.retryInfo')}
         </Typography>
         
         <Box sx={{ textAlign: 'left', maxWidth: 600 }}>
           <Typography variant="subtitle2" gutterBottom>
-            📋 פתרונות אפשריים:
+            {t('connection.troubleshooting')}
           </Typography>
           <Typography variant="body2" component="ul" sx={{ pl: 2 }}>
-            <li>ודא שהשרת רץ על פורט 3001</li>
-            <li>הרץ את הפקודה: <code>./run-dev.sh</code></li>
-            <li>בדוק שקובץ .env בשרת מכיל את ההגדרות הנכונות</li>
-            <li>ודא שאין חומת אש חוסמת את הפורט</li>
+            <li>{t('connection.solutions.checkServer')}</li>
+            <li>{t('connection.solutions.runCommand')} <code>{t('connection.solutions.commandText')}</code></li>
+            <li>{t('connection.solutions.checkEnv')}</li>
+            <li>{t('connection.solutions.checkFirewall')}</li>
           </Typography>
         </Box>
       </Box>
