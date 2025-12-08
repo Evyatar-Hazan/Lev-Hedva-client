@@ -55,12 +55,22 @@ export class ProductsClient {
 
   // Product Instances CRUD
   static async getProductInstances(productId?: string): Promise<ProductInstance[]> {
-    const path = productId 
-      ? `${this.BASE_PATH}/${productId}/instances`
-      : `${this.BASE_PATH}/instances`;
+    const params = new URLSearchParams();
+    if (productId) {
+      params.append('productId', productId);
+    }
     
-    const response = await apiClient.get<ProductInstance[]>(path);
-    return response.data;
+    const path = `${this.BASE_PATH}/instances${params.toString() ? `?${params.toString()}` : ''}`;
+    const response = await apiClient.get<{ instances: ProductInstance[] }>(path);
+    
+    // Handle different response formats
+    if (Array.isArray(response.data)) {
+      return response.data;
+    } else if (response.data.instances) {
+      return response.data.instances;
+    } else {
+      return [];
+    }
   }
 
   static async getProductInstanceById(id: string): Promise<ProductInstance> {
