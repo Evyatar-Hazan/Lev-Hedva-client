@@ -27,6 +27,10 @@ import {
   CardActions,
   useMediaQuery,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -35,8 +39,10 @@ import {
   Inventory as InventoryIcon,
   QrCode as QrCodeIcon,
   Visibility as VisibilityIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
-import { useProducts, useProductInstances } from '../hooks';
+import { useProducts, useProductInstances, useCreateProduct } from '../hooks';
+import { CreateProductDto } from '../lib/types';
 
 const ProductsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -46,12 +52,22 @@ const ProductsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [page, setPage] = useState(1);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newProduct, setNewProduct] = useState<CreateProductDto>({
+    name: '',
+    description: '',
+    category: '',
+    manufacturer: '',
+    model: '',
+  });
   
   // שימוש בהוכים החדשים
   const { data: productsData, isLoading, error } = useProducts({ 
     page,
     limit: 10
   });
+  
+  const createProductMutation = useCreateProduct();
   
   const { data: productInstances } = useProductInstances();
 
@@ -88,6 +104,73 @@ const ProductsPage: React.FC = () => {
     return 'זמין';
   };
 
+  const handleAddProduct = () => {
+    setIsAddDialogOpen(true);
+  };
+
+  const handleCloseAddDialog = () => {
+    setIsAddDialogOpen(false);
+    setNewProduct({
+      name: '',
+      description: '',
+      category: '',
+      manufacturer: '',
+      model: '',
+    });
+  };
+
+  const handleSaveProduct = async () => {
+    console.log('🔄 Starting product save process...');
+    console.log('📋 Current product state:', newProduct);
+    console.log('🚀 Mutation status:', { 
+      isPending: createProductMutation.isPending, 
+      isError: createProductMutation.isError,
+      error: createProductMutation.error 
+    });
+    
+    try {
+      // ניקוי הדאטה - הסרת שדות ריקים
+      const cleanedProduct: CreateProductDto = {
+        name: newProduct.name.trim(),
+        category: newProduct.category.trim(),
+        ...(newProduct.description?.trim() && { description: newProduct.description.trim() }),
+        ...(newProduct.manufacturer?.trim() && { manufacturer: newProduct.manufacturer.trim() }),
+        ...(newProduct.model?.trim() && { model: newProduct.model.trim() }),
+      };
+      
+      console.log('📤 Sending product data:', cleanedProduct);
+      
+      const result = await createProductMutation.mutateAsync(cleanedProduct);
+      console.log('✅ Product created successfully:', result);
+      
+      handleCloseAddDialog();
+    } catch (error) {
+      console.error('❌ Error creating product:', error);
+      
+      // הצגת פרטי השגיאה
+      if (error && typeof error === 'object') {
+        console.error('Error details:', {
+          message: (error as any)?.message,
+          response: (error as any)?.response?.data,
+          status: (error as any)?.response?.status,
+          request: (error as any)?.request
+        });
+      }
+      
+      // לא סוגרים את הדיאלוג במקרה של שגיאה
+      // handleCloseAddDialog();
+    }
+  };
+
+  const handleProductFieldChange = (field: keyof CreateProductDto, value: string) => {
+    console.log('🔄 Product field change:', { field, value });
+    setNewProduct(prev => {
+      const updated = { ...prev, [field]: value };
+      console.log('📦 Updated product:', updated);
+      return updated;
+    });
+  };
+
   if (error) {
     return (
       <Box sx={{ p: 3 }}>
@@ -121,6 +204,7 @@ const ProductsPage: React.FC = () => {
           variant="contained"
           startIcon={<AddIcon />}
           size="large"
+          onClick={handleAddProduct}
         >
           {t('products.addProduct')}
         </Button>
@@ -404,6 +488,100 @@ const ProductsPage: React.FC = () => {
           </Typography>
         </Box>
       )}
+
+      {/* Add Product Dialog */}
+      <Dialog 
+        open={isAddDialogOpen} 
+        onClose={handleCloseAddDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {t('products.addProduct')}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseAddDialog}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Grid container spacing={3} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('products.productName')}
+                value={newProduct.name}
+                onChange={(e) => handleProductFieldChange('name', e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('products.description')}
+                value={newProduct.description}
+                onChange={(e) => handleProductFieldChange('description', e.target.value)}
+                multiline
+                rows={3}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth required>
+                <InputLabel>{t('products.category')}</InputLabel>
+                <Select
+                  value={newProduct.category}
+                  onChange={(e) => handleProductFieldChange('category', e.target.value)}
+                  label={t('products.category')}
+                >
+                  <MenuItem value="ניידות">{t('products.categories.mobility')}</MenuItem>
+                  <MenuItem value="ריהוט רפואי">{t('products.categories.medical_furniture')}</MenuItem>
+                  <MenuItem value="עזרי שמיעה">{t('products.categories.hearing_aids')}</MenuItem>
+                  <MenuItem value="עזרי ראייה">{t('products.categories.vision_aids')}</MenuItem>
+                  <MenuItem value="עזרי רחצה">{t('products.categories.bathing_aids')}</MenuItem>
+                  <MenuItem value="אחר">{t('products.categories.other')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('products.manufacturer')}
+                value={newProduct.manufacturer}
+                onChange={(e) => handleProductFieldChange('manufacturer', e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('products.model')}
+                value={newProduct.model}
+                onChange={(e) => handleProductFieldChange('model', e.target.value)}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseAddDialog}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSaveProduct}
+            variant="contained"
+            disabled={createProductMutation.isPending || !newProduct.name.trim() || !newProduct.category.trim()}
+          >
+            {createProductMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
