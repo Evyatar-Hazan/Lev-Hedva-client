@@ -42,11 +42,11 @@ import {
   Close as CloseIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
-import { useProducts, useProductInstances, useCreateProduct } from '../hooks';
-import { CreateProductDto } from '../lib/types';
+import { useProducts, useProductInstances, useCreateProduct, useUpdateProduct, useUpdateProductInstance, useProductCategories, useProductManufacturers } from '../hooks';
+import { CreateProductDto, UpdateProductDto, UpdateProductInstanceDto } from '../lib/types';
 
 // רכיב פשוט לתצוגת מופעים
-const ProductInstancesView: React.FC<{ product: any; instances: any[] }> = ({ product, instances }) => {
+const ProductInstancesView: React.FC<{ product: any; instances: any[]; onEditInstance: (instance: any) => void }> = ({ product, instances, onEditInstance }) => {
   const { t } = useTranslation();
   
   if (!instances || instances.length === 0) {
@@ -106,7 +106,11 @@ const ProductInstancesView: React.FC<{ product: any; instances: any[] }> = ({ pr
               </CardContent>
               
               <CardActions sx={{ justifyContent: 'flex-end' }}>
-                <Button size="small" startIcon={<EditIcon />}>
+                <Button 
+                  size="small" 
+                  startIcon={<EditIcon />}
+                  onClick={() => onEditInstance(instance)}
+                >
                   {t('common.edit')}
                 </Button>
                 <Button size="small" color="error" startIcon={<CloseIcon />}>
@@ -130,18 +134,45 @@ const ProductsPage: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [page, setPage] = useState(1);
   
+  // משתנים לקטגוריות חדשות
+  const [customCategory, setCustomCategory] = useState('');
+  const [customManufacturer, setCustomManufacturer] = useState('');
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [showCustomManufacturer, setShowCustomManufacturer] = useState(false);
+  
   // משתנים לניהול תצוגה
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isViewingInstances, setIsViewingInstances] = useState(false);
   
   // דיאלוגי פעולות מוצרים
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditProductDialogOpen, setIsEditProductDialogOpen] = useState(false);
+  const [isEditInstanceDialogOpen, setIsEditInstanceDialogOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingInstance, setEditingInstance] = useState<any>(null);
+  
   const [newProduct, setNewProduct] = useState<CreateProductDto>({
     name: '',
     description: '',
     category: '',
     manufacturer: '',
     model: '',
+  });
+  
+  const [editProduct, setEditProduct] = useState<UpdateProductDto>({
+    name: '',
+    description: '',
+    category: '',
+    manufacturer: '',
+    model: '',
+  });
+  
+  const [editInstance, setEditInstance] = useState<UpdateProductInstanceDto>({
+    barcode: '',
+    serialNumber: '',
+    condition: '',
+    location: '',
+    notes: '',
   });
   
   // שימוש בהוכים
@@ -151,7 +182,11 @@ const ProductsPage: React.FC = () => {
   });
   
   const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
+  const updateInstanceMutation = useUpdateProductInstance();
   const { data: productInstances } = useProductInstances();
+  const { data: categories = [] } = useProductCategories();
+  const { data: manufacturers = [] } = useProductManufacturers();
 
   // Debug logging
   console.log('📦 Products Page Debug:', {
@@ -199,6 +234,10 @@ const ProductsPage: React.FC = () => {
       manufacturer: '',
       model: '',
     });
+    setCustomCategory('');
+    setCustomManufacturer('');
+    setShowCustomCategory(false);
+    setShowCustomManufacturer(false);
   };
 
   const handleSaveProduct = async () => {
@@ -266,6 +305,90 @@ const ProductsPage: React.FC = () => {
     setIsViewingInstances(false);
   };
 
+  // פונקציות עריכת מוצרים
+  const handleEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setEditProduct({
+      name: product.name || '',
+      description: product.description || '',
+      category: product.category || '',
+      manufacturer: product.manufacturer || '',
+      model: product.model || '',
+    });
+    setIsEditProductDialogOpen(true);
+  };
+
+  const handleSaveEditedProduct = async () => {
+    if (!editingProduct?.id) return;
+    
+    try {
+      await updateProductMutation.mutateAsync({
+        id: editingProduct.id,
+        productData: editProduct
+      });
+      setIsEditProductDialogOpen(false);
+      setEditingProduct(null);
+    } catch (error) {
+      console.error('Failed to update product:', error);
+    }
+  };
+
+  const handleCloseEditProduct = () => {
+    setIsEditProductDialogOpen(false);
+    setEditingProduct(null);
+    setEditProduct({
+      name: '',
+      description: '',
+      category: '',
+      manufacturer: '',
+      model: '',
+    });
+    setCustomCategory('');
+    setCustomManufacturer('');
+    setShowCustomCategory(false);
+    setShowCustomManufacturer(false);
+  };
+
+  // פונקציות עריכת מופעים
+  const handleEditInstance = (instance: any) => {
+    setEditingInstance(instance);
+    setEditInstance({
+      barcode: instance.barcode || '',
+      serialNumber: instance.serialNumber || '',
+      condition: instance.condition || '',
+      location: instance.location || '',
+      notes: instance.notes || '',
+    });
+    setIsEditInstanceDialogOpen(true);
+  };
+
+  const handleSaveInstance = async () => {
+    if (!editingInstance?.id) return;
+    
+    try {
+      await updateInstanceMutation.mutateAsync({
+        id: editingInstance.id,
+        instanceData: editInstance
+      });
+      setIsEditInstanceDialogOpen(false);
+      setEditingInstance(null);
+    } catch (error) {
+      console.error('Failed to update instance:', error);
+    }
+  };
+
+  const handleCloseEditInstance = () => {
+    setIsEditInstanceDialogOpen(false);
+    setEditingInstance(null);
+    setEditInstance({
+      barcode: '',
+      serialNumber: '',
+      condition: '',
+      location: '',
+      notes: '',
+    });
+  };
+
   if (error) {
     return (
       <Box sx={{ p: 3 }}>
@@ -306,6 +429,7 @@ const ProductsPage: React.FC = () => {
         <ProductInstancesView 
           product={selectedProduct} 
           instances={productInstances?.filter(inst => inst.productId === selectedProduct.id) || []}
+          onEditInstance={handleEditInstance}
         />
       </Box>
     );
@@ -420,12 +544,9 @@ const ProductsPage: React.FC = () => {
             onChange={handleCategoryFilterChange}
           >
             <MenuItem value="all">{t('products.categories.all')}</MenuItem>
-            <MenuItem value="ניידות">{t('products.categories.mobility')}</MenuItem>
-            <MenuItem value="ריהוט רפואי">{t('products.categories.medical_furniture')}</MenuItem>
-            <MenuItem value="עזרי שמיעה">{t('products.categories.hearing_aids')}</MenuItem>
-            <MenuItem value="עזרי ראייה">{t('products.categories.vision_aids')}</MenuItem>
-            <MenuItem value="עזרי רחצה">{t('products.categories.bathing_aids')}</MenuItem>
-            <MenuItem value="אחר">{t('products.categories.other')}</MenuItem>
+            {categories.map(category => (
+              <MenuItem key={category} value={category}>{category}</MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>
@@ -501,6 +622,19 @@ const ProductsPage: React.FC = () => {
                       </Typography>
                     )}
                   </CardContent>
+                  
+                  <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
+                    <Button
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditProduct(product);
+                      }}
+                    >
+                      {t('common.edit')}
+                    </Button>
+                  </CardActions>
                 </Card>
               );
             })
@@ -518,7 +652,7 @@ const ProductsPage: React.FC = () => {
                 <TableCell align="center">{t('products.total_instances')}</TableCell>
                 <TableCell align="center">{t('products.available_instances')}</TableCell>
                 <TableCell align="center">{t('common.status')}</TableCell>
-                <TableCell align="center">{t('products.view_instances')}</TableCell>
+                <TableCell align="center">{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -600,6 +734,16 @@ const ProductsPage: React.FC = () => {
                         >
                           <QrCodeIcon />
                         </IconButton>
+                        <IconButton 
+                          size="small" 
+                          title={t('common.edit')}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditProduct(product);
+                          }}
+                        >
+                          <EditIcon />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   );
@@ -671,26 +815,90 @@ const ProductsPage: React.FC = () => {
               <FormControl fullWidth required>
                 <InputLabel>{t('products.category')}</InputLabel>
                 <Select
-                  value={newProduct.category}
-                  onChange={(e) => handleProductFieldChange('category', e.target.value)}
+                  value={showCustomCategory ? 'custom' : newProduct.category}
+                  onChange={(e) => {
+                    if (e.target.value === 'custom') {
+                      setShowCustomCategory(true);
+                      handleProductFieldChange('category', customCategory);
+                    } else {
+                      setShowCustomCategory(false);
+                      handleProductFieldChange('category', e.target.value);
+                    }
+                  }}
                   label={t('products.category')}
                 >
-                  <MenuItem value="ניידות">{t('products.categories.mobility')}</MenuItem>
-                  <MenuItem value="ריהוט רפואי">{t('products.categories.medical_furniture')}</MenuItem>
-                  <MenuItem value="עזרי שמיעה">{t('products.categories.hearing_aids')}</MenuItem>
-                  <MenuItem value="עזרי ראייה">{t('products.categories.vision_aids')}</MenuItem>
-                  <MenuItem value="עזרי רחצה">{t('products.categories.bathing_aids')}</MenuItem>
-                  <MenuItem value="אחר">{t('products.categories.other')}</MenuItem>
+                  {categories.map(category => (
+                    <MenuItem key={category} value={category}>{category}</MenuItem>
+                  ))}
+                  <MenuItem value="custom">
+                    <em>{t('products.categories.add_new')}</em>
+                  </MenuItem>
                 </Select>
               </FormControl>
+              {showCustomCategory && (
+                <TextField
+                  fullWidth
+                  label={t('products.categories.new_category')}
+                  value={customCategory}
+                  onChange={(e) => {
+                    setCustomCategory(e.target.value);
+                    handleProductFieldChange('category', e.target.value);
+                  }}
+                  sx={{ mt: 2 }}
+                />
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label={t('products.manufacturer')}
-                value={newProduct.manufacturer}
-                onChange={(e) => handleProductFieldChange('manufacturer', e.target.value)}
-              />
+              {showCustomManufacturer ? (
+                <TextField
+                  fullWidth
+                  label={t('products.manufacturer')}
+                  value={customManufacturer}
+                  onChange={(e) => {
+                    setCustomManufacturer(e.target.value);
+                    handleProductFieldChange('manufacturer', e.target.value);
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        onClick={() => {
+                          setShowCustomManufacturer(false);
+                          setCustomManufacturer('');
+                          handleProductFieldChange('manufacturer', '');
+                        }}
+                        edge="end"
+                        size="small"
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    )
+                  }}
+                />
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>{t('products.manufacturer')}</InputLabel>
+                  <Select
+                    value={newProduct.manufacturer}
+                    onChange={(e) => {
+                      if (e.target.value === 'custom') {
+                        setShowCustomManufacturer(true);
+                      } else {
+                        handleProductFieldChange('manufacturer', e.target.value);
+                      }
+                    }}
+                    label={t('products.manufacturer')}
+                  >
+                    {manufacturers.map(manufacturer => (
+                      <MenuItem key={manufacturer} value={manufacturer}>
+                        {manufacturer}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="custom">
+                      <em>{t('products.manufacturers.add_new')}</em>
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -713,6 +921,196 @@ const ProductsPage: React.FC = () => {
             disabled={createProductMutation.isPending || !newProduct.name.trim() || !newProduct.category.trim()}
           >
             {createProductMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Product Dialog */}
+      <Dialog 
+        open={isEditProductDialogOpen} 
+        onClose={handleCloseEditProduct}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {t('editProduct')}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseEditProduct}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Grid container spacing={3} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('products.productName')}
+                value={editProduct.name}
+                onChange={(e) => setEditProduct(prev => ({ ...prev, name: e.target.value }))}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('products.description')}
+                value={editProduct.description}
+                onChange={(e) => setEditProduct(prev => ({ ...prev, description: e.target.value }))}
+                multiline
+                rows={3}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth required>
+                <InputLabel>{t('products.category')}</InputLabel>
+                <Select
+                  value={editProduct.category}
+                  onChange={(e) => setEditProduct(prev => ({ ...prev, category: e.target.value }))}
+                  label={t('products.category')}
+                >
+                  {categories.map(category => (
+                    <MenuItem key={category} value={category}>{category}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>{t('products.manufacturer')}</InputLabel>
+                <Select
+                  value={editProduct.manufacturer}
+                  onChange={(e) => setEditProduct(prev => ({ ...prev, manufacturer: e.target.value }))}
+                  label={t('products.manufacturer')}
+                >
+                  {manufacturers.map(manufacturer => (
+                    <MenuItem key={manufacturer} value={manufacturer}>
+                      {manufacturer}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('products.model')}
+                value={editProduct.model}
+                onChange={(e) => setEditProduct(prev => ({ ...prev, model: e.target.value }))}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseEditProduct}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSaveEditedProduct}
+            variant="contained"
+            disabled={updateProductMutation.isPending || !editProduct.name?.trim() || !editProduct.category?.trim()}
+          >
+            {updateProductMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Instance Dialog */}
+      <Dialog 
+        open={isEditInstanceDialogOpen} 
+        onClose={handleCloseEditInstance}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {t('editInstance')}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseEditInstance}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Grid container spacing={3} sx={{ mt: 1 }}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('products.barcode')}
+                value={editInstance.barcode}
+                onChange={(e) => setEditInstance(prev => ({ ...prev, barcode: e.target.value }))}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('products.serial_number')}
+                value={editInstance.serialNumber}
+                onChange={(e) => setEditInstance(prev => ({ ...prev, serialNumber: e.target.value }))}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>{t('products.condition')}</InputLabel>
+                <Select
+                  value={editInstance.condition}
+                  onChange={(e) => setEditInstance(prev => ({ ...prev, condition: e.target.value }))}
+                  label={t('products.condition')}
+                >
+                  <MenuItem value="חדש">{t('products.conditions.new')}</MenuItem>
+                  <MenuItem value="משומש - מצב טוב">{t('products.conditions.used_good')}</MenuItem>
+                  <MenuItem value="משומש - מצב בינוני">{t('products.conditions.used_fair')}</MenuItem>
+                  <MenuItem value="זקוק לתיקון">{t('products.conditions.needs_repair')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('products.location')}
+                value={editInstance.location}
+                onChange={(e) => setEditInstance(prev => ({ ...prev, location: e.target.value }))}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('products.notes')}
+                value={editInstance.notes}
+                onChange={(e) => setEditInstance(prev => ({ ...prev, notes: e.target.value }))}
+                multiline
+                rows={3}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseEditInstance}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSaveInstance}
+            variant="contained"
+            disabled={updateInstanceMutation.isPending}
+          >
+            {updateInstanceMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>

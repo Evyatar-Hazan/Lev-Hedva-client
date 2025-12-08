@@ -103,4 +103,15 @@ export class ProductsClient {
     const response = await apiClient.get<ProductInstance[]>(`${this.BASE_PATH}/instances/available`);
     return response.data;
   }
+
+  // Categories and Manufacturers
+  static async getProductCategories(): Promise<string[]> {
+    const response = await apiClient.get<string[]>(`${this.BASE_PATH}/categories`);
+    return response.data;
+  }
+
+  static async getProductManufacturers(): Promise<string[]> {
+    const response = await apiClient.get<string[]>(`${this.BASE_PATH}/manufacturers`);
+    return response.data;
+  }
 }

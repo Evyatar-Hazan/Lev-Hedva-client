@@ -38,6 +38,8 @@ export const useCreateProduct = () => {
       ProductsClient.createProduct(productData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['product-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['product-manufacturers'] });
     },
   });
 };
@@ -52,6 +54,8 @@ export const useUpdateProduct = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: [...PRODUCTS_QUERY_KEY, variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['product-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['product-manufacturers'] });
     },
   });
 };
@@ -64,6 +68,8 @@ export const useDeleteProduct = () => {
     mutationFn: (id: string) => ProductsClient.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['product-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['product-manufacturers'] });
     },
   });
 };
@@ -134,5 +140,23 @@ export const useAvailableInstances = () => {
     queryKey: [...PRODUCT_INSTANCES_QUERY_KEY, 'available'],
     queryFn: () => ProductsClient.getAvailableInstances(),
     staleTime: 30 * 1000, // 30 שניות
+  });
+};
+
+// Hook לקבלת קטגוריות מוצרים
+export const useProductCategories = () => {
+  return useQuery({
+    queryKey: ['product-categories'],
+    queryFn: () => ProductsClient.getProductCategories(),
+    staleTime: 10 * 60 * 1000, // 10 דקות
+  });
+};
+
+// Hook לקבלת יצרנים
+export const useProductManufacturers = () => {
+  return useQuery({
+    queryKey: ['product-manufacturers'],
+    queryFn: () => ProductsClient.getProductManufacturers(),
+    staleTime: 10 * 60 * 1000, // 10 דקות
   });
 };

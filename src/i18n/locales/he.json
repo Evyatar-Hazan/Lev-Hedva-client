@@ -35,6 +35,8 @@
     "noData": "לא נמצאו נתונים",
     "serverError": "שגיאה בחיבור לשרת"
   },
+  "editProduct": "עריכת מוצר",
+  "editInstance": "עריכת מופע",
   "connection": {
     "waitingForServer": "ממתין לתגובה מ-http://localhost:3001",
     "connectionError": "❌ שגיאה בחיבור לשרת",
@@ -153,6 +155,7 @@
     "view_instances": "צפה במופעים",
     "instancesTitle": "מופעי מוצר",
     "serial_number": "מספר סידורי",
+    "barcode": "ברקוד",
     "condition": "מצב",
     "location": "מיקום",
     "notes": "הערות",
@@ -174,7 +177,18 @@
       "hearing_aids": "עזרי שמיעה",
       "vision_aids": "עזרי ראייה",
       "bathing_aids": "עזרי רחצה",
-      "other": "אחר"
+      "other": "אחר",
+      "add_new": "הוסף קטגוריה חדשה",
+      "new_category": "שם קטגוריה חדשה"
+    },
+    "conditions": {
+      "new": "חדש",
+      "used_good": "משומש - מצב טוב",
+      "used_fair": "משומש - מצב בינוני",
+      "needs_repair": "זקוק לתיקון"
+    },
+    "manufacturers": {
+      "add_new": "הוסף יצרן חדש"
     },
     "stats": {
       "totalProducts": "סה\"כ מוצרים",
@@ -186,7 +200,9 @@
     "noProducts": "לא נמצאו מוצרים",
     "loadError": "שגיאה בטעינת נתוני המוצרים:",
     "pagination": "עמוד {{page}} מתוך {{totalPages}} | סה\"כ {{total}} מוצרים",
-    "debug": "טוען: {{loading}} | שגיאה: {{error}} | מוצרים: {{count}} | מופעי מוצרים: {{instances}}"
+    "debug": "טוען: {{loading}} | שגיאה: {{error}} | מוצרים: {{count}} | מופעי מוצרים: {{instances}}",
+    "available_instances": "מופעים זמינים",
+    "total_instances": "סה\"כ מופעים"
   },
   "users": {
     "title": "ניהול משתמשים",
