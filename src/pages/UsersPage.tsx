@@ -28,6 +28,11 @@ import {
   Grid,
   FormControlLabel,
   Switch,
+  Card,
+  CardContent,
+  CardActions,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -44,6 +49,9 @@ import { format } from 'date-fns';
 
 const UsersPage: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
@@ -266,92 +274,177 @@ const UsersPage: React.FC = () => {
         </FormControl>
       </Box>
 
-      {/* טבלת משתמשים */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('users.fullName')}</TableCell>
-              <TableCell>{t('users.email')}</TableCell>
-              <TableCell>{t('users.phone')}</TableCell>
-              <TableCell>{t('users.role')}</TableCell>
-              <TableCell>{t('users.status')}</TableCell>
-              <TableCell>{t('users.joinDate')}</TableCell>
-              <TableCell>{t('common.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
-                  <CircularProgress />
-                </TableCell>
-              </TableRow>
-            ) : (usersData as any)?.users?.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
-                  {t('users.noUsers')}
-                </TableCell>
-              </TableRow>
-            ) : (
-              (usersData as any)?.users?.map((user: any) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    {user.firstName} {user.lastName}
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.phone || '-'}</TableCell>
-                  <TableCell>
+      {/* טבלת משתמשים / כרטיסיות למובייל */}
+      {isMobile ? (
+        // תצוגת כרטיסיות למובייל
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {isLoading ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : (usersData as any)?.users?.length === 0 ? (
+            <Paper sx={{ p: 3, textAlign: 'center' }}>
+              <Typography>{t('users.noUsers')}</Typography>
+            </Paper>
+          ) : (
+            (usersData as any)?.users?.map((user: any) => (
+              <Card key={user.id} sx={{ p: 0 }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Typography variant="h6" component="div">
+                      {user.firstName} {user.lastName}
+                    </Typography>
                     <Chip 
                       label={user.role} 
                       color={getRoleColor(user.role) as any}
                       size="small"
                     />
-                  </TableCell>
-                  <TableCell>
+                  </Box>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>{t('users.email')}:</strong> {user.email}
+                  </Typography>
+                  
+                  {user.phone && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <strong>{t('users.phone')}:</strong> {user.phone}
+                    </Typography>
+                  )}
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>{t('users.status')}:</strong>{' '}
                     <Chip 
                       label={user.isActive ? 'פעיל' : 'לא פעיל'} 
                       color={getStatusColor(user.isActive) as any}
                       size="small"
                     />
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(user.createdAt), 'dd/MM/yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton 
-                      size="small" 
-                      color="primary" 
-                      title="עריכה"
-                      onClick={() => handleEditUser(user)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      color={user.isActive ? 'warning' : 'success'}
-                      title={user.isActive ? 'השבתה' : 'הפעלה'}
-                      onClick={() => handleToggleUserStatus(user.id, user.isActive)}
-                      disabled={toggleUserStatusMutation.isPending}
-                    >
-                      {user.isActive ? <LockIcon /> : <LockOpenIcon />}
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      color="error" 
-                      title="מחיקה"
-                      onClick={() => handleDeleteUser(user.id)}
-                      disabled={deleteUserMutation.isPending}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>{t('users.joinDate')}:</strong> {format(new Date(user.createdAt), 'dd/MM/yyyy')}
+                  </Typography>
+                </CardContent>
+                
+                <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
+                  <IconButton 
+                    size="small" 
+                    color="primary" 
+                    title="עריכה"
+                    onClick={() => handleEditUser(user)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton 
+                    size="small" 
+                    color={user.isActive ? 'warning' : 'success'}
+                    title={user.isActive ? 'השבתה' : 'הפעלה'}
+                    onClick={() => handleToggleUserStatus(user.id, user.isActive)}
+                    disabled={toggleUserStatusMutation.isPending}
+                  >
+                    {user.isActive ? <LockIcon /> : <LockOpenIcon />}
+                  </IconButton>
+                  <IconButton 
+                    size="small" 
+                    color="error" 
+                    title="מחיקה"
+                    onClick={() => handleDeleteUser(user.id)}
+                    disabled={deleteUserMutation.isPending}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </CardActions>
+              </Card>
+            ))
+          )}
+        </Box>
+      ) : (
+        // תצוגת טבלה לדסקטופ
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('users.fullName')}</TableCell>
+                <TableCell>{t('users.email')}</TableCell>
+                <TableCell>{t('users.phone')}</TableCell>
+                <TableCell>{t('users.role')}</TableCell>
+                <TableCell>{t('users.status')}</TableCell>
+                <TableCell>{t('users.joinDate')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
+                    <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ) : (usersData as any)?.users?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
+                    {t('users.noUsers')}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                (usersData as any)?.users?.map((user: any) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      {user.firstName} {user.lastName}
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone || '-'}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={user.role} 
+                        color={getRoleColor(user.role) as any}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={user.isActive ? 'פעיל' : 'לא פעיל'} 
+                        color={getStatusColor(user.isActive) as any}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(user.createdAt), 'dd/MM/yyyy')}
+                    </TableCell>
+                    <TableCell>
+                      <IconButton 
+                        size="small" 
+                        color="primary" 
+                        title="עריכה"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton 
+                        size="small" 
+                        color={user.isActive ? 'warning' : 'success'}
+                        title={user.isActive ? 'השבתה' : 'הפעלה'}
+                        onClick={() => handleToggleUserStatus(user.id, user.isActive)}
+                        disabled={toggleUserStatusMutation.isPending}
+                      >
+                        {user.isActive ? <LockIcon /> : <LockOpenIcon />}
+                      </IconButton>
+                      <IconButton 
+                        size="small" 
+                        color="error" 
+                        title="מחיקה"
+                        onClick={() => handleDeleteUser(user.id)}
+                        disabled={deleteUserMutation.isPending}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* Pagination */}
       {(usersData as any)?.total && (

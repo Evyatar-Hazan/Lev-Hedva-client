@@ -24,7 +24,10 @@ import {
   Grid,
   Card,
   CardContent,
+  CardActions,
   Avatar,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -42,6 +45,9 @@ import { he } from 'date-fns/locale';
 
 const VolunteersPage: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -218,90 +224,152 @@ const VolunteersPage: React.FC = () => {
         </FormControl>
       </Box>
 
-      {/* טבלת פעילויות מתנדבים */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('volunteers.volunteer')}</TableCell>
-              <TableCell>{t('volunteers.activityType')}</TableCell>
-              <TableCell>{t('volunteers.description')}</TableCell>
-              <TableCell>{t('volunteers.date')}</TableCell>
-              <TableCell align="center">{t('volunteers.hours')}</TableCell>
-              <TableCell align="center">{t('common.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                    <CircularProgress />
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ) : activities.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  <Typography variant="body2" color="text.secondary">
-                    {t('volunteers.noActivities')}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              activities.map((activity: any) => (
-                <TableRow key={activity.id}>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-                        {activity.volunteer?.firstName?.[0]}{activity.volunteer?.lastName?.[0]}
-                      </Avatar>
-                      <Box>
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          {activity.volunteer?.firstName} {activity.volunteer?.lastName}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {activity.volunteer?.email}
-                        </Typography>
-                      </Box>
+      {/* טבלת פעילויות מתנדבים / כרטיסיות למובייל */}
+      {isMobile ? (
+        // תצוגת כרטיסיות למובייל
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {isLoading ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : activities.length === 0 ? (
+            <Paper sx={{ p: 3, textAlign: 'center' }}>
+              <Typography>{t('volunteers.noActivities')}</Typography>
+            </Paper>
+          ) : (
+            activities.map((activity: any) => (
+              <Card key={activity.id}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
+                      {activity.volunteer?.firstName?.[0]}{activity.volunteer?.lastName?.[0]}
+                    </Avatar>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="h6" component="div">
+                        {activity.volunteer?.firstName} {activity.volunteer?.lastName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {activity.volunteer?.email}
+                      </Typography>
                     </Box>
-                  </TableCell>
-                  <TableCell>
                     <Chip 
                       label={getActivityTypeText(activity.activityType)}
                       color={getActivityTypeColor(activity.activityType)}
                       size="small"
                     />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {activity.description || 'אין תיאור'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {format(new Date(activity.date), 'dd/MM/yyyy', { locale: he })}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography variant="body2" fontWeight="bold">
-                      {activity.hours || 0}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton size="small" title="צפה">
-                      <VisibilityIcon />
-                    </IconButton>
-                    <IconButton size="small" title="ערוך">
-                      <EditIcon />
-                    </IconButton>
+                  </Box>
+                  
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    <strong>{t('volunteers.description')}:</strong> {activity.description || 'אין תיאור'}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>{t('volunteers.date')}:</strong> {format(new Date(activity.date), 'dd/MM/yyyy', { locale: he })}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>{t('volunteers.hours')}:</strong> {activity.hours || 0}
+                  </Typography>
+                </CardContent>
+                
+                <CardActions sx={{ justifyContent: 'flex-end' }}>
+                  <IconButton size="small" title="צפה">
+                    <VisibilityIcon />
+                  </IconButton>
+                  <IconButton size="small" title="ערוך">
+                    <EditIcon />
+                  </IconButton>
+                </CardActions>
+              </Card>
+            ))
+          )}
+        </Box>
+      ) : (
+        // תצוגת טבלה לדסקטופ
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('volunteers.volunteer')}</TableCell>
+                <TableCell>{t('volunteers.activityType')}</TableCell>
+                <TableCell>{t('volunteers.description')}</TableCell>
+                <TableCell>{t('volunteers.date')}</TableCell>
+                <TableCell align="center">{t('volunteers.hours')}</TableCell>
+                <TableCell align="center">{t('common.actions')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                      <CircularProgress />
+                    </Box>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ) : activities.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    <Typography variant="body2" color="text.secondary">
+                      {t('volunteers.noActivities')}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                activities.map((activity: any) => (
+                  <TableRow key={activity.id}>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                          {activity.volunteer?.firstName?.[0]}{activity.volunteer?.lastName?.[0]}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="subtitle2" fontWeight="bold">
+                            {activity.volunteer?.firstName} {activity.volunteer?.lastName}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {activity.volunteer?.email}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={getActivityTypeText(activity.activityType)}
+                        color={getActivityTypeColor(activity.activityType)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {activity.description || 'אין תיאור'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {format(new Date(activity.date), 'dd/MM/yyyy', { locale: he })}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography variant="body2" fontWeight="bold">
+                        {activity.hours || 0}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton size="small" title="צפה">
+                        <VisibilityIcon />
+                      </IconButton>
+                      <IconButton size="small" title="ערוך">
+                        <EditIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* דף */}
       {activitiesData?.pagination && (

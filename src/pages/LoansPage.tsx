@@ -24,6 +24,9 @@ import {
   Grid,
   Card,
   CardContent,
+  CardActions,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -37,7 +40,10 @@ import { useLoans, useLoanStats, useReturnLoan } from '../hooks';
 import { format } from 'date-fns';
 
 const LoansPage: React.FC = () => {
-  // const { t } = useTranslation(); // Removed duplicate declaration
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -78,8 +84,6 @@ const LoansPage: React.FC = () => {
       default: return 'default';
     }
   };
-
-  const { t } = useTranslation();
   
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
@@ -203,76 +207,139 @@ const LoansPage: React.FC = () => {
         </FormControl>
       </Box>
 
-      {/* טבלת השאלות */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('loans.borrower')}</TableCell>
-              <TableCell>{t('loans.product')}</TableCell>
-              <TableCell>{t('loans.loanDate')}</TableCell>
-              <TableCell>{t('loans.returnDate')}</TableCell>
-              <TableCell>{t('common.status')}</TableCell>
-              <TableCell>{t('common.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
-                  <CircularProgress />
-                </TableCell>
-              </TableRow>
-            ) : loansData?.data?.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
-                  {t('loans.noLoans')}
-                </TableCell>
-              </TableRow>
-            ) : (
-              loansData?.data?.map((loan) => (
-                <TableRow key={loan.id}>
-                  <TableCell>
-                    {loan.user?.firstName} {loan.user?.lastName}
-                  </TableCell>
-                  <TableCell>
-                    {loan.productInstance?.product?.name}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(loan.loanDate), 'dd/MM/yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    {loan.expectedReturnDate ? format(new Date(loan.expectedReturnDate), 'dd/MM/yyyy') : '-'}
-                  </TableCell>
-                  <TableCell>
+      {/* טבלת השאלות / כרטיסיות למובייל */}
+      {isMobile ? (
+        // תצוגת כרטיסיות למובייל
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {isLoading ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : loansData?.data?.length === 0 ? (
+            <Paper sx={{ p: 3, textAlign: 'center' }}>
+              <Typography>{t('loans.noLoans')}</Typography>
+            </Paper>
+          ) : (
+            loansData?.data?.map((loan) => (
+              <Card key={loan.id}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Typography variant="h6" component="div">
+                      {loan.user?.firstName} {loan.user?.lastName}
+                    </Typography>
                     <Chip 
                       label={getStatusText(loan.status)} 
                       color={getStatusColor(loan.status) as any}
                       size="small"
                     />
-                  </TableCell>
-                  <TableCell>
-                    {loan.status === 'ACTIVE' && (
-                      <IconButton 
-                        size="small" 
-                        color="primary" 
-                        title="החזרה"
-                        onClick={() => handleReturnLoan(loan.id)}
-                        disabled={returnLoanMutation.isPending}
-                      >
-                        <UndoIcon />
-                      </IconButton>
-                    )}
-                    <IconButton size="small" color="primary" title="עריכה">
-                      <EditIcon />
+                  </Box>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>{t('loans.product')}:</strong> {loan.productInstance?.product?.name}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>{t('loans.loanDate')}:</strong> {format(new Date(loan.loanDate), 'dd/MM/yyyy')}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>{t('loans.returnDate')}:</strong>{' '}
+                    {loan.expectedReturnDate ? format(new Date(loan.expectedReturnDate), 'dd/MM/yyyy') : '-'}
+                  </Typography>
+                </CardContent>
+                
+                <CardActions sx={{ justifyContent: 'flex-end' }}>
+                  {loan.status === 'ACTIVE' && (
+                    <IconButton 
+                      size="small" 
+                      color="primary" 
+                      title="החזרה"
+                      onClick={() => handleReturnLoan(loan.id)}
+                      disabled={returnLoanMutation.isPending}
+                    >
+                      <UndoIcon />
                     </IconButton>
+                  )}
+                  <IconButton size="small" color="primary" title="עריכה">
+                    <EditIcon />
+                  </IconButton>
+                </CardActions>
+              </Card>
+            ))
+          )}
+        </Box>
+      ) : (
+        // תצוגת טבלה לדסקטופ
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('loans.borrower')}</TableCell>
+                <TableCell>{t('loans.product')}</TableCell>
+                <TableCell>{t('loans.loanDate')}</TableCell>
+                <TableCell>{t('loans.returnDate')}</TableCell>
+                <TableCell>{t('common.status')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
+                    <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ) : loansData?.data?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
+                    {t('loans.noLoans')}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                loansData?.data?.map((loan) => (
+                  <TableRow key={loan.id}>
+                    <TableCell>
+                      {loan.user?.firstName} {loan.user?.lastName}
+                    </TableCell>
+                    <TableCell>
+                      {loan.productInstance?.product?.name}
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(loan.loanDate), 'dd/MM/yyyy')}
+                    </TableCell>
+                    <TableCell>
+                      {loan.expectedReturnDate ? format(new Date(loan.expectedReturnDate), 'dd/MM/yyyy') : '-'}
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={getStatusText(loan.status)} 
+                        color={getStatusColor(loan.status) as any}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {loan.status === 'ACTIVE' && (
+                        <IconButton 
+                          size="small" 
+                          color="primary" 
+                          title="החזרה"
+                          onClick={() => handleReturnLoan(loan.id)}
+                          disabled={returnLoanMutation.isPending}
+                        >
+                          <UndoIcon />
+                        </IconButton>
+                      )}
+                      <IconButton size="small" color="primary" title="עריכה">
+                        <EditIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* Pagination */}
       {loansData?.pagination && (

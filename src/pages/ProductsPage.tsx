@@ -24,6 +24,9 @@ import {
   Grid,
   Card,
   CardContent,
+  CardActions,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -37,6 +40,9 @@ import { useProducts, useProductInstances } from '../hooks';
 
 const ProductsPage: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -221,95 +227,170 @@ const ProductsPage: React.FC = () => {
         </FormControl>
       </Box>
 
-      {/* טבלת מוצרים */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('products.productName')}</TableCell>
-              <TableCell>{t('products.category')}</TableCell>
-              <TableCell>{t('products.manufacturer')}</TableCell>
-              <TableCell align="center">{t('products.instances')}</TableCell>
-              <TableCell align="center">{t('products.availability')}</TableCell>
-              <TableCell align="center">{t('common.status')}</TableCell>
-              <TableCell align="center">{t('common.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                    <CircularProgress />
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ) : products.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Typography variant="body2" color="text.secondary">
-                    {t('products.noProducts')}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              products.map((product: any) => {
-                const instanceCounts = productInstancesMap.get(product.id) || { total: 0, available: 0 };
-                return (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <Typography variant="subtitle2" fontWeight="bold">
+      {/* טבלת מוצרים / כרטיסיות למובייל */}
+      {isMobile ? (
+        // תצוגת כרטיסיות למובייל
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {isLoading ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : products.length === 0 ? (
+            <Paper sx={{ p: 3, textAlign: 'center' }}>
+              <Typography>{t('products.noProducts')}</Typography>
+            </Paper>
+          ) : (
+            products.map((product: any) => {
+              const instanceCounts = productInstancesMap.get(product.id) || { total: 0, available: 0 };
+              return (
+                <Card key={product.id}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                      <Typography variant="h6" component="div">
                         {product.name}
                       </Typography>
-                      {product.description && (
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          {product.description}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={product.category}
-                        size="small"
-                        variant="outlined"
-                      />
-                    </TableCell>
-                    <TableCell>{product.manufacturer}</TableCell>
-                    <TableCell align="center">
-                      <Typography variant="body2">
-                        {instanceCounts.total}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="body2">
-                        {instanceCounts.available}/{instanceCounts.total}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
                       <Chip
                         label={getStatusText(instanceCounts.available, instanceCounts.total)}
                         color={getStatusColor(instanceCounts.available, instanceCounts.total)}
                         size="small"
                       />
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton size="small" title="צפה">
-                        <VisibilityIcon />
-                      </IconButton>
-                      <IconButton size="small" title="ערוך">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton size="small" title="מופעים">
-                        <QrCodeIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                    </Box>
+                    
+                    {product.description && (
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        {product.description}
+                      </Typography>
+                    )}
+                    
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      <strong>{t('products.category')}:</strong>{' '}
+                      <Chip 
+                        label={product.category}
+                        size="small"
+                        variant="outlined"
+                      />
+                    </Typography>
+                    
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <strong>{t('products.manufacturer')}:</strong> {product.manufacturer}
+                    </Typography>
+                    
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <strong>{t('products.instances')}:</strong> {instanceCounts.total}
+                    </Typography>
+                    
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>{t('products.availability')}:</strong> {instanceCounts.available}/{instanceCounts.total}
+                    </Typography>
+                  </CardContent>
+                  
+                  <CardActions sx={{ justifyContent: 'flex-end' }}>
+                    <IconButton size="small" title="צפה">
+                      <VisibilityIcon />
+                    </IconButton>
+                    <IconButton size="small" title="ערוך">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton size="small" title="מופעים">
+                      <QrCodeIcon />
+                    </IconButton>
+                  </CardActions>
+                </Card>
+              );
+            })
+          )}
+        </Box>
+      ) : (
+        // תצוגת טבלה לדסקטופ
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('products.productName')}</TableCell>
+                <TableCell>{t('products.category')}</TableCell>
+                <TableCell>{t('products.manufacturer')}</TableCell>
+                <TableCell align="center">{t('products.instances')}</TableCell>
+                <TableCell align="center">{t('products.availability')}</TableCell>
+                <TableCell align="center">{t('common.status')}</TableCell>
+                <TableCell align="center">{t('common.actions')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                      <CircularProgress />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : products.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <Typography variant="body2" color="text.secondary">
+                      {t('products.noProducts')}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                products.map((product: any) => {
+                  const instanceCounts = productInstancesMap.get(product.id) || { total: 0, available: 0 };
+                  return (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <Typography variant="subtitle2" fontWeight="bold">
+                          {product.name}
+                        </Typography>
+                        {product.description && (
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            {product.description}
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={product.category}
+                          size="small"
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell>{product.manufacturer}</TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2">
+                          {instanceCounts.total}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2">
+                          {instanceCounts.available}/{instanceCounts.total}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={getStatusText(instanceCounts.available, instanceCounts.total)}
+                          color={getStatusColor(instanceCounts.available, instanceCounts.total)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <IconButton size="small" title="צפה">
+                          <VisibilityIcon />
+                        </IconButton>
+                        <IconButton size="small" title="ערוך">
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton size="small" title="מופעים">
+                          <QrCodeIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* דף */}
       {productsData?.pagination && (

@@ -23,6 +23,9 @@ import {
   Grid,
   Card,
   CardContent,
+  CardActions,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -39,6 +42,9 @@ import { he } from 'date-fns/locale';
 
 const AuditPage: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [search, setSearch] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -220,50 +226,27 @@ const AuditPage: React.FC = () => {
         </FormControl>
       </Box>
 
-      {/* טבלת יומן ביקורת */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('audit.time')}</TableCell>
-              <TableCell>{t('audit.user')}</TableCell>
-              <TableCell>{t('audit.action')}</TableCell>
-              <TableCell>{t('audit.entity')}</TableCell>
-              <TableCell>{t('audit.description')}</TableCell>
-              <TableCell>{t('audit.ipAddress')}</TableCell>
-              <TableCell align="center">{t('common.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                    <CircularProgress />
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ) : auditLogs.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Typography variant="body2" color="text.secondary">
-                    {t('audit.noAuditRecords')}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              auditLogs.map((log: any) => (
-                <TableRow key={log.id}>
-                  <TableCell>
-                    <Typography variant="body2" fontSize="0.8rem">
-                      {format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: he })}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
+      {/* טבלת יומן ביקורת / כרטיסיות למובייל */}
+      {isMobile ? (
+        // תצוגת כרטיסיות למובייל
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {isLoading ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : auditLogs.length === 0 ? (
+            <Paper sx={{ p: 3, textAlign: 'center' }}>
+              <Typography>{t('audit.noAuditRecords')}</Typography>
+            </Paper>
+          ) : (
+            auditLogs.map((log: any) => (
+              <Card key={log.id}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <PersonIcon fontSize="small" color="primary" />
                       <Box>
-                        <Typography variant="body2" fontWeight="bold">
+                        <Typography variant="h6" component="div">
                           {log.user ? `${log.user.firstName} ${log.user.lastName}` : 'מערכת'}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
@@ -271,44 +254,137 @@ const AuditPage: React.FC = () => {
                         </Typography>
                       </Box>
                     </Box>
-                  </TableCell>
-                  <TableCell>
                     <Chip 
                       label={getActionText(log.action)}
                       color={getActionColor(log.action)}
                       size="small"
                     />
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {getEntityTypeIcon(log.entityType)}
-                      <Typography variant="body2">
-                        {log.entityType}
-                        {log.entityId && ` #${log.entityId.substring(0, 8)}`}
-                      </Typography>
+                  </Box>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>{t('audit.time')}:</strong> {format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: he })}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>{t('audit.entity')}:</strong>
+                    </Typography>
+                    {getEntityTypeIcon(log.entityType)}
+                    <Typography variant="body2">
+                      {log.entityType}
+                      {log.entityId && ` #${log.entityId.substring(0, 8)}`}
+                    </Typography>
+                  </Box>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>{t('audit.description')}:</strong> {log.description || 'אין תיאור'}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>{t('audit.ipAddress')}:</strong> {log.ipAddress || 'N/A'}
+                  </Typography>
+                </CardContent>
+                
+                <CardActions sx={{ justifyContent: 'flex-end' }}>
+                  <IconButton size="small" title="צפה בפרטים">
+                    <VisibilityIcon />
+                  </IconButton>
+                </CardActions>
+              </Card>
+            ))
+          )}
+        </Box>
+      ) : (
+        // תצוגת טבלה לדסקטופ
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('audit.time')}</TableCell>
+                <TableCell>{t('audit.user')}</TableCell>
+                <TableCell>{t('audit.action')}</TableCell>
+                <TableCell>{t('audit.entity')}</TableCell>
+                <TableCell>{t('audit.description')}</TableCell>
+                <TableCell>{t('audit.ipAddress')}</TableCell>
+                <TableCell align="center">{t('common.actions')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                      <CircularProgress />
                     </Box>
                   </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ maxWidth: 300 }}>
-                      {log.description || 'אין תיאור'}
+                </TableRow>
+              ) : auditLogs.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <Typography variant="body2" color="text.secondary">
+                      {t('audit.noAuditRecords')}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption" color="text.secondary">
-                      {log.ipAddress || 'N/A'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton size="small" title="צפה בפרטים">
-                      <VisibilityIcon />
-                    </IconButton>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ) : (
+                auditLogs.map((log: any) => (
+                  <TableRow key={log.id}>
+                    <TableCell>
+                      <Typography variant="body2" fontSize="0.8rem">
+                        {format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: he })}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <PersonIcon fontSize="small" color="primary" />
+                        <Box>
+                          <Typography variant="body2" fontWeight="bold">
+                            {log.user ? `${log.user.firstName} ${log.user.lastName}` : 'מערכת'}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {log.user?.email || 'N/A'}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={getActionText(log.action)}
+                        color={getActionColor(log.action)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {getEntityTypeIcon(log.entityType)}
+                        <Typography variant="body2">
+                          {log.entityType}
+                          {log.entityId && ` #${log.entityId.substring(0, 8)}`}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ maxWidth: 300 }}>
+                        {log.description || 'אין תיאור'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="caption" color="text.secondary">
+                        {log.ipAddress || 'N/A'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton size="small" title="צפה בפרטים">
+                        <VisibilityIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* דף */}
       {auditData?.pagination && (
