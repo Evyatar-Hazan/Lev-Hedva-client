@@ -19,6 +19,7 @@
     "success": "הצלחה",
     "warning": "אזהרה",
     "info": "מידע",
+    "status": "סטטוס",
     "actions": "פעולות",
     "filter": "סינון",
     "refresh": "רענן",
@@ -136,6 +137,7 @@
   "products": {
     "title": "ניהול מוצרים",
     "addProduct": "הוספת מוצר",
+    "addInstance": "הוספת מופע חדש",
     "view_product": "צפייה במוצר",
     "edit_product": "עריכת מוצר",
     "manage_instances": "ניהול מופעים",
@@ -185,7 +187,11 @@
       "new": "חדש",
       "used_good": "משומש - מצב טוב",
       "used_fair": "משומש - מצב בינוני",
-      "needs_repair": "זקוק לתיקון"
+      "needs_repair": "זקוק לתיקון",
+      "excellent": "מצוין",
+      "good": "טוב",
+      "fair": "בינוני", 
+      "poor": "גרוע"
     },
     "manufacturers": {
       "add_new": "הוסף יצרן חדש"

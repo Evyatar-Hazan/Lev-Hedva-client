@@ -139,6 +139,7 @@
     "manage_instances": "Manage Instances",
     "product_instances": "Product Instances",
     "add_instance": "Add Instance",
+    "addInstance": "Add New Instance",
     "total_instances": "Total Instances",
     "available_instances": "Available",
     "borrowed_instances": "Borrowed",

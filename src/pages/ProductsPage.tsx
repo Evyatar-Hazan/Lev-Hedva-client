@@ -42,20 +42,26 @@ import {
   Close as CloseIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
-import { useProducts, useProductInstances, useCreateProduct, useUpdateProduct, useUpdateProductInstance, useProductCategories, useProductManufacturers } from '../hooks';
-import { CreateProductDto, UpdateProductDto, UpdateProductInstanceDto } from '../lib/types';
+import { useProducts, useProductInstances, useCreateProduct, useUpdateProduct, useUpdateProductInstance, useCreateProductInstance, useDeleteProductInstance, useProductCategories, useProductManufacturers } from '../hooks';
+import { CreateProductDto, UpdateProductDto, UpdateProductInstanceDto, CreateProductInstanceDto } from '../lib/types';
 
 // רכיב פשוט לתצוגת מופעים
-const ProductInstancesView: React.FC<{ product: any; instances: any[]; onEditInstance: (instance: any) => void }> = ({ product, instances, onEditInstance }) => {
+const ProductInstancesView: React.FC<{ 
+  product: any; 
+  instances: any[]; 
+  onEditInstance: (instance: any) => void;
+  onDeleteInstance: (instance: any) => void;
+}> = ({ product, instances, onEditInstance, onDeleteInstance }) => {
   const { t } = useTranslation();
   
   if (!instances || instances.length === 0) {
     return (
-      <Box sx={{ textAlign: 'center', py: 4 }}>
-        <Typography variant="h6" gutterBottom>
+      <Box sx={{ textAlign: 'center', py: 8 }}>
+        <InventoryIcon sx={{ fontSize: 80, color: 'text.disabled', mb: 2 }} />
+        <Typography variant="h5" gutterBottom color="text.secondary">
           {t('products.no_instances')}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
           {t('products.add_first_instance')}
         </Typography>
       </Box>
@@ -64,56 +70,91 @@ const ProductInstancesView: React.FC<{ product: any; instances: any[]; onEditIns
 
   return (
     <Box>
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {instances.map((instance) => (
-          <Grid item xs={12} sm={6} md={4} key={instance.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {instance.barcode || `מופע ${instance.id.slice(-4)}`}
-                </Typography>
+          <Grid item xs={12} sm={6} md={4} lg={3} key={instance.id}>
+            <Card 
+              sx={{ 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                '&:hover': { boxShadow: 4 },
+                transition: 'box-shadow 0.2s ease-in-out'
+              }}
+            >
+              <CardContent sx={{ flexGrow: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <QrCodeIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography variant="h6" fontWeight="bold">
+                    {instance.barcode || `מופע ${instance.id.slice(-4)}`}
+                  </Typography>
+                </Box>
                 
                 {instance.serialNumber && (
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     <strong>{t('products.serial_number')}:</strong> {instance.serialNumber}
                   </Typography>
                 )}
                 
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  <strong>{t('products.condition')}:</strong> {instance.condition}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>{t('products.condition')}:</strong>
+                  </Typography>
+                  <Chip
+                    label={instance.condition}
+                    size="small"
+                    variant="outlined"
+                    sx={{ ml: 1 }}
+                  />
+                </Box>
                 
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  <strong>{t('products.status')}:</strong>{' '}
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>{t('products.status')}:</strong>
+                  </Typography>
                   <Chip
                     label={instance.isAvailable ? t('products.available') : t('products.borrowed')}
                     color={instance.isAvailable ? 'success' : 'warning'}
                     size="small"
+                    sx={{ ml: 1 }}
                   />
-                </Typography>
+                </Box>
                 
                 {instance.location && (
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     <strong>{t('products.location')}:</strong> {instance.location}
                   </Typography>
                 )}
                 
                 {instance.notes && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical'
+                  }}>
                     <strong>{t('products.notes')}:</strong> {instance.notes}
                   </Typography>
                 )}
               </CardContent>
               
-              <CardActions sx={{ justifyContent: 'flex-end' }}>
+              <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
                 <Button 
                   size="small" 
                   startIcon={<EditIcon />}
                   onClick={() => onEditInstance(instance)}
+                  variant="outlined"
                 >
                   {t('common.edit')}
                 </Button>
-                <Button size="small" color="error" startIcon={<CloseIcon />}>
+                <Button 
+                  size="small" 
+                  color="error" 
+                  startIcon={<CloseIcon />}
+                  onClick={() => onDeleteInstance(instance)}
+                  variant="outlined"
+                >
                   {t('common.delete')}
                 </Button>
               </CardActions>
@@ -146,6 +187,7 @@ const ProductsPage: React.FC = () => {
   
   // דיאלוגי פעולות מוצרים
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isAddInstanceDialogOpen, setIsAddInstanceDialogOpen] = useState(false);
   const [isEditProductDialogOpen, setIsEditProductDialogOpen] = useState(false);
   const [isEditInstanceDialogOpen, setIsEditInstanceDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -157,6 +199,15 @@ const ProductsPage: React.FC = () => {
     category: '',
     manufacturer: '',
     model: '',
+  });
+  
+  const [newInstance, setNewInstance] = useState<CreateProductInstanceDto>({
+    productId: '',
+    barcode: '',
+    serialNumber: '',
+    condition: 'חדש',
+    location: '',
+    notes: '',
   });
   
   const [editProduct, setEditProduct] = useState<UpdateProductDto>({
@@ -178,12 +229,14 @@ const ProductsPage: React.FC = () => {
   // שימוש בהוכים
   const { data: productsData, isLoading, error } = useProducts({ 
     page,
-    limit: 10
+    limit: 100 // מספר גבוה יותר למוצרים רבים
   });
   
   const createProductMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
   const updateInstanceMutation = useUpdateProductInstance();
+  const createInstanceMutation = useCreateProductInstance();
+  const deleteInstanceMutation = useDeleteProductInstance();
   const { data: productInstances } = useProductInstances();
   const { data: categories = [] } = useProductCategories();
   const { data: manufacturers = [] } = useProductManufacturers();
@@ -362,7 +415,162 @@ const ProductsPage: React.FC = () => {
     setIsEditInstanceDialogOpen(true);
   };
 
+  // פונקציה ליצירת ברקוד אוטומטי
+  const generateBarcode = () => {
+    if (!selectedProduct) return '';
+    
+    // יצירת קיצור משם המוצר
+    const productName = selectedProduct.name;
+    let prefix = '';
+    
+    // קיצורים לפי קטגוריה
+    const category = selectedProduct.category?.toLowerCase() || '';
+    if (category.includes('כסא') || category.includes('גלגל')) {
+      prefix = 'WC';
+    } else if (category.includes('הליכ') || category.includes('הליכון')) {
+      prefix = 'WAL';
+    } else if (category.includes('מיט') || category.includes('מטה')) {
+      prefix = 'BED';
+    } else if (category.includes('שמיע')) {
+      prefix = 'HA';
+    } else if (category.includes('ראי')) {
+      prefix = 'VA';
+    } else if (category.includes('רחצ')) {
+      prefix = 'BA';
+    } else {
+      // אם לא מצאנו קטגוריה, נשתמש באותיות הראשונות של השם
+      const words = productName.split(' ').filter((word: string) => word.length > 0);
+      if (words.length >= 2) {
+        prefix = (words[0][0] + words[1][0]).toUpperCase();
+      } else if (words.length === 1) {
+        prefix = words[0].substring(0, 2).toUpperCase();
+      } else {
+        prefix = 'ITEM';
+      }
+    }
+    
+    // חישוב המספר הרץ על בסיס מופעים קיימים
+    const existingInstances = productInstances?.filter(inst => inst.productId === selectedProduct.id) || [];
+    const nextNumber = String(existingInstances.length + 1).padStart(3, '0');
+    
+    return `${prefix}${nextNumber}`;
+  };
+
+  const handleGenerateBarcode = () => {
+    const suggestedBarcode = generateBarcode();
+    setNewInstance(prev => ({ ...prev, barcode: suggestedBarcode }));
+  };
+
+  // פונקציות להוספת מופע חדש
+  const handleAddInstance = () => {
+    console.log('🔄 Adding new instance for product:', selectedProduct);
+    if (selectedProduct && selectedProduct.id) {
+      const suggestedBarcode = generateBarcode();
+      setNewInstance({
+        productId: selectedProduct.id,
+        barcode: suggestedBarcode, // ברקוד אוטומטי
+        serialNumber: '',
+        condition: 'excellent',
+        location: '',
+        notes: '',
+      });
+      console.log('📋 New instance initialized with productId:', selectedProduct.id, 'and barcode:', suggestedBarcode);
+      setIsAddInstanceDialogOpen(true);
+    } else {
+      console.error('❌ Error: selectedProduct or selectedProduct.id is missing');
+      alert('שגיאה: לא נמצא מוצר נבחר');
+    }
+  };
+
+  const handleCloseAddInstance = () => {
+    setIsAddInstanceDialogOpen(false);
+    setNewInstance({
+      productId: '',
+      barcode: '',
+      serialNumber: '',
+      condition: 'excellent',
+      location: '',
+      notes: '',
+    });
+  };
+
   const handleSaveInstance = async () => {
+    console.log('🔄 Starting instance save process...');
+    console.log('📋 Current instance state:', newInstance);
+    
+    // ולידציה שה-productId קיים
+    if (!newInstance.productId) {
+      console.error('❌ Error: productId is missing');
+      alert('שגיאה: לא נמצא מזהה מוצר');
+      return;
+    }
+    
+    // ולידציה שברקוד קיים (שדה חובה)
+    if (!newInstance.barcode || newInstance.barcode.trim() === '') {
+      console.error('❌ Error: barcode is required');
+      alert('שגיאה: ברקוד הוא שדה חובה');
+      return;
+    }
+    
+    // ניקוי והכנת הדאטה
+    const cleanedInstanceData = {
+      productId: newInstance.productId.trim(),
+      barcode: newInstance.barcode.trim(),
+      ...(newInstance.serialNumber?.trim() && { serialNumber: newInstance.serialNumber.trim() }),
+      ...(newInstance.condition?.trim() && { condition: newInstance.condition.trim() }),
+      ...(newInstance.location?.trim() && { location: newInstance.location.trim() }),
+      ...(newInstance.notes?.trim() && { notes: newInstance.notes.trim() }),
+    };
+    
+    console.log('🧹 Cleaned instance data:', cleanedInstanceData);
+    
+    try {
+      console.log('📤 Sending instance data:', cleanedInstanceData);
+      const result = await createInstanceMutation.mutateAsync(cleanedInstanceData as any);
+      console.log('✅ Instance created successfully:', result);
+      handleCloseAddInstance();
+    } catch (error) {
+      console.error('❌ Failed to create instance:', error);
+      
+      // הצגת פרטי השגיאה
+      if (error && typeof error === 'object') {
+        const errorDetails = {
+          message: (error as any)?.message,
+          status: (error as any)?.response?.status,
+          statusText: (error as any)?.response?.statusText,
+          data: (error as any)?.response?.data,
+        };
+        console.error('Error details:', errorDetails);
+        
+        // הצגת הודעת שגיאה מפורטת
+        let errorMessage = 'שגיאה בהוספת המופע';
+        if (errorDetails.data?.message) {
+          if (Array.isArray(errorDetails.data.message)) {
+            errorMessage += ':\n• ' + errorDetails.data.message.join('\n• ');
+          } else {
+            errorMessage += ': ' + errorDetails.data.message;
+          }
+        } else if (errorDetails.message) {
+          errorMessage += ': ' + errorDetails.message;
+        }
+        
+        alert(errorMessage);
+      }
+    }
+  };
+
+  // פונקציה למחיקת מופע
+  const handleDeleteInstance = async (instance: any) => {
+    if (window.confirm(`האם אתה בטוח שברצונך למחוק את המופע ${instance.barcode || instance.id.slice(-4)}?`)) {
+      try {
+        await deleteInstanceMutation.mutateAsync(instance.id);
+      } catch (error) {
+        console.error('Failed to delete instance:', error);
+      }
+    }
+  };
+
+  const handleSaveEditedInstance = async () => {
     if (!editingInstance?.id) return;
     
     try {
@@ -415,23 +623,234 @@ const ProductsPage: React.FC = () => {
   // אם נבחר מוצר, מציגים את המופעים שלו
   if (isViewingInstances && selectedProduct) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <IconButton onClick={handleBackToProducts} sx={{ mr: 2 }}>
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h4" component="h1" fontWeight="bold">
-            {t('products.instancesTitle')} - {selectedProduct.name}
-          </Typography>
+      <>
+        <Box sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <IconButton onClick={handleBackToProducts} sx={{ mr: 2 }}>
+                <ArrowBackIcon />
+              </IconButton>
+              <Typography variant="h4" component="h1" fontWeight="bold">
+                {t('products.instancesTitle')} - {selectedProduct.name}
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddInstance}
+              size="large"
+            >
+              {t('products.addInstance')}
+            </Button>
+          </Box>
+          
+          {/* כאן נוסיף את תצוגת המופעים */}
+          <ProductInstancesView 
+            product={selectedProduct} 
+            instances={productInstances?.filter(inst => inst.productId === selectedProduct.id) || []}
+            onEditInstance={handleEditInstance}
+            onDeleteInstance={handleDeleteInstance}
+          />
         </Box>
-        
-        {/* כאן נוסיף את תצוגת המופעים */}
-        <ProductInstancesView 
-          product={selectedProduct} 
-          instances={productInstances?.filter(inst => inst.productId === selectedProduct.id) || []}
-          onEditInstance={handleEditInstance}
-        />
-      </Box>
+
+        {/* Add Instance Dialog */}
+        <Dialog 
+          open={isAddInstanceDialogOpen} 
+          onClose={handleCloseAddInstance}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>
+            {t('products.addInstance')}
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseAddInstance}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          
+          <DialogContent>
+            <Grid container spacing={3} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  label={t('products.barcode')}
+                  value={newInstance.barcode}
+                  onChange={(e) => setNewInstance(prev => ({ ...prev, barcode: e.target.value }))}
+                  helperText="שדה חובה - ברקוד ייחודי למופע"
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        onClick={handleGenerateBarcode}
+                        edge="end"
+                        size="small"
+                        title="יצירת ברקוד אוטומטי"
+                      >
+                        <QrCodeIcon />
+                      </IconButton>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t('products.serial_number')}
+                  value={newInstance.serialNumber}
+                  onChange={(e) => setNewInstance(prev => ({ ...prev, serialNumber: e.target.value }))}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>{t('products.condition')}</InputLabel>
+                  <Select
+                    value={newInstance.condition}
+                    onChange={(e) => setNewInstance(prev => ({ ...prev, condition: e.target.value }))}
+                    label={t('products.condition')}
+                  >
+                    <MenuItem value="excellent">{t('products.conditions.excellent')}</MenuItem>
+                    <MenuItem value="good">{t('products.conditions.good')}</MenuItem>
+                    <MenuItem value="fair">{t('products.conditions.fair')}</MenuItem>
+                    <MenuItem value="poor">{t('products.conditions.poor')}</MenuItem>
+                    <MenuItem value="needs-repair">{t('products.conditions.needs_repair')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t('products.location')}
+                  value={newInstance.location}
+                  onChange={(e) => setNewInstance(prev => ({ ...prev, location: e.target.value }))}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label={t('products.notes')}
+                  value={newInstance.notes}
+                  onChange={(e) => setNewInstance(prev => ({ ...prev, notes: e.target.value }))}
+                  multiline
+                  rows={3}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          
+          <DialogActions>
+            <Button onClick={handleCloseAddInstance}>
+              {t('common.cancel')}
+            </Button>
+            <Button 
+              onClick={handleSaveInstance}
+              variant="contained"
+              disabled={createInstanceMutation.isPending || !newInstance.barcode?.trim()}
+            >
+              {createInstanceMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Edit Instance Dialog */}
+        <Dialog 
+          open={isEditInstanceDialogOpen} 
+          onClose={handleCloseEditInstance}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>
+            {t('editInstance')}
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseEditInstance}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          
+          <DialogContent>
+            <Grid container spacing={3} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t('products.barcode')}
+                  value={editInstance.barcode}
+                  onChange={(e) => setEditInstance(prev => ({ ...prev, barcode: e.target.value }))}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t('products.serial_number')}
+                  value={editInstance.serialNumber}
+                  onChange={(e) => setEditInstance(prev => ({ ...prev, serialNumber: e.target.value }))}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>{t('products.condition')}</InputLabel>
+                  <Select
+                    value={editInstance.condition}
+                    onChange={(e) => setEditInstance(prev => ({ ...prev, condition: e.target.value }))}
+                    label={t('products.condition')}
+                  >
+                    <MenuItem value="excellent">{t('products.conditions.excellent')}</MenuItem>
+                    <MenuItem value="good">{t('products.conditions.good')}</MenuItem>
+                    <MenuItem value="fair">{t('products.conditions.fair')}</MenuItem>
+                    <MenuItem value="poor">{t('products.conditions.poor')}</MenuItem>
+                    <MenuItem value="needs-repair">{t('products.conditions.needs_repair')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t('products.location')}
+                  value={editInstance.location}
+                  onChange={(e) => setEditInstance(prev => ({ ...prev, location: e.target.value }))}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label={t('products.notes')}
+                  value={editInstance.notes}
+                  onChange={(e) => setEditInstance(prev => ({ ...prev, notes: e.target.value }))}
+                  multiline
+                  rows={3}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          
+          <DialogActions>
+            <Button onClick={handleCloseEditInstance}>
+              {t('common.cancel')}
+            </Button>
+            <Button 
+              onClick={handleSaveEditedInstance}
+              variant="contained"
+              disabled={updateInstanceMutation.isPending}
+            >
+              {updateInstanceMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     );
   }
 
@@ -1020,97 +1439,6 @@ const ProductsPage: React.FC = () => {
             disabled={updateProductMutation.isPending || !editProduct.name?.trim() || !editProduct.category?.trim()}
           >
             {updateProductMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Edit Instance Dialog */}
-      <Dialog 
-        open={isEditInstanceDialogOpen} 
-        onClose={handleCloseEditInstance}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {t('editInstance')}
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseEditInstance}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        
-        <DialogContent>
-          <Grid container spacing={3} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label={t('products.barcode')}
-                value={editInstance.barcode}
-                onChange={(e) => setEditInstance(prev => ({ ...prev, barcode: e.target.value }))}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label={t('products.serial_number')}
-                value={editInstance.serialNumber}
-                onChange={(e) => setEditInstance(prev => ({ ...prev, serialNumber: e.target.value }))}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>{t('products.condition')}</InputLabel>
-                <Select
-                  value={editInstance.condition}
-                  onChange={(e) => setEditInstance(prev => ({ ...prev, condition: e.target.value }))}
-                  label={t('products.condition')}
-                >
-                  <MenuItem value="חדש">{t('products.conditions.new')}</MenuItem>
-                  <MenuItem value="משומש - מצב טוב">{t('products.conditions.used_good')}</MenuItem>
-                  <MenuItem value="משומש - מצב בינוני">{t('products.conditions.used_fair')}</MenuItem>
-                  <MenuItem value="זקוק לתיקון">{t('products.conditions.needs_repair')}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label={t('products.location')}
-                value={editInstance.location}
-                onChange={(e) => setEditInstance(prev => ({ ...prev, location: e.target.value }))}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label={t('products.notes')}
-                value={editInstance.notes}
-                onChange={(e) => setEditInstance(prev => ({ ...prev, notes: e.target.value }))}
-                multiline
-                rows={3}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        
-        <DialogActions>
-          <Button onClick={handleCloseEditInstance}>
-            {t('common.cancel')}
-          </Button>
-          <Button 
-            onClick={handleSaveInstance}
-            variant="contained"
-            disabled={updateInstanceMutation.isPending}
-          >
-            {updateInstanceMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>

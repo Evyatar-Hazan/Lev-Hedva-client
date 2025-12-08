@@ -87,7 +87,7 @@ export class ProductsClient {
   }
 
   static async updateProductInstance(id: string, instanceData: UpdateProductInstanceDto): Promise<ProductInstance> {
-    const response = await apiClient.patch<ProductInstance>(
+    const response = await apiClient.put<ProductInstance>(
       `${this.BASE_PATH}/instances/${id}`,
       instanceData
     );
