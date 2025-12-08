@@ -176,7 +176,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   return (
     <Drawer
       variant="temporary"
-      anchor="right"
+      anchor="left"
       open={open}
       onClose={onClose}
       ModalProps={{
