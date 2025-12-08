@@ -21,6 +21,13 @@ import {
   Select,
   CircularProgress,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Grid,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -29,9 +36,10 @@ import {
   Delete as DeleteIcon,
   Lock as LockIcon,
   LockOpen as LockOpenIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
-import { useUsers } from '../hooks';
-import { UserRole } from '../lib/types';
+import { useUsers, useCreateUser } from '../hooks';
+import { UserRole, CreateUserDto } from '../lib/types';
 import { format } from 'date-fns';
 
 const UsersPage: React.FC = () => {
@@ -39,6 +47,16 @@ const UsersPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newUser, setNewUser] = useState<CreateUserDto>({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    role: UserRole.CLIENT,
+    isActive: true,
+  });
   
   // שימוש בהוק החדש
   const { 
@@ -51,6 +69,8 @@ const UsersPage: React.FC = () => {
     page,
     limit: 10
   });
+
+  const createUserMutation = useCreateUser();
 
   // Debug logging
   console.log('👥 Users Page Debug:', {
@@ -70,6 +90,36 @@ const UsersPage: React.FC = () => {
   const handleRoleFilterChange = (event: any) => {
     setRoleFilter(event.target.value);
     setPage(1);
+  };
+
+  const handleAddUser = () => {
+    setIsAddDialogOpen(true);
+  };
+
+  const handleCloseAddDialog = () => {
+    setIsAddDialogOpen(false);
+    setNewUser({
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      phone: '',
+      role: UserRole.CLIENT,
+      isActive: true,
+    });
+  };
+
+  const handleSaveUser = async () => {
+    try {
+      await createUserMutation.mutateAsync(newUser);
+      handleCloseAddDialog();
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
+  };
+
+  const handleUserFieldChange = (field: keyof CreateUserDto, value: any) => {
+    setNewUser(prev => ({ ...prev, [field]: value }));
   };
 
   const getRoleColor = (role: string) => {
@@ -106,6 +156,7 @@ const UsersPage: React.FC = () => {
           variant="contained"
           startIcon={<AddIcon />}
           size="large"
+          onClick={handleAddUser}
         >
           {t('users.addUser')}
         </Button>
@@ -239,6 +290,116 @@ const UsersPage: React.FC = () => {
           </Typography>
         </Box>
       )}
+
+      {/* Add User Dialog */}
+      <Dialog 
+        open={isAddDialogOpen} 
+        onClose={handleCloseAddDialog}
+        maxWidth="sm"
+        fullWidth
+        dir="rtl"
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6">
+              {t('users.addUser')}
+            </Typography>
+            <IconButton onClick={handleCloseAddDialog} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('users.firstName')}
+                value={newUser.firstName}
+                onChange={(e) => handleUserFieldChange('firstName', e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('users.lastName')}
+                value={newUser.lastName}
+                onChange={(e) => handleUserFieldChange('lastName', e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('users.email')}
+                type="email"
+                value={newUser.email}
+                onChange={(e) => handleUserFieldChange('email', e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('users.password')}
+                type="password"
+                value={newUser.password}
+                onChange={(e) => handleUserFieldChange('password', e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('users.phone')}
+                value={newUser.phone}
+                onChange={(e) => handleUserFieldChange('phone', e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>{t('users.role')}</InputLabel>
+                <Select
+                  value={newUser.role}
+                  onChange={(e) => handleUserFieldChange('role', e.target.value)}
+                  label={t('users.role')}
+                >
+                  <MenuItem value={UserRole.CLIENT}>{t('users.roles.user')}</MenuItem>
+                  <MenuItem value={UserRole.VOLUNTEER}>{t('users.roles.volunteer')}</MenuItem>
+                  <MenuItem value={UserRole.WORKER}>{t('users.roles.manager')}</MenuItem>
+                  <MenuItem value={UserRole.ADMIN}>{t('users.roles.admin')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={newUser.isActive}
+                    onChange={(e) => handleUserFieldChange('isActive', e.target.checked)}
+                  />
+                }
+                label={t('users.activeUser')}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseAddDialog}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSaveUser}
+            variant="contained"
+            disabled={createUserMutation.isPending || !newUser.email || !newUser.password || !newUser.firstName || !newUser.lastName}
+          >
+            {createUserMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
