@@ -17,10 +17,12 @@ import {
 import { useUsers, useProducts, useLoanStats } from '../hooks';
 import { useAuth } from '../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardPage: React.FC = () => {
   const auth = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { data: usersData, isLoading: usersLoading, error: usersError } = useUsers({ limit: 1 });
   const { data: productsData, isLoading: productsLoading, error: productsError } = useProducts({ limit: 1 });
   const { data: loanStats, isLoading: statsLoading, error: statsError } = useLoanStats();
@@ -71,7 +73,17 @@ const DashboardPage: React.FC = () => {
       
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card 
+            sx={{ 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: 3,
+              }
+            }}
+            onClick={() => navigate('/users')}
+          >
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Person color="primary" sx={{ fontSize: 40, mr: 2 }} />
@@ -87,7 +99,17 @@ const DashboardPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card 
+            sx={{ 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: 3,
+              }
+            }}
+            onClick={() => navigate('/products')}
+          >
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Inventory color="success" sx={{ fontSize: 40, mr: 2 }} />
@@ -103,7 +125,17 @@ const DashboardPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card 
+            sx={{ 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: 3,
+              }
+            }}
+            onClick={() => navigate('/loans')}
+          >
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Assignment color="info" sx={{ fontSize: 40, mr: 2 }} />
@@ -119,7 +151,17 @@ const DashboardPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card 
+            sx={{ 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: 3,
+              }
+            }}
+            onClick={() => navigate('/loans')}
+          >
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Warning color="error" sx={{ fontSize: 40, mr: 2 }} />

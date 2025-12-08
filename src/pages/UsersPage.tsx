@@ -31,6 +31,7 @@ import {
   LockOpen as LockOpenIcon,
 } from '@mui/icons-material';
 import { useUsers } from '../hooks';
+import { UserRole } from '../lib/types';
 import { format } from 'date-fns';
 
 const UsersPage: React.FC = () => {
@@ -46,7 +47,7 @@ const UsersPage: React.FC = () => {
     error 
   } = useUsers({ 
     search: search || undefined,
-    role: roleFilter !== 'all' ? (roleFilter as any) : undefined,
+    role: roleFilter !== 'all' ? (roleFilter as UserRole) : undefined,
     page,
     limit: 10
   });
@@ -73,10 +74,10 @@ const UsersPage: React.FC = () => {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'error';
-      case 'manager': return 'warning';
-      case 'volunteer': return 'info';
-      case 'user': return 'default';
+      case 'ADMIN': return 'error';
+      case 'WORKER': return 'warning';
+      case 'VOLUNTEER': return 'info';
+      case 'CLIENT': return 'default';
       default: return 'default';
     }
   };
@@ -145,10 +146,10 @@ const UsersPage: React.FC = () => {
             label="תפקיד"
           >
             <MenuItem value="all">{t('users.roles.all')}</MenuItem>
-            <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-            <MenuItem value="manager">{t('users.roles.manager')}</MenuItem>
-            <MenuItem value="volunteer">{t('users.roles.volunteer')}</MenuItem>
-            <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+            <MenuItem value={UserRole.ADMIN}>{t('users.roles.admin')}</MenuItem>
+            <MenuItem value={UserRole.WORKER}>{t('users.roles.manager')}</MenuItem>
+            <MenuItem value={UserRole.VOLUNTEER}>{t('users.roles.volunteer')}</MenuItem>
+            <MenuItem value={UserRole.CLIENT}>{t('users.roles.user')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
