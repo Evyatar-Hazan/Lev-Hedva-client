@@ -43,9 +43,19 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <MenuIcon />
         </IconButton>
 
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          {t('header.systemTitle')}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
+          <img 
+            src="/logoLevChedva.png" 
+            alt="לב חדוה" 
+            style={{ 
+              height: 32, 
+              width: 'auto'
+            }} 
+          />
+          <Typography variant="h6" noWrap component="div">
+            {t('header.systemTitle')}
+          </Typography>
+        </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <LanguageSelector />

@@ -100,13 +100,23 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const drawer = (
     <div>
       <Toolbar sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-          <Typography variant="h6" noWrap component="div">
-            {t('sidebar.systemTitle')}
-          </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.8 }}>
-            {t('sidebar.welcomeUser', { firstName: user?.firstName, lastName: user?.lastName })}
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+          <img 
+            src="/logoLevChedva.png" 
+            alt="לב חדוה" 
+            style={{ 
+              height: 32, 
+              width: 'auto'
+            }} 
+          />
+          <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+            <Typography variant="h6" noWrap component="div">
+              {t('sidebar.systemTitle')}
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              {t('sidebar.welcomeUser', { firstName: user?.firstName, lastName: user?.lastName })}
+            </Typography>
+          </Box>
         </Box>
       </Toolbar>
 
