@@ -24,10 +24,20 @@ export class UsersClient {
       });
     }
 
-    const response = await apiClient.get<PaginatedResponse<User>>(
+    const response = await apiClient.get<{users: User[], total: number, page: number, limit: number, totalPages: number}>(
       `${this.BASE_PATH}?${params.toString()}`
     );
-    return response.data;
+    
+    // המרה לפורמט הצפוי על ידי הקליינט
+    return {
+      data: response.data.users,
+      pagination: {
+        page: response.data.page,
+        limit: response.data.limit,
+        total: response.data.total,
+        totalPages: response.data.totalPages
+      }
+    };
   }
 
   static async getUserById(id: string): Promise<User> {

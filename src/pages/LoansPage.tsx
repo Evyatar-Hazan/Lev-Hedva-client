@@ -27,6 +27,11 @@ import {
   CardActions,
   useMediaQuery,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Autocomplete,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -36,7 +41,9 @@ import {
   Edit as EditIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
-import { useLoans, useLoanStats, useReturnLoan } from '../hooks';
+import { useLoans, useLoanStats, useReturnLoan, useCreateLoan } from '../hooks';
+import { useUsers } from '../hooks/useUsers';
+import { useProductInstances } from '../hooks/useProducts';
 import { format } from 'date-fns';
 
 const LoansPage: React.FC = () => {
@@ -47,6 +54,13 @@ const LoansPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newLoan, setNewLoan] = useState({
+    userId: '',
+    productInstanceId: '',
+    expectedReturnDate: '',
+    notes: ''
+  });
   
   // שימוש בהוכים החדשים
   const { data: loansData, isLoading, error } = useLoans({ 
@@ -56,6 +70,17 @@ const LoansPage: React.FC = () => {
   
   const { data: loanStats } = useLoanStats();
   const returnLoanMutation = useReturnLoan();
+  const createLoanMutation = useCreateLoan();
+  const { data: usersData } = useUsers();
+  const { data: productInstancesData } = useProductInstances();
+
+  // Debug logging
+  console.log('🔍 Dialog Debug Data:', { 
+    usersData, 
+    productInstancesData,
+    isCreateDialogOpen,
+    newLoan
+  });
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -72,6 +97,36 @@ const LoansPage: React.FC = () => {
       await returnLoanMutation.mutateAsync(loanId);
     } catch (error) {
       console.error('Failed to return loan:', error);
+    }
+  };
+
+  const handleCreateLoan = () => {
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleCloseCreateDialog = () => {
+    setIsCreateDialogOpen(false);
+    setNewLoan({
+      userId: '',
+      productInstanceId: '',
+      expectedReturnDate: '',
+      notes: ''
+    });
+  };
+
+  const handleSubmitCreateLoan = async () => {
+    console.log('🚀 Creating loan with data:', newLoan);
+    console.log('🔍 Validation state:', {
+      hasUserId: !!newLoan.userId,
+      hasProductInstanceId: !!newLoan.productInstanceId,
+      isPending: createLoanMutation.isPending
+    });
+    
+    try {
+      await createLoanMutation.mutateAsync(newLoan);
+      handleCloseCreateDialog();
+    } catch (error) {
+      console.error('Failed to create loan:', error);
     }
   };
 
@@ -115,6 +170,7 @@ const LoansPage: React.FC = () => {
           variant="contained"
           startIcon={<AddIcon />}
           size="large"
+          onClick={handleCreateLoan}
         >
           {t('loans.newLoan')}
         </Button>
@@ -352,6 +408,77 @@ const LoansPage: React.FC = () => {
           </Typography>
         </Box>
       )}
+
+      {/* דיאלוג יצירת הלוואה חדשה */}
+      <Dialog open={isCreateDialogOpen} onClose={handleCloseCreateDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('loans.createNewLoan')}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Autocomplete
+              options={usersData?.data || []}
+              getOptionLabel={(option: any) => `${option.firstName} ${option.lastName} (${option.email})`}
+              value={usersData?.data?.find((u: any) => u.id === newLoan.userId) || null}
+              onChange={(_, newValue: any) => {
+                console.log('👤 User selected:', newValue);
+                setNewLoan(prev => ({ ...prev, userId: newValue?.id || '' }));
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label={t('loans.selectUser')} required />
+              )}
+            />
+
+            <Autocomplete
+              options={productInstancesData || []}
+              getOptionLabel={(option: any) => 
+                `${option.product.name} - ${option.barcode} (${option.condition})`
+              }
+              value={productInstancesData?.find((p: any) => p.id === newLoan.productInstanceId) || null}
+              onChange={(_, newValue: any) => {
+                console.log('📦 Product selected:', newValue);
+                setNewLoan(prev => ({ ...prev, productInstanceId: newValue?.id || '' }));
+              }}
+              isOptionEqualToValue={(option: any, value: any) => option.id === value?.id}
+              getOptionDisabled={(option: any) => !option.isAvailable}
+              renderInput={(params) => (
+                <TextField {...params} label={t('loans.selectProduct')} required />
+              )}
+            />
+
+            <TextField
+              label={t('loans.expectedReturnDate')}
+              type="date"
+              value={newLoan.expectedReturnDate}
+              onChange={(e) => setNewLoan(prev => ({ ...prev, expectedReturnDate: e.target.value }))}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputProps={{
+                min: new Date().toISOString().split('T')[0], // תאריך מינימלי - היום
+              }}
+            />
+
+            <TextField
+              label={t('loans.notes')}
+              multiline
+              rows={3}
+              value={newLoan.notes}
+              onChange={(e) => setNewLoan(prev => ({ ...prev, notes: e.target.value }))}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCreateDialog}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSubmitCreateLoan}
+            variant="contained"
+            disabled={!newLoan.userId || !newLoan.productInstanceId || createLoanMutation.isPending}
+          >
+            {createLoanMutation.isPending ? <CircularProgress size={20} /> : t('common.create')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

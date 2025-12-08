@@ -34,7 +34,16 @@ export const useCreateLoan = () => {
     mutationFn: (loanData: CreateLoanDto) => 
       LoansClient.createLoan(loanData),
     onSuccess: () => {
+      // רענון נתוני השאלות
       queryClient.invalidateQueries({ queryKey: LOANS_QUERY_KEY });
+      // רענון כל נתוני המוצרים (כולל מופעים)
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === 'products' || 
+          query.queryKey[0] === 'product-instances'
+      });
+      // רענון סטטיסטיקות השאלות
+      queryClient.invalidateQueries({ queryKey: ['loanStats'] });
     },
   });
 };
@@ -60,8 +69,17 @@ export const useReturnLoan = () => {
   return useMutation({
     mutationFn: (id: string) => LoansClient.returnLoan(id),
     onSuccess: (_, id) => {
+      // רענון נתוני השאלות
       queryClient.invalidateQueries({ queryKey: LOANS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: [...LOANS_QUERY_KEY, id] });
+      // רענון כל נתוני המוצרים (כולל מופעים)
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === 'products' || 
+          query.queryKey[0] === 'product-instances'
+      });
+      // רענון סטטיסטיקות השאלות
+      queryClient.invalidateQueries({ queryKey: ['loanStats'] });
     },
   });
 };
