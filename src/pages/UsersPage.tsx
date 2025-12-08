@@ -38,8 +38,8 @@ import {
   LockOpen as LockOpenIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
-import { useUsers, useCreateUser } from '../hooks';
-import { UserRole, CreateUserDto } from '../lib/types';
+import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, useToggleUserStatus } from '../hooks';
+import { UserRole, CreateUserDto, UpdateUserDto } from '../lib/types';
 import { format } from 'date-fns';
 
 const UsersPage: React.FC = () => {
@@ -48,6 +48,8 @@ const UsersPage: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState<CreateUserDto>({
     email: '',
     password: '',
@@ -71,6 +73,9 @@ const UsersPage: React.FC = () => {
   });
 
   const createUserMutation = useCreateUser();
+  const updateUserMutation = useUpdateUser();
+  const deleteUserMutation = useDeleteUser();
+  const toggleUserStatusMutation = useToggleUserStatus();
 
   // Debug logging
   console.log('👥 Users Page Debug:', {
@@ -120,6 +125,62 @@ const UsersPage: React.FC = () => {
 
   const handleUserFieldChange = (field: keyof CreateUserDto, value: any) => {
     setNewUser(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditUser = (user: any) => {
+    setEditingUser(user);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setEditingUser(null);
+  };
+
+  const handleSaveEditUser = async () => {
+    try {
+      if (editingUser) {
+        await updateUserMutation.mutateAsync({
+          id: editingUser.id,
+          userData: {
+            firstName: editingUser.firstName,
+            lastName: editingUser.lastName,
+            email: editingUser.email,
+            phone: editingUser.phone,
+            role: editingUser.role,
+            isActive: editingUser.isActive,
+          }
+        });
+        handleCloseEditDialog();
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const handleEditUserFieldChange = (field: string, value: any) => {
+    setEditingUser((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const handleToggleUserStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      await toggleUserStatusMutation.mutateAsync({ 
+        id: userId, 
+        isActive: !currentStatus 
+      });
+    } catch (error) {
+      console.error('Error toggling user status:', error);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (window.confirm(t('users.confirmDelete'))) {
+      try {
+        await deleteUserMutation.mutateAsync(userId);
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
   };
 
   const getRoleColor = (role: string) => {
@@ -258,17 +319,30 @@ const UsersPage: React.FC = () => {
                     {format(new Date(user.createdAt), 'dd/MM/yyyy')}
                   </TableCell>
                   <TableCell>
-                    <IconButton size="small" color="primary" title="עריכה">
+                    <IconButton 
+                      size="small" 
+                      color="primary" 
+                      title="עריכה"
+                      onClick={() => handleEditUser(user)}
+                    >
                       <EditIcon />
                     </IconButton>
                     <IconButton 
                       size="small" 
                       color={user.isActive ? 'warning' : 'success'}
                       title={user.isActive ? 'השבתה' : 'הפעלה'}
+                      onClick={() => handleToggleUserStatus(user.id, user.isActive)}
+                      disabled={toggleUserStatusMutation.isPending}
                     >
                       {user.isActive ? <LockIcon /> : <LockOpenIcon />}
                     </IconButton>
-                    <IconButton size="small" color="error" title="מחיקה">
+                    <IconButton 
+                      size="small" 
+                      color="error" 
+                      title="מחיקה"
+                      onClick={() => handleDeleteUser(user.id)}
+                      disabled={deleteUserMutation.isPending}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
@@ -397,6 +471,105 @@ const UsersPage: React.FC = () => {
             disabled={createUserMutation.isPending || !newUser.email || !newUser.password || !newUser.firstName || !newUser.lastName}
           >
             {createUserMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={isEditDialogOpen} onClose={handleCloseEditDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {t('users.editUser')}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseEditDialog}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Grid container spacing={3} sx={{ mt: 1 }}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('users.firstName')}
+                value={editingUser?.firstName || ''}
+                onChange={(e) => handleEditUserFieldChange('firstName', e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label={t('users.lastName')}
+                value={editingUser?.lastName || ''}
+                onChange={(e) => handleEditUserFieldChange('lastName', e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('users.email')}
+                type="email"
+                value={editingUser?.email || ''}
+                onChange={(e) => handleEditUserFieldChange('email', e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={t('users.phone')}
+                value={editingUser?.phone || ''}
+                onChange={(e) => handleEditUserFieldChange('phone', e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>{t('users.role')}</InputLabel>
+                <Select
+                  value={editingUser?.role || UserRole.CLIENT}
+                  onChange={(e) => handleEditUserFieldChange('role', e.target.value)}
+                  label={t('users.role')}
+                >
+                  <MenuItem value={UserRole.CLIENT}>{t('users.roles.user')}</MenuItem>
+                  <MenuItem value={UserRole.VOLUNTEER}>{t('users.roles.volunteer')}</MenuItem>
+                  <MenuItem value={UserRole.WORKER}>{t('users.roles.manager')}</MenuItem>
+                  <MenuItem value={UserRole.ADMIN}>{t('users.roles.admin')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={editingUser?.isActive || false}
+                    onChange={(e) => handleEditUserFieldChange('isActive', e.target.checked)}
+                  />
+                }
+                label={t('users.activeUser')}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSaveEditUser}
+            variant="contained"
+            disabled={updateUserMutation.isPending || !editingUser?.email || !editingUser?.firstName || !editingUser?.lastName}
+          >
+            {updateUserMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>
