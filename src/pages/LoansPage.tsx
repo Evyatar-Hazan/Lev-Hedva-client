@@ -127,7 +127,7 @@ const LoansPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center' }}>
               <AssignmentIcon color="info" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" color="info.main">
-                {loanStats?.active || 0}
+                {loanStats?.totalActiveLoans || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t('loans.stats.activeLoans')}
@@ -140,7 +140,7 @@ const LoansPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center' }}>
               <UndoIcon color="error" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" color="error.main">
-                {loanStats?.overdue || 0}
+                {loanStats?.totalOverdueLoans || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t('loans.stats.overdue')}
@@ -153,7 +153,7 @@ const LoansPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center' }}>
               <PersonIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" color="success.main">
-                {loanStats?.returned || 0}
+                {loanStats?.totalReturnedLoans || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t('loans.stats.returned')}
@@ -166,7 +166,7 @@ const LoansPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center' }}>
               <AssignmentIcon color="warning" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" color="warning.main">
-                {loanStats?.lost || 0}
+                {loanStats?.totalLostItems || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t('loans.stats.lost')}
@@ -215,12 +215,12 @@ const LoansPage: React.FC = () => {
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <CircularProgress />
             </Box>
-          ) : loansData?.data?.length === 0 ? (
+          ) : loansData?.loans?.length === 0 ? (
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <Typography>{t('loans.noLoans')}</Typography>
             </Paper>
           ) : (
-            loansData?.data?.map((loan) => (
+            loansData?.loans?.map((loan) => (
               <Card key={loan.id}>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -289,14 +289,14 @@ const LoansPage: React.FC = () => {
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ) : loansData?.data?.length === 0 ? (
+              ) : loansData?.loans?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
                     {t('loans.noLoans')}
                   </TableCell>
                 </TableRow>
               ) : (
-                loansData?.data?.map((loan) => (
+                loansData?.loans?.map((loan) => (
                   <TableRow key={loan.id}>
                     <TableCell>
                       {loan.user?.firstName} {loan.user?.lastName}
@@ -342,12 +342,12 @@ const LoansPage: React.FC = () => {
       )}
 
       {/* Pagination */}
-      {loansData?.pagination && (
+      {loansData && loansData.total > 0 && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <Typography variant="body2">
             {t('loans.pagination', { 
-              showing: loansData.data.length, 
-              total: loansData.pagination.total 
+              showing: loansData.loans.length, 
+              total: loansData.total 
             })}
           </Typography>
         </Box>

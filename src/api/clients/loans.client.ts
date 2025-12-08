@@ -3,14 +3,32 @@ import {
   Loan, 
   CreateLoanDto, 
   UpdateLoanDto, 
-  LoansQueryDto, 
-  PaginatedResponse
+  LoansQueryDto
 } from '../../lib/types';
+
+// Define the response interface to match server response
+interface LoansListResponse {
+  loans: Loan[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+interface LoanStatsResponse {
+  totalActiveLoans: number;
+  totalOverdueLoans: number;
+  totalReturnedLoans: number;
+  totalLostItems: number;
+  averageLoanDuration: number;
+  loansByCategory: { category: string; count: number; }[];
+  overdueByUser: { userId: string; userName: string; count: number; }[];
+}
 
 export class LoansClient {
   private static readonly BASE_PATH = '/loans';
 
-  static async getLoans(query?: LoansQueryDto): Promise<PaginatedResponse<Loan>> {
+  static async getLoans(query?: LoansQueryDto): Promise<LoansListResponse> {
     const params = new URLSearchParams();
     
     if (query) {
@@ -22,7 +40,7 @@ export class LoansClient {
       });
     }
 
-    const response = await apiClient.get<PaginatedResponse<Loan>>(
+    const response = await apiClient.get<LoansListResponse>(
       `${this.BASE_PATH}?${params.toString()}`
     );
     return response.data;
@@ -63,18 +81,8 @@ export class LoansClient {
     return response.data;
   }
 
-  static async getLoanStats(): Promise<{
-    active: number;
-    overdue: number;
-    returned: number;
-    lost: number;
-  }> {
-    const response = await apiClient.get<{
-      active: number;
-      overdue: number;
-      returned: number;
-      lost: number;
-    }>(`${this.BASE_PATH}/stats`);
+  static async getLoanStats(): Promise<LoanStatsResponse> {
+    const response = await apiClient.get<LoanStatsResponse>(`${this.BASE_PATH}/stats`);
     return response.data;
   }
 }
