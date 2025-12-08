@@ -238,22 +238,35 @@ const ProductsPage: React.FC = () => {
   };
 
   const handleSaveEditProduct = async () => {
-    if (!selectedProduct?.id) return;
+    console.log('🔄 handleSaveEditProduct called');
+    console.log('🔍 selectedProduct:', selectedProduct);
+    
+    if (!selectedProduct?.id) {
+      console.log('❌ No selected product ID, aborting save');
+      return;
+    }
     
     console.log('💾 Starting product edit save process...');
     console.log('📋 Current edit product state:', editProduct);
     console.log('🎯 Selected product ID:', selectedProduct.id);
+    console.log('🚀 updateProductMutation status:', {
+      isPending: updateProductMutation.isPending,
+      isError: updateProductMutation.isError,
+      error: updateProductMutation.error
+    });
     
     try {
-      await updateProductMutation.mutateAsync({
+      console.log('📤 Sending update request...');
+      const result = await updateProductMutation.mutateAsync({
         id: selectedProduct.id,
         productData: editProduct
       });
       
-      console.log('✅ Product updated successfully!');
+      console.log('✅ Product updated successfully!', result);
       handleCloseEditDialog();
     } catch (error) {
       console.error('❌ Failed to update product:', error);
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
       // הודעה תוצג אוטומטית על ידי ה-hook
     }
   };
@@ -859,7 +872,16 @@ const ProductsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button 
-            onClick={handleSaveEditProduct}
+            onClick={() => {
+              console.log('🖱️ Save button clicked!');
+              console.log('🔍 Button disabled status:', {
+                isPending: updateProductMutation.isPending,
+                nameEmpty: !editProduct.name?.trim(),
+                categoryEmpty: !editProduct.category?.trim(),
+                editProduct
+              });
+              handleSaveEditProduct();
+            }}
             variant="contained"
             disabled={updateProductMutation.isPending || !editProduct.name?.trim() || !editProduct.category?.trim()}
           >

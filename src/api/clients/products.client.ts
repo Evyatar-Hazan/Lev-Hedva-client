@@ -44,7 +44,7 @@ export class ProductsClient {
   }
 
   static async updateProduct(id: string, productData: UpdateProductDto): Promise<Product> {
-    const response = await apiClient.patch<Product>(`${this.BASE_PATH}/${id}`, productData);
+    const response = await apiClient.put<Product>(`${this.BASE_PATH}/${id}`, productData);
     return response.data;
   }
 
