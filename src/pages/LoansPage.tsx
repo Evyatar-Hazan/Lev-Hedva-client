@@ -41,7 +41,7 @@ import {
   Edit as EditIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
-import { useLoans, useLoanStats, useReturnLoan, useCreateLoan } from '../hooks';
+import { useLoans, useLoanStats, useReturnLoan, useCreateLoan, useUpdateLoan } from '../hooks';
 import { useUsers } from '../hooks/useUsers';
 import { useProductInstances } from '../hooks/useProducts';
 import { format } from 'date-fns';
@@ -55,11 +55,18 @@ const LoansPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editLoanId, setEditLoanId] = useState<string | null>(null);
   const [newLoan, setNewLoan] = useState({
     userId: '',
     productInstanceId: '',
     expectedReturnDate: '',
     notes: ''
+  });
+  const [editLoan, setEditLoan] = useState({
+    expectedReturnDate: '',
+    notes: '',
+    status: ''
   });
   
   // שימוש בהוכים החדשים
@@ -71,16 +78,37 @@ const LoansPage: React.FC = () => {
   const { data: loanStats } = useLoanStats();
   const returnLoanMutation = useReturnLoan();
   const createLoanMutation = useCreateLoan();
+  const updateLoanMutation = useUpdateLoan();
   const { data: usersData } = useUsers();
   const { data: productInstancesData } = useProductInstances();
 
-  // Debug logging
-  console.log('🔍 Dialog Debug Data:', { 
-    usersData, 
-    productInstancesData,
-    isCreateDialogOpen,
-    newLoan
-  });
+  // סינון השאלות לפי סטטוס
+  const getFilteredLoans = () => {
+    if (!loansData?.loans) return [];
+    
+    if (statusFilter === 'all') return loansData.loans;
+    
+    return loansData.loans.filter(loan => {
+      const today = new Date();
+      const expectedReturn = loan.expectedReturnDate ? new Date(loan.expectedReturnDate) : null;
+      const isOverdue = loan.status === 'ACTIVE' && expectedReturn && expectedReturn < today;
+      
+      switch (statusFilter) {
+        case 'active':
+          return loan.status?.toLowerCase() === 'active' && !isOverdue;
+        case 'overdue':
+          return loan.status?.toLowerCase() === 'overdue' || isOverdue;
+        case 'returned':
+          return loan.status?.toLowerCase() === 'returned';
+        case 'lost':
+          return loan.status?.toLowerCase() === 'lost';
+        default:
+          return true;
+      }
+    });
+  };
+
+  const filteredLoans = getFilteredLoans();
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -104,6 +132,53 @@ const LoansPage: React.FC = () => {
     setIsCreateDialogOpen(true);
   };
 
+  const handleEditLoan = (loanId: string) => {
+    const loanToEdit = loansData?.loans?.find(loan => loan.id === loanId);
+    if (loanToEdit) {
+      setEditLoanId(loanId);
+      setEditLoan({
+        expectedReturnDate: loanToEdit.expectedReturnDate 
+          ? new Date(loanToEdit.expectedReturnDate).toISOString().split('T')[0] 
+          : '',
+        notes: loanToEdit.notes || '',
+        status: loanToEdit.status || ''
+      });
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setEditLoanId(null);
+    setEditLoan({
+      expectedReturnDate: '',
+      notes: '',
+      status: ''
+    });
+  };
+
+  const handleSubmitEditLoan = async () => {
+    if (!editLoanId) return;
+    
+    try {
+      // המרת תאריך לפורמט ISO עם שעה
+      const loanData = {
+        ...editLoan,
+        expectedReturnDate: editLoan.expectedReturnDate 
+          ? new Date(editLoan.expectedReturnDate + 'T23:59:59.999Z').toISOString()
+          : undefined
+      };
+      
+      await updateLoanMutation.mutateAsync({
+        id: editLoanId,
+        loanData
+      });
+      handleCloseEditDialog();
+    } catch (error) {
+      console.error('Failed to update loan:', error);
+    }
+  };
+
   const handleCloseCreateDialog = () => {
     setIsCreateDialogOpen(false);
     setNewLoan({
@@ -115,15 +190,16 @@ const LoansPage: React.FC = () => {
   };
 
   const handleSubmitCreateLoan = async () => {
-    console.log('🚀 Creating loan with data:', newLoan);
-    console.log('🔍 Validation state:', {
-      hasUserId: !!newLoan.userId,
-      hasProductInstanceId: !!newLoan.productInstanceId,
-      isPending: createLoanMutation.isPending
-    });
-    
     try {
-      await createLoanMutation.mutateAsync(newLoan);
+      // המרת תאריך לפורמט ISO עם שעה
+      const loanData = {
+        ...newLoan,
+        expectedReturnDate: newLoan.expectedReturnDate 
+          ? new Date(newLoan.expectedReturnDate + 'T23:59:59.999Z').toISOString()
+          : undefined
+      };
+      
+      await createLoanMutation.mutateAsync(loanData);
       handleCloseCreateDialog();
     } catch (error) {
       console.error('Failed to create loan:', error);
@@ -135,7 +211,6 @@ const LoansPage: React.FC = () => {
       case 'active': return 'info';
       case 'overdue': return 'error';
       case 'returned': return 'success';
-      case 'pending': return 'warning';
       default: return 'default';
     }
   };
@@ -145,7 +220,6 @@ const LoansPage: React.FC = () => {
       case 'active': return t('loans.status.active');
       case 'overdue': return t('loans.status.overdue');
       case 'returned': return t('loans.status.returned');
-      case 'pending': return 'ממתין'; // Add to translations if needed
       default: return status;
     }
   };
@@ -259,6 +333,7 @@ const LoansPage: React.FC = () => {
             <MenuItem value="active">{t('loans.status.active')}</MenuItem>
             <MenuItem value="overdue">{t('loans.status.overdue')}</MenuItem>
             <MenuItem value="returned">{t('loans.status.returned')}</MenuItem>
+            <MenuItem value="lost">{t('loans.status.lost')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -271,12 +346,12 @@ const LoansPage: React.FC = () => {
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <CircularProgress />
             </Box>
-          ) : loansData?.loans?.length === 0 ? (
+          ) : filteredLoans?.length === 0 ? (
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <Typography>{t('loans.noLoans')}</Typography>
             </Paper>
           ) : (
-            loansData?.loans?.map((loan) => (
+            filteredLoans?.map((loan) => (
               <Card key={loan.id}>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -305,7 +380,7 @@ const LoansPage: React.FC = () => {
                 </CardContent>
                 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
-                  {loan.status === 'ACTIVE' && (
+                  {(loan.status === 'ACTIVE' || loan.status === 'OVERDUE') && (
                     <IconButton 
                       size="small" 
                       color="primary" 
@@ -316,7 +391,12 @@ const LoansPage: React.FC = () => {
                       <UndoIcon />
                     </IconButton>
                   )}
-                  <IconButton size="small" color="primary" title="עריכה">
+                  <IconButton 
+                    size="small" 
+                    color="primary" 
+                    title="עריכה"
+                    onClick={() => handleEditLoan(loan.id)}
+                  >
                     <EditIcon />
                   </IconButton>
                 </CardActions>
@@ -345,14 +425,14 @@ const LoansPage: React.FC = () => {
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ) : loansData?.loans?.length === 0 ? (
+              ) : filteredLoans?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
                     {t('loans.noLoans')}
                   </TableCell>
                 </TableRow>
               ) : (
-                loansData?.loans?.map((loan) => (
+                filteredLoans?.map((loan) => (
                   <TableRow key={loan.id}>
                     <TableCell>
                       {loan.user?.firstName} {loan.user?.lastName}
@@ -374,7 +454,7 @@ const LoansPage: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      {loan.status === 'ACTIVE' && (
+                      {(loan.status === 'ACTIVE' || loan.status === 'OVERDUE') && (
                         <IconButton 
                           size="small" 
                           color="primary" 
@@ -385,7 +465,12 @@ const LoansPage: React.FC = () => {
                           <UndoIcon />
                         </IconButton>
                       )}
-                      <IconButton size="small" color="primary" title="עריכה">
+                      <IconButton 
+                        size="small" 
+                        color="primary" 
+                        title="עריכה"
+                        onClick={() => handleEditLoan(loan.id)}
+                      >
                         <EditIcon />
                       </IconButton>
                     </TableCell>
@@ -419,7 +504,6 @@ const LoansPage: React.FC = () => {
               getOptionLabel={(option: any) => `${option.firstName} ${option.lastName} (${option.email})`}
               value={usersData?.data?.find((u: any) => u.id === newLoan.userId) || null}
               onChange={(_, newValue: any) => {
-                console.log('👤 User selected:', newValue);
                 setNewLoan(prev => ({ ...prev, userId: newValue?.id || '' }));
               }}
               renderInput={(params) => (
@@ -434,7 +518,6 @@ const LoansPage: React.FC = () => {
               }
               value={productInstancesData?.find((p: any) => p.id === newLoan.productInstanceId) || null}
               onChange={(_, newValue: any) => {
-                console.log('📦 Product selected:', newValue);
                 setNewLoan(prev => ({ ...prev, productInstanceId: newValue?.id || '' }));
               }}
               isOptionEqualToValue={(option: any, value: any) => option.id === value?.id}
@@ -476,6 +559,59 @@ const LoansPage: React.FC = () => {
             disabled={!newLoan.userId || !newLoan.productInstanceId || createLoanMutation.isPending}
           >
             {createLoanMutation.isPending ? <CircularProgress size={20} /> : t('common.create')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* דיאלוג עריכת השאלה */}
+      <Dialog open={isEditDialogOpen} onClose={handleCloseEditDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('loans.editLoan')}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              label={t('loans.expectedReturnDate')}
+              type="date"
+              value={editLoan.expectedReturnDate}
+              onChange={(e) => setEditLoan(prev => ({ ...prev, expectedReturnDate: e.target.value }))}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+            />
+
+            <FormControl fullWidth>
+              <InputLabel>{t('loans.status.label')}</InputLabel>
+              <Select
+                value={editLoan.status}
+                onChange={(e) => setEditLoan(prev => ({ ...prev, status: e.target.value }))}
+                label={t('loans.status.label')}
+              >
+                <MenuItem value="ACTIVE">{t('loans.status.active')}</MenuItem>
+                <MenuItem value="OVERDUE">{t('loans.status.overdue')}</MenuItem>
+                <MenuItem value="RETURNED">{t('loans.status.returned')}</MenuItem>
+                <MenuItem value="LOST">{t('loans.status.lost')}</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField
+              label={t('loans.notes')}
+              multiline
+              rows={3}
+              value={editLoan.notes}
+              onChange={(e) => setEditLoan(prev => ({ ...prev, notes: e.target.value }))}
+              placeholder={t('loans.notesPlaceholder')}
+              fullWidth
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSubmitEditLoan}
+            variant="contained"
+            disabled={updateLoanMutation.isPending}
+          >
+            {updateLoanMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>

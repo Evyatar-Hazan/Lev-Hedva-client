@@ -57,12 +57,12 @@ export class LoansClient {
   }
 
   static async updateLoan(id: string, loanData: UpdateLoanDto): Promise<Loan> {
-    const response = await apiClient.patch<Loan>(`${this.BASE_PATH}/${id}`, loanData);
+    const response = await apiClient.put<Loan>(`${this.BASE_PATH}/${id}`, loanData);
     return response.data;
   }
 
   static async returnLoan(id: string): Promise<Loan> {
-    const response = await apiClient.post<Loan>(`${this.BASE_PATH}/${id}/return`);
+    const response = await apiClient.patch<Loan>(`${this.BASE_PATH}/${id}/return`);
     return response.data;
   }
 
