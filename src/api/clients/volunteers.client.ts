@@ -43,7 +43,7 @@ export class VolunteersClient {
   }
 
   static async updateActivity(id: string, activityData: UpdateVolunteerActivityDto): Promise<VolunteerActivity> {
-    const response = await apiClient.patch<VolunteerActivity>(
+    const response = await apiClient.put<VolunteerActivity>(
       `${this.BASE_PATH}/activities/${id}`,
       activityData
     );

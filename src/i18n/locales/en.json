@@ -5,6 +5,7 @@
     "cancel": "Cancel",
     "create": "Create",
     "edit": "Edit",
+    "view": "View",
     "delete": "Delete",
     "add": "Add",
     "search": "Search",
@@ -224,11 +225,15 @@
   "volunteers": {
     "title": "Volunteers Management",
     "addActivity": "Add Activity",
+    "editActivity": "Edit Activity",
+    "viewActivity": "View Activity",
     "volunteer": "Volunteer",
     "activityType": "Activity Type",
     "description": "Description",
     "date": "Date",
     "hours": "Hours",
+    "notes": "Notes",
+    "createdAt": "Created At",
     "activities": {
       "all": "All Activities",
       "delivery": "Delivery",
@@ -248,6 +253,8 @@
     },
     "noActivities": "No volunteer activities found",
     "loadError": "Error loading volunteers data:",
+    "createSuccess": "Activity created successfully",
+    "updateSuccess": "Activity updated successfully",
     "pagination": "Page {{page}} of {{totalPages}} | Total {{total}} activities"
   },
   "audit": {

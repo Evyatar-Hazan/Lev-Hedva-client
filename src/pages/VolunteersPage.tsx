@@ -44,7 +44,7 @@ import {
   Star as StarIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
-import { useVolunteerActivities, useCreateVolunteerActivity } from '../hooks';
+import { useVolunteerActivities, useCreateVolunteerActivity, useUpdateVolunteerActivity } from '../hooks';
 import { useUsers } from '../hooks/useUsers';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
@@ -66,6 +66,8 @@ const VolunteersPage: React.FC = () => {
     date: ''
   });
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
   
   // שימוש בהוכים החדשים
   const { data: activitiesData, isLoading, error } = useVolunteerActivities({ 
@@ -75,6 +77,7 @@ const VolunteersPage: React.FC = () => {
   
   const { data: usersData } = useUsers();
   const createActivityMutation = useCreateVolunteerActivity();
+  const updateActivityMutation = useUpdateVolunteerActivity();
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -122,23 +125,63 @@ const VolunteersPage: React.FC = () => {
       date: ''
     });
     setSubmitError(null);
+    setSelectedActivity(null);
   };
 
   const handleSubmitActivity = async () => {
     setSubmitError(null);
     try {
-      await createActivityMutation.mutateAsync({
-        volunteerId: newActivity.volunteerId,
-        activityType: newActivity.activityType,
-        description: newActivity.description,
-        hours: parseInt(newActivity.hours),
-        date: newActivity.date
-      });
+      if (selectedActivity) {
+        // עדכון פעילות קיימת - ללא volunteerId
+        const activityData = {
+          activityType: newActivity.activityType,
+          description: newActivity.description,
+          hours: parseInt(newActivity.hours),
+          date: new Date(newActivity.date).toISOString()
+        };
+        await updateActivityMutation.mutateAsync({
+          id: selectedActivity.id,
+          activityData
+        });
+      } else {
+        // יצירת פעילות חדשה - עם volunteerId
+        const activityData = {
+          volunteerId: newActivity.volunteerId,
+          activityType: newActivity.activityType,
+          description: newActivity.description,
+          hours: parseInt(newActivity.hours),
+          date: new Date(newActivity.date).toISOString()
+        };
+        await createActivityMutation.mutateAsync(activityData);
+      }
+      
       handleCloseDialog();
     } catch (error: any) {
-      console.error('Error creating activity:', error);
-      setSubmitError(error?.response?.data?.message || error?.message || 'שגיאה ביצירת הפעילות');
+      console.error('Error submitting activity:', error);
+      setSubmitError(error?.response?.data?.message || error?.message || 'שגיאה בשמירת הפעילות');
     }
+  };
+
+  const handleViewActivity = (activity: any) => {
+    setSelectedActivity(activity);
+    setViewDialogOpen(true);
+  };
+
+  const handleEditActivity = (activity: any) => {
+    setSelectedActivity(activity);
+    setNewActivity({
+      volunteerId: activity.volunteerId,
+      activityType: activity.activityType,
+      description: activity.description,
+      hours: activity.hours.toString(),
+      date: activity.date.split('T')[0] // Format date for input
+    });
+    setIsAddDialogOpen(true);
+  };
+
+  const handleCloseViewDialog = () => {
+    setViewDialogOpen(false);
+    setSelectedActivity(null);
   };
 
   if (error) {
@@ -325,10 +368,10 @@ const VolunteersPage: React.FC = () => {
                 </CardContent>
                 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
-                  <IconButton size="small" title="צפה">
+                  <IconButton size="small" title="צפה" onClick={() => handleViewActivity(activity)}>
                     <VisibilityIcon />
                   </IconButton>
-                  <IconButton size="small" title="ערוך">
+                  <IconButton size="small" title="ערוך" onClick={() => handleEditActivity(activity)}>
                     <EditIcon />
                   </IconButton>
                 </CardActions>
@@ -408,10 +451,10 @@ const VolunteersPage: React.FC = () => {
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" title="צפה">
+                      <IconButton size="small" title="צפה" onClick={() => handleViewActivity(activity)}>
                         <VisibilityIcon />
                       </IconButton>
-                      <IconButton size="small" title="ערוך">
+                      <IconButton size="small" title="ערוך" onClick={() => handleEditActivity(activity)}>
                         <EditIcon />
                       </IconButton>
                     </TableCell>
@@ -436,9 +479,11 @@ const VolunteersPage: React.FC = () => {
         </Box>
       )}
 
-      {/* דיאלוג הוספת פעילות */}
+      {/* דיאלוג הוספת/עריכת פעילות */}
       <Dialog open={isAddDialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>{t('volunteers.addActivity')}</DialogTitle>
+        <DialogTitle>
+          {selectedActivity ? t('volunteers.editActivity') : t('volunteers.addActivity')}
+        </DialogTitle>
         <DialogContent>
           {submitError && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -530,10 +575,79 @@ const VolunteersPage: React.FC = () => {
             onClick={handleSubmitActivity}
             disabled={!newActivity.volunteerId || !newActivity.activityType || 
                      !newActivity.description || !newActivity.hours || !newActivity.date ||
-                     createActivityMutation.isPending}
-            startIcon={createActivityMutation.isPending ? <CircularProgress size={20} /> : null}
+                     createActivityMutation.isPending || updateActivityMutation.isPending}
+            startIcon={(createActivityMutation.isPending || updateActivityMutation.isPending) ? <CircularProgress size={20} /> : null}
           >
-            {t('common.add')}
+            {selectedActivity ? t('common.save') : t('common.add')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* דיאלוג צפייה בפעילות */}
+      <Dialog open={viewDialogOpen} onClose={handleCloseViewDialog} maxWidth="md" fullWidth>
+        <DialogTitle>{t('volunteers.viewActivity')}</DialogTitle>
+        <DialogContent>
+          {selectedActivity && (
+            <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <TextField
+                label={t('volunteers.volunteer')}
+                value={`${selectedActivity.volunteer?.firstName || ''} ${selectedActivity.volunteer?.lastName || ''}`}
+                InputProps={{ readOnly: true }}
+                variant="outlined"
+              />
+              
+              <TextField
+                label={t('volunteers.activityType')}
+                value={getActivityTypeText(selectedActivity.activityType)}
+                InputProps={{ readOnly: true }}
+                variant="outlined"
+              />
+
+              <TextField
+                label={t('volunteers.description')}
+                value={selectedActivity.description}
+                InputProps={{ readOnly: true }}
+                multiline
+                rows={3}
+                variant="outlined"
+              />
+
+              <TextField
+                label={t('volunteers.hours')}
+                value={selectedActivity.hours}
+                InputProps={{ readOnly: true }}
+                variant="outlined"
+              />
+
+              <TextField
+                label={t('volunteers.date')}
+                value={format(new Date(selectedActivity.date), 'dd/MM/yyyy', { locale: he })}
+                InputProps={{ readOnly: true }}
+                variant="outlined"
+              />
+              
+              <TextField
+                label={t('volunteers.createdAt')}
+                value={format(new Date(selectedActivity.createdAt), 'dd/MM/yyyy HH:mm', { locale: he })}
+                InputProps={{ readOnly: true }}
+                variant="outlined"
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseViewDialog}>
+            {t('common.close')}
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={() => {
+              handleCloseViewDialog();
+              handleEditActivity(selectedActivity);
+            }}
+            startIcon={<EditIcon />}
+          >
+            {t('common.edit')}
           </Button>
         </DialogActions>
       </Dialog>

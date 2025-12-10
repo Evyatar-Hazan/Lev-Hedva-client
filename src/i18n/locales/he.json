@@ -5,6 +5,7 @@
     "cancel": "ביטול",
     "create": "צור",
     "edit": "עדכון",
+    "view": "צפייה",
     "delete": "מחיקה",
     "add": "הוספה",
     "search": "חיפוש",
@@ -252,11 +253,15 @@
   "volunteers": {
     "title": "ניהול מתנדבים",
     "addActivity": "הוספת פעילות",
+    "editActivity": "עריכת פעילות",
+    "viewActivity": "צפייה בפעילות",
     "volunteer": "מתנדב",
     "activityType": "סוג פעילות",
     "description": "תיאור",
     "date": "תאריך",
     "hours": "שעות",
+    "notes": "הערות",
+    "createdAt": "נוצר בתאריך",
     "activities": {
       "all": "כל הפעילויות",
       "delivery": "משלוח",
@@ -276,6 +281,8 @@
     },
     "noActivities": "לא נמצאו פעילויות התנדבות",
     "loadError": "שגיאה בטעינת נתוני המתנדבים:",
+    "createSuccess": "הפעילות נוצרה בהצלחה",
+    "updateSuccess": "הפעילות עודכנה בהצלחה",
     "pagination": "עמוד {{page}} מתוך {{totalPages}} | סה\"כ {{total}} פעילויות"
   },
   "audit": {
