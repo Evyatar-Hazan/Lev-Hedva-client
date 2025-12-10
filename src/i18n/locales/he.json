@@ -98,14 +98,21 @@
   },
   "sidebar": {
     "systemTitle": "מערכת לב חדוה",
+    "systemSubtitle": "מערכת ניהול",
     "welcomeUser": "ברוך הבא, {{firstName}} {{lastName}}",
     "userRole": "תפקיד: {{role}}",
     "roleAdmin": "מנהל",
-    "roleUser": "משתמש"
+    "roleUser": "משתמש",
+    "version": "גרסה 1.0.0 © לב חדוה"
   },
   "header": {
     "systemTitle": "מערכת ניהול לב חדוה",
+    "systemSubtitle": "מערכת ניהול",
     "notifications": "התראות"
+  },
+  "menu": {
+    "profile": "פרופיל",
+    "settings": "הגדרות"
   },
   "loans": {
     "title": "ניהול השאלות",

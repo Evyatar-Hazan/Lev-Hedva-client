@@ -187,27 +187,29 @@ export const COLORS = {
   },
 } as const;
 
-// פונקציות עזר ליצירת וריאציות צבע
+// פונקציות עזר ליצירת וריאציות צבע - מוגדרות קודם
+const withOpacity = (color: string, opacity: number): string => {
+  if (color.startsWith('#')) {
+    const hex = color.slice(1);
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  }
+  return color;
+};
+
 export const colorUtils = {
   /**
    * יוצר צבע עם שקיפות
    */
-  withOpacity: (color: string, opacity: number): string => {
-    if (color.startsWith('#')) {
-      const hex = color.slice(1);
-      const r = parseInt(hex.slice(0, 2), 16);
-      const g = parseInt(hex.slice(2, 4), 16);
-      const b = parseInt(hex.slice(4, 6), 16);
-      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    }
-    return color;
-  },
+  withOpacity,
   
   /**
    * מחזיר את הצבע הראשי עם שקיפות
    */
   primaryWithOpacity: (opacity: number): string => {
-    return colorUtils.withOpacity(BRAND_COLORS.PRIMARY, opacity);
+    return withOpacity(BRAND_COLORS.PRIMARY, opacity);
   },
   
   /**
@@ -219,8 +221,34 @@ export const colorUtils = {
       return BRAND_COLORS.PRIMARY_DARK;
     }
     // אחרת החזר עם שקיפות
-    return colorUtils.withOpacity(baseColor, 0.8);
+    return withOpacity(baseColor, 0.8);
   },
+  
+  /**
+   * יוצר גרדיינט ראשי מודרני
+   */
+  primaryGradient: `linear-gradient(135deg, ${BRAND_COLORS.PRIMARY} 0%, ${BRAND_COLORS.PRIMARY_DARK} 100%)`,
+  
+  /**
+   * יוצר גרדיינט עדין לרקע
+   */
+  backgroundGradient: `linear-gradient(135deg, ${BRAND_COLORS.BACKGROUND} 0%, ${BRAND_COLORS.BACKGROUND_SOFT} 100%)`,
+  
+  /**
+   * צלליות מודרניות
+   */
+  shadows: {
+    soft: '0 2px 8px rgba(0,0,0,0.08)',
+    medium: '0 4px 16px rgba(0,0,0,0.12)',
+    strong: '0 8px 32px rgba(0,0,0,0.16)',
+    primary: `0 4px 16px ${withOpacity(BRAND_COLORS.PRIMARY, 0.25)}`,
+  },
+} as const;
+
+// מערכת צבעים מורחבת עם כלי עזר
+export const COLORS_WITH_UTILS = {
+  ...COLORS,
+  colorUtils,
 } as const;
 
 // ייצוא הצבעים הבסיסיים למען נוחות

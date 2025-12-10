@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Toolbar } from '@mui/material';
+import { Box, Toolbar, useTheme, useMediaQuery } from '@mui/material';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { COLORS } from '../../theme/colors';
@@ -10,6 +10,8 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSidebarToggle = () => {
     setSidebarOpen(!sidebarOpen);
@@ -20,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Header onMenuClick={handleSidebarToggle} />
       
       <Sidebar open={sidebarOpen} onClose={handleSidebarClose} />
@@ -29,14 +31,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
           width: '100%',
           minHeight: '100vh',
           backgroundColor: COLORS.background.soft,
+          transition: 'all 0.3s ease',
+          position: 'relative',
         }}
       >
-        <Toolbar /> {/* This creates space under the fixed AppBar */}
-        {children}
+        <Toolbar 
+          sx={{ 
+            minHeight: { xs: 56, sm: 64 },
+          }} 
+        />
+        <Box
+          sx={{
+            p: { xs: 2, sm: 3 },
+            maxWidth: '100%',
+            overflow: 'hidden',
+          }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );

@@ -7,9 +7,12 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Toolbar,
   Typography,
   Box,
+  useTheme,
+  useMediaQuery,
+  Avatar,
+  Chip,
 } from '@mui/material';
 import {
   Dashboard,
@@ -19,11 +22,12 @@ import {
   VolunteerActivism,
   Assessment,
   Logout,
+  Close,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
-import { COLORS } from '../../theme/colors';
+import { COLORS, colorUtils } from '../../theme/colors';
 
 const drawerWidth = 280;
 
@@ -44,6 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const menuItems: MenuItem[] = [
     {
@@ -99,89 +105,240 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   };
 
   const drawer = (
-    <div>
-      <Toolbar sx={{ backgroundColor: COLORS.primary.main, color: COLORS.text.onPrimary }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-          <img 
-            src="/logoLevChedva.png" 
-            alt="לב חדוה" 
-            style={{ 
-              height: 32, 
-              width: 'auto'
-            }} 
-          />
-          <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-            <Typography variant="h6" noWrap component="div">
+    <Box sx={{ 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column',
+      marginTop: { xs: '56px', sm: '64px' }, // מקום ל-navbar
+    }}>
+      {/* Header Section */}
+      <Box
+        sx={{
+          background: `linear-gradient(135deg, ${COLORS.primary.main} 0%, ${COLORS.primary.dark} 100%)`,
+          color: COLORS.text.onPrimary,
+          p: 3,
+          position: 'relative',
+        }}
+      >
+        {/* Close button for mobile */}
+        {isMobile && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              cursor: 'pointer',
+              borderRadius: '50%',
+              p: 1,
+              '&:hover': {
+                backgroundColor: colorUtils.withOpacity(COLORS.text.onPrimary, 0.1),
+              },
+            }}
+            onClick={onClose}
+          >
+            <Close />
+          </Box>
+        )}
+        
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Box
+            sx={{
+              p: 1,
+              borderRadius: '12px',
+              backgroundColor: colorUtils.withOpacity(COLORS.text.onPrimary, 0.15),
+            }}
+          >
+            <img 
+              src="/logoLevChedva.png" 
+              alt="לב חדוה" 
+              style={{ 
+                height: 32, 
+                width: 'auto',
+                borderRadius: '4px',
+              }} 
+            />
+          </Box>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
               {t('sidebar.systemTitle')}
             </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.8 }}>
-              {t('sidebar.welcomeUser', { firstName: user?.firstName, lastName: user?.lastName })}
+            <Typography variant="body2" sx={{ opacity: 0.8, fontSize: '0.85rem' }}>
+              {t('sidebar.systemSubtitle')}
             </Typography>
           </Box>
         </Box>
-      </Toolbar>
-
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.path} disablePadding>
-            <ListItemButton
-              selected={location.pathname === item.path}
-              onClick={() => handleNavigate(item.path)}
-              sx={{
-                minHeight: 64,
-                '&.Mui-selected': {
-                  backgroundColor: COLORS.primary.light,
-                  color: COLORS.text.onPrimary,
-                  '& .MuiListItemIcon-root': {
-                    color: COLORS.text.onPrimary,
-                  },
-                },
+        
+        {/* User Info */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            p: 2,
+            borderRadius: '12px',
+            backgroundColor: colorUtils.withOpacity(COLORS.text.onPrimary, 0.1),
+            border: `1px solid ${colorUtils.withOpacity(COLORS.text.onPrimary, 0.2)}`,
+          }}
+        >
+          <Avatar
+            sx={{
+              width: 40,
+              height: 40,
+              backgroundColor: COLORS.secondary.main,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+            }}
+          >
+            {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+          </Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography 
+              variant="subtitle2" 
+              sx={{ 
+                fontWeight: 600,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: 2,
-                  justifyContent: 'center',
-                }}
-              >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                secondary={item.description}
-                primaryTypographyProps={{
-                  fontSize: '14px',
-                  fontWeight: location.pathname === item.path ? 600 : 400,
-                }}
-                secondaryTypographyProps={{
-                  fontSize: '12px',
-                  sx: { opacity: 0.7 },
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-
-      <Divider />
-
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton onClick={handleLogout}>
-            <ListItemIcon>
-              <Logout />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('navigation.logout')}
-              secondary={t('sidebar.userRole', { 
-                role: user?.role === 'ADMIN' ? t('sidebar.roleAdmin') : t('sidebar.roleUser')
-              })}
+              {user?.firstName} {user?.lastName}
+            </Typography>
+            <Chip
+              label={user?.role === 'ADMIN' ? 'מנהל' : 'משתמש'}
+              size="small"
+              sx={{
+                height: '18px',
+                fontSize: '0.7rem',
+                backgroundColor: colorUtils.withOpacity(COLORS.text.onPrimary, 0.2),
+                color: COLORS.text.onPrimary,
+                mt: 0.5,
+              }}
             />
-          </ListItemButton>
-        </ListItem>
-      </List>
-    </div>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Navigation Menu */}
+      <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
+        <List sx={{ px: 2 }}>
+          {menuItems.map((item, index) => {
+            const isSelected = location.pathname === item.path;
+            return (
+              <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
+                <ListItemButton
+                  selected={isSelected}
+                  onClick={() => handleNavigate(item.path)}
+                  sx={{
+                    borderRadius: '12px',
+                    minHeight: 56,
+                    transition: 'all 0.2s ease',
+                    '&.Mui-selected': {
+                      backgroundColor: COLORS.primary.main,
+                      color: COLORS.text.onPrimary,
+                      boxShadow: `0 4px 12px ${colorUtils.withOpacity(COLORS.primary.main, 0.3)}`,
+                      transform: 'translateX(-2px)',
+                      '& .MuiListItemIcon-root': {
+                        color: COLORS.text.onPrimary,
+                        transform: 'scale(1.1)',
+                      },
+                      '&:hover': {
+                        backgroundColor: COLORS.primary.dark,
+                      },
+                    },
+                    '&:hover:not(.Mui-selected)': {
+                      backgroundColor: COLORS.action.hover,
+                      transform: 'translateX(-1px)',
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.05)',
+                        color: COLORS.primary.main,
+                      },
+                    },
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: 2,
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease',
+                      color: isSelected ? COLORS.text.onPrimary : COLORS.icon.default,
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    secondary={!isSelected ? item.description : undefined}
+                    primaryTypographyProps={{
+                      fontSize: '0.9rem',
+                      fontWeight: isSelected ? 600 : 500,
+                    }}
+                    secondaryTypographyProps={{
+                      fontSize: '0.75rem',
+                      sx: { 
+                        opacity: 0.7,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Box>
+
+      {/* Footer Section */}
+      <Box sx={{ p: 2 }}>
+        <Divider sx={{ mb: 2, opacity: 0.3 }} />
+        <ListItemButton
+          onClick={handleLogout}
+          sx={{
+            borderRadius: '12px',
+            minHeight: 48,
+            color: COLORS.status.error,
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              backgroundColor: colorUtils.withOpacity(COLORS.status.error, 0.1),
+              transform: 'translateX(-1px)',
+            },
+          }}
+        >
+          <ListItemIcon
+            sx={{
+              minWidth: 0,
+              mr: 2,
+              justifyContent: 'center',
+              color: COLORS.status.error,
+            }}
+          >
+            <Logout />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('navigation.logout')}
+            primaryTypographyProps={{
+              fontSize: '0.9rem',
+              fontWeight: 500,
+            }}
+          />
+        </ListItemButton>
+        
+        <Typography
+          variant="caption"
+          sx={{
+            display: 'block',
+            textAlign: 'center',
+            mt: 2,
+            opacity: 0.6,
+            fontSize: '0.7rem',
+          }}
+        >
+          {t('sidebar.version')}
+        </Typography>
+      </Box>
+    </Box>
   );
 
   return (
@@ -194,10 +351,17 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         keepMounted: true, // Better open performance on mobile.
       }}
       sx={{
-        display: { xs: 'block', sm: 'block' },
+        display: 'block',
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
           width: drawerWidth,
+          border: 'none',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          backgroundImage: 'none',
+        },
+        '& .MuiBackdrop-root': {
+          backgroundColor: 'rgba(0,0,0,0.3)',
+          backdropFilter: 'blur(4px)',
         },
       }}
     >
