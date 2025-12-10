@@ -114,6 +114,60 @@
     "profile": "פרופיל",
     "settings": "הגדרות"
   },
+  "profile": {
+    "title": "פרופיל משתמש",
+    "personalInfo": "מידע אישי",
+    "changePassword": "שינוי סיסמה",
+    "currentPassword": "סיסמה נוכחית",
+    "newPassword": "סיסמה חדשה",
+    "confirmPassword": "אימות סיסמה",
+    "updatePassword": "עדכן סיסמה",
+    "updateSuccess": "הפרטים עודכנו בהצלחה",
+    "updateError": "שגיאה בעדכון הפרטים",
+    "passwordChangeSuccess": "הסיסמה שונתה בהצלחה",
+    "passwordChangeError": "שגיאה בשינוי הסיסמה",
+    "passwordMismatch": "הסיסמאות אינן תואמות",
+    "memberSince": "חבר מאז",
+    "userId": "מזהה משתמש",
+    "roleAdmin": "מנהל",
+    "roleUser": "משתמש",
+    "address": "כתובת"
+  },
+  "notifications": {
+    "overdueLoans": {
+      "title": "הלוואות באיחור",
+      "message": "יש {{count}} הלוואות שלא הוחזרו במועד"
+    },
+    "newLoans": {
+      "title": "הלוואות חדשות",
+      "message": "נוצרו {{count}} הלוואות חדשות היום"
+    },
+    "newProducts": {
+      "title": "מוצרים חדשים",
+      "message": "נוספו {{count}} מוצרים חדשים למערכת"
+    },
+    "newUsers": {
+      "title": "משתמשים חדשים",
+      "message": "נרשמו {{count}} משתמשים חדשים השבוע"
+    },
+    "monthlyReport": {
+      "title": "דוח חודשי מוכן",
+      "message": "הדוח החודשי זמין לצפייה"
+    },
+    "viewLoans": "צפה בהלוואות",
+    "viewProducts": "צפה במוצרים",
+    "viewUsers": "צפה במשתמשים",
+    "viewReport": "צפה בדוח",
+    "noNotifications": "אין התראות חדשות",
+    "viewAll": "צפה בכל ההתראות",
+    "newNotifications": "התראות חדשות"
+  },
+  "time": {
+    "now": "כעת",
+    "minutesAgo": "לפני {{count}} דקות",
+    "hoursAgo": "לפני {{count}} שעות",
+    "daysAgo": "לפני {{count}} ימים"
+  },
   "loans": {
     "title": "ניהול השאלות",
     "newLoan": "השאלה חדשה",
@@ -223,9 +277,7 @@
     "noProducts": "לא נמצאו מוצרים",
     "loadError": "שגיאה בטעינת נתוני המוצרים:",
     "pagination": "עמוד {{page}} מתוך {{totalPages}} | סה\"כ {{total}} מוצרים",
-    "debug": "טוען: {{loading}} | שגיאה: {{error}} | מוצרים: {{count}} | מופעי מוצרים: {{instances}}",
-    "available_instances": "מופעים זמינים",
-    "total_instances": "סה\"כ מופעים"
+    "debug": "טוען: {{loading}} | שגיאה: {{error}} | מוצרים: {{count}} | מופעי מוצרים: {{instances}}"
   },
   "users": {
     "title": "ניהול משתמשים",
@@ -237,6 +289,7 @@
     "email": "אימייל",
     "password": "סיסמה",
     "phone": "טלפון",
+    "address": "כתובת",
     "role": "תפקיד",
     "status": "סטטוס",
     "joinDate": "תאריך הצטרפות",

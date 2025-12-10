@@ -12,3 +12,6 @@ export * from './useVolunteers';
 
 // Audit hooks
 export * from './useAudit';
+
+// Notifications hooks
+export * from './useNotifications';

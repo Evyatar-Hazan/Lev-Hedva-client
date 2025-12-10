@@ -5,6 +5,7 @@ export interface User {
   firstName: string;
   lastName: string;
   phone?: string;
+  address?: string;
   role: UserRole;
   isActive: boolean;
   refreshToken?: string;

@@ -23,11 +23,17 @@ import {
   Logout,
   Settings,
   Person,
+  Warning,
+  Info,
+  CheckCircle,
+  Error,
 } from '@mui/icons-material';
 import { useAuth } from '../../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import LanguageSelector from '../LanguageSelector';
 import { COLORS, colorUtils } from '../../theme/colors';
+import { useNotifications } from '../../hooks';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -36,10 +42,12 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
   const [notificationsAnchor, setNotificationsAnchor] = useState<null | HTMLElement>(null);
+  const { notifications, unreadCount } = useNotifications();
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setUserMenuAnchor(event.currentTarget);
@@ -64,6 +72,49 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     } catch (error) {
       console.error('Logout error:', error);
     }
+  };
+
+  const handleProfileClick = () => {
+    handleUserMenuClose();
+    navigate('/profile'); // ניווט לעמוד הפרופיל
+  };
+
+  const handleSettingsClick = () => {
+    handleUserMenuClose();
+    navigate('/audit'); // ניווט לעמוד הביקורת/הגדרות
+  };
+
+  const handleNotificationClick = (notification: any) => {
+    handleNotificationsClose();
+    if (notification.action?.path) {
+      navigate(notification.action.path);
+    }
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'error':
+        return <Error fontSize="small" sx={{ color: COLORS.status.error }} />;
+      case 'warning':
+        return <Warning fontSize="small" sx={{ color: COLORS.status.warning }} />;
+      case 'success':
+        return <CheckCircle fontSize="small" sx={{ color: COLORS.status.success }} />;
+      default:
+        return <Info fontSize="small" sx={{ color: COLORS.status.info }} />;
+    }
+  };
+
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return t('time.now');
+    if (diffMins < 60) return t('time.minutesAgo', { count: diffMins });
+    if (diffHours < 24) return t('time.hoursAgo', { count: diffHours });
+    return t('time.daysAgo', { count: diffDays });
   };
 
   return (
@@ -187,7 +238,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 },
               }}
             >
-              <Badge badgeContent={3} color="secondary">
+              <Badge badgeContent={unreadCount} color="secondary">
                 <NotificationsNone />
               </Badge>
             </IconButton>
@@ -274,13 +325,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             </Typography>
           </Box>
           <Divider />
-          <MenuItem onClick={handleUserMenuClose}>
+          <MenuItem onClick={handleProfileClick}>
             <ListItemIcon>
               <Person fontSize="small" />
             </ListItemIcon>
             <ListItemText>{t('menu.profile')}</ListItemText>
           </MenuItem>
-          <MenuItem onClick={handleUserMenuClose}>
+          <MenuItem onClick={handleSettingsClick}>
             <ListItemIcon>
               <Settings fontSize="small" />
             </ListItemIcon>
@@ -315,26 +366,68 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
               {t('header.notifications')}
             </Typography>
+            {unreadCount > 0 && (
+              <Chip 
+                label={t('notifications.newNotifications')} 
+                size="small" 
+                color="primary" 
+                sx={{ mt: 0.5 }}
+              />
+            )}
           </Box>
           <Divider />
-          <MenuItem onClick={handleNotificationsClose}>
-            <ListItemText
-              primary="הלוואה חדשה ממתינה לאישור"
-              secondary="לפני 5 דקות"
-            />
-          </MenuItem>
-          <MenuItem onClick={handleNotificationsClose}>
-            <ListItemText
-              primary="מוצר חדש נוסף למלאי"
-              secondary="לפני שעה"
-            />
-          </MenuItem>
-          <MenuItem onClick={handleNotificationsClose}>
-            <ListItemText
-              primary="דוח חודשי מוכן לצפייה"
-              secondary="אתמול"
-            />
-          </MenuItem>
+          
+          {notifications.length === 0 ? (
+            <MenuItem disabled>
+              <ListItemText primary={t('notifications.noNotifications', 'אין התראות חדשות')} />
+            </MenuItem>
+          ) : (
+            notifications.slice(0, 5).map((notification) => (
+              <MenuItem 
+                key={notification.id}
+                onClick={() => handleNotificationClick(notification)}
+                sx={{
+                  minHeight: 60,
+                  alignItems: 'flex-start',
+                  opacity: notification.isRead ? 0.7 : 1,
+                  backgroundColor: notification.isRead ? 'transparent' : colorUtils.withOpacity(COLORS.primary.main, 0.02),
+                }}
+              >
+                <ListItemIcon sx={{ mt: 0.5, minWidth: 32 }}>
+                  {getNotificationIcon(notification.type)}
+                </ListItemIcon>
+                <ListItemText
+                  primary={notification.title}
+                  secondary={
+                    <Box>
+                      <Typography variant="body2" sx={{ mb: 0.5 }}>
+                        {notification.message}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {formatTimeAgo(notification.timestamp)}
+                      </Typography>
+                    </Box>
+                  }
+                  primaryTypographyProps={{
+                    fontWeight: notification.isRead ? 400 : 600,
+                    fontSize: '0.875rem',
+                  }}
+                />
+              </MenuItem>
+            ))
+          )}
+          
+          {notifications.length > 5 && (
+            <>
+              <Divider />
+              <MenuItem onClick={() => { handleNotificationsClose(); navigate('/notifications'); }}>
+                <ListItemText 
+                  primary={t('notifications.viewAll', 'צפה בכל ההתראות')}
+                  sx={{ textAlign: 'center' }}
+                />
+              </MenuItem>
+            </>
+          )}
         </Menu>
       </Toolbar>
     </AppBar>
