@@ -44,6 +44,7 @@ import {
 } from '@mui/icons-material';
 import { useProducts, useProductInstances, useCreateProduct, useUpdateProduct, useUpdateProductInstance, useCreateProductInstance, useDeleteProductInstance, useProductCategories, useProductManufacturers } from '../hooks';
 import { CreateProductDto, UpdateProductDto, UpdateProductInstanceDto, CreateProductInstanceDto } from '../lib/types';
+import { COLORS } from '../theme/colors';
 
 // רכיב פשוט לתצוגת מופעים
 const ProductInstancesView: React.FC<{ 
@@ -57,7 +58,7 @@ const ProductInstancesView: React.FC<{
   if (!instances || instances.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 8 }}>
-        <InventoryIcon sx={{ fontSize: 80, color: 'text.disabled', mb: 2 }} />
+        <InventoryIcon sx={{ fontSize: 80, color: COLORS.icon.disabled, mb: 2 }} />
         <Typography variant="h5" gutterBottom color="text.secondary">
           {t('products.no_instances')}
         </Typography>
@@ -84,7 +85,7 @@ const ProductInstancesView: React.FC<{
             >
               <CardContent sx={{ flexGrow: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <QrCodeIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  <QrCodeIcon sx={{ mr: 1, color: COLORS.icon.primary }} />
                   <Typography variant="h6" fontWeight="bold">
                     {instance.barcode || `מופע ${instance.id.slice(-4)}`}
                   </Typography>
@@ -669,7 +670,7 @@ const ProductsPage: React.FC = () => {
                 position: 'absolute',
                 right: 8,
                 top: 8,
-                color: (theme) => theme.palette.grey[500],
+                color: COLORS.icon.secondary,
               }}
             >
               <CloseIcon />
@@ -775,7 +776,7 @@ const ProductsPage: React.FC = () => {
                 position: 'absolute',
                 right: 8,
                 top: 8,
-                color: (theme) => theme.palette.grey[500],
+                color: COLORS.icon.secondary,
               }}
             >
               <CloseIcon />
@@ -990,7 +991,7 @@ const ProductsPage: React.FC = () => {
                   key={product.id}
                   sx={{ 
                     cursor: 'pointer', 
-                    '&:hover': { boxShadow: 4, backgroundColor: 'action.hover' },
+                    '&:hover': { boxShadow: 4, backgroundColor: COLORS.action.hover },
                     transition: 'all 0.2s ease-in-out'
                   }}
                   onClick={() => handleProductClick(product)}
@@ -1099,7 +1100,7 @@ const ProductsPage: React.FC = () => {
                       key={product.id}
                       sx={{ 
                         cursor: 'pointer', 
-                        '&:hover': { backgroundColor: 'action.hover' }
+                        '&:hover': { backgroundColor: COLORS.action.hover }
                       }}
                       onClick={() => handleProductClick(product)}
                     >
@@ -1202,7 +1203,7 @@ const ProductsPage: React.FC = () => {
               position: 'absolute',
               right: 8,
               top: 8,
-              color: (theme) => theme.palette.grey[500],
+              color: COLORS.icon.secondary,
             }}
           >
             <CloseIcon />
@@ -1360,7 +1361,7 @@ const ProductsPage: React.FC = () => {
               position: 'absolute',
               right: 8,
               top: 8,
-              color: (theme) => theme.palette.grey[500],
+              color: COLORS.icon.secondary,
             }}
           >
             <CloseIcon />

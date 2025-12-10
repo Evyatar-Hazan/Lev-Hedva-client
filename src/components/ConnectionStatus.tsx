@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Box, CircularProgress, Typography } from '@mui/material';
 import { apiClient } from '../api/axios';
 import { useTranslation } from 'react-i18next';
+import { COLORS } from '../theme/colors';
 
 interface ConnectionStatusProps {
   children: React.ReactNode;
@@ -62,13 +63,13 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
         justifyContent="center" 
         alignItems="center" 
         minHeight="100vh"
-        bgcolor="#f5f5f5"
+        bgcolor={COLORS.background.soft}
       >
-        <CircularProgress size={60} />
-        <Typography variant="h6" sx={{ mt: 2, color: '#666' }}>
+        <CircularProgress size={60} sx={{ color: COLORS.primary.main }} />
+        <Typography variant="h6" sx={{ mt: 2, color: COLORS.text.secondary }}>
           🔍 בודק חיבור לשרת...
         </Typography>
-        <Typography variant="body2" sx={{ mt: 1, color: '#999' }}>
+        <Typography variant="body2" sx={{ mt: 1, color: COLORS.text.hint }}>
           {t('connection.waitingForServer')}
         </Typography>
       </Box>
@@ -83,7 +84,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
         justifyContent="center" 
         alignItems="center" 
         minHeight="100vh"
-        bgcolor="#f5f5f5"
+        bgcolor={COLORS.background.soft}
         p={3}
       >
         <Alert severity="error" sx={{ mb: 2, maxWidth: 600 }}>

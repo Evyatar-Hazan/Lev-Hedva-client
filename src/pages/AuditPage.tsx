@@ -45,6 +45,7 @@ import {
 import { useInfiniteAuditLogs, useAuditStats } from '../hooks';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
+import { COLORS } from '../theme/colors';
 
 const AuditPage: React.FC = () => {
   const { t } = useTranslation();
@@ -611,7 +612,7 @@ const AuditPage: React.FC = () => {
                     <Typography variant="subtitle2" color="text.secondary">
                       {t('audit.viewDetails.description')}
                     </Typography>
-                    <Paper sx={{ p: 2, backgroundColor: 'grey.50', mt: 1 }}>
+                    <Paper sx={{ p: 2, backgroundColor: COLORS.grey[50], mt: 1 }}>
                       <Typography variant="body2">
                         {selectedLog.description || t('audit.viewDetails.noDescription')}
                       </Typography>
@@ -622,7 +623,7 @@ const AuditPage: React.FC = () => {
                       <Typography variant="subtitle2" color="text.secondary">
                         {t('audit.viewDetails.metadata')}
                       </Typography>
-                      <Paper sx={{ p: 2, backgroundColor: 'grey.50', mt: 1 }}>
+                      <Paper sx={{ p: 2, backgroundColor: COLORS.grey[50], mt: 1 }}>
                         <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
                           {typeof selectedLog.metadata === 'string' 
                             ? selectedLog.metadata 

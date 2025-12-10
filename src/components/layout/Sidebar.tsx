@@ -23,6 +23,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
+import { COLORS } from '../../theme/colors';
 
 const drawerWidth = 280;
 
@@ -99,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   const drawer = (
     <div>
-      <Toolbar sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText' }}>
+      <Toolbar sx={{ backgroundColor: COLORS.primary.main, color: COLORS.text.onPrimary }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
           <img 
             src="/logoLevChedva.png" 
@@ -129,10 +130,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               sx={{
                 minHeight: 64,
                 '&.Mui-selected': {
-                  backgroundColor: 'primary.light',
-                  color: 'primary.contrastText',
+                  backgroundColor: COLORS.primary.light,
+                  color: COLORS.text.onPrimary,
                   '& .MuiListItemIcon-root': {
-                    color: 'primary.contrastText',
+                    color: COLORS.text.onPrimary,
                   },
                 },
               }}

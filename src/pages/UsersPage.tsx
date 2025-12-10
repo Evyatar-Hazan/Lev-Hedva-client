@@ -46,6 +46,7 @@ import {
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, useToggleUserStatus } from '../hooks';
 import { UserRole, CreateUserDto, UpdateUserDto } from '../lib/types';
 import { format } from 'date-fns';
+import { COLORS } from '../theme/colors';
 
 const UsersPage: React.FC = () => {
   const { t } = useTranslation();
@@ -580,7 +581,7 @@ const UsersPage: React.FC = () => {
               position: 'absolute',
               right: 8,
               top: 8,
-              color: (theme) => theme.palette.grey[500],
+              color: COLORS.icon.secondary,
             }}
           >
             <CloseIcon />

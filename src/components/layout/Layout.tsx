@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { COLORS } from '../../theme/colors';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -31,7 +32,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           p: 3,
           width: '100%',
           minHeight: '100vh',
-          backgroundColor: 'grey.50',
+          backgroundColor: COLORS.background.soft,
         }}
       >
         <Toolbar /> {/* This creates space under the fixed AppBar */}

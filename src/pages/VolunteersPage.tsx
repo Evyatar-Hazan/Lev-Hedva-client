@@ -50,6 +50,7 @@ import { useVolunteerActivities, useCreateVolunteerActivity, useUpdateVolunteerA
 import { useUsers } from '../hooks/useUsers';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
+import { COLORS } from '../theme/colors';
 
 const VolunteersPage: React.FC = () => {
   const { t } = useTranslation();
@@ -366,7 +367,7 @@ const VolunteersPage: React.FC = () => {
               <Card key={activity.id}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
+                    <Avatar sx={{ width: 40, height: 40, bgcolor: COLORS.primary.main }}>
                       {activity.volunteer?.firstName?.[0]}{activity.volunteer?.lastName?.[0]}
                     </Avatar>
                     <Box sx={{ flexGrow: 1 }}>
@@ -445,7 +446,7 @@ const VolunteersPage: React.FC = () => {
                   <TableRow key={activity.id}>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                        <Avatar sx={{ width: 32, height: 32, bgcolor: COLORS.primary.main }}>
                           {activity.volunteer?.firstName?.[0]}{activity.volunteer?.lastName?.[0]}
                         </Avatar>
                         <Box>

@@ -4,6 +4,7 @@ import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { useTranslation } from 'react-i18next';
+import { COLORS } from '../theme/colors';
 
 interface RTLThemeProviderProps {
   children: React.ReactNode;
@@ -35,24 +36,56 @@ const RTLThemeProvider: React.FC<RTLThemeProviderProps> = ({ children }) => {
     palette: {
       mode: 'light',
       primary: {
-        main: '#1976d2',
-        light: '#42a5f5',
-        dark: '#1565c0',
-        contrastText: '#fff',
+        main: COLORS.primary.main,
+        light: COLORS.primary.light,
+        dark: COLORS.primary.dark,
+        contrastText: COLORS.primary.contrast,
       },
       secondary: {
-        main: '#dc004e',
-        light: '#ff5983',
-        dark: '#9a0036',
-        contrastText: '#fff',
+        main: COLORS.secondary.main,
+        light: COLORS.secondary.light,
+        dark: COLORS.secondary.dark,
+        contrastText: COLORS.secondary.contrast,
       },
       background: {
-        default: '#fafafa',
-        paper: '#fff',
+        default: COLORS.background.default,
+        paper: COLORS.background.paper,
       },
       text: {
-        primary: '#212121',
-        secondary: '#757575',
+        primary: COLORS.text.primary,
+        secondary: COLORS.text.secondary,
+      },
+      error: {
+        main: COLORS.status.error,
+        light: COLORS.status.errorLight,
+        dark: COLORS.status.errorDark,
+        contrastText: COLORS.text.onPrimary,
+      },
+      warning: {
+        main: COLORS.status.warning,
+        light: COLORS.status.warningLight,
+        dark: COLORS.status.warningDark,
+        contrastText: COLORS.text.onPrimary,
+      },
+      success: {
+        main: COLORS.status.success,
+        light: COLORS.status.successLight,
+        dark: COLORS.status.successDark,
+        contrastText: COLORS.text.onPrimary,
+      },
+      info: {
+        main: COLORS.status.info,
+        light: COLORS.status.infoLight,
+        dark: COLORS.status.infoDark,
+        contrastText: COLORS.text.onPrimary,
+      },
+      grey: COLORS.grey,
+      action: {
+        hover: COLORS.action.hover,
+        selected: COLORS.action.selected,
+        disabled: COLORS.action.disabled,
+        disabledBackground: COLORS.action.disabledBackground,
+        focus: COLORS.action.focus,
       },
     },
     typography: {
@@ -195,9 +228,9 @@ const RTLThemeProvider: React.FC<RTLThemeProviderProps> = ({ children }) => {
             borderRadius: 8,
             margin: '2px 8px',
             '&.Mui-selected': {
-              backgroundColor: 'rgba(25, 118, 210, 0.12)',
+              backgroundColor: COLORS.action.selected,
               '&:hover': {
-                backgroundColor: 'rgba(25, 118, 210, 0.18)',
+                backgroundColor: COLORS.action.hoverStrong,
               },
             },
           },

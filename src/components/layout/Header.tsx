@@ -15,6 +15,7 @@ import {
 import { useAuth } from '../../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from '../LanguageSelector';
+import { COLORS } from '../../theme/colors';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -29,7 +30,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       position="fixed" 
       sx={{ 
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: 'primary.main',
+        backgroundColor: COLORS.primary.main,
       }}
     >
       <Toolbar>
@@ -72,7 +73,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 sx={{ 
                   width: 32, 
                   height: 32, 
-                  backgroundColor: 'secondary.main',
+                  backgroundColor: COLORS.secondary.main,
                   fontSize: '0.875rem',
                 }}
               >
