@@ -312,6 +312,7 @@
     },
     "noAuditRecords": "לא נמצאו רשומות ביקורת",
     "loadError": "שגיאה בטעינת נתוני הביקורת:",
+    "loadedEntries": "נטענו {{loaded}} מתוך {{total}} פעולות",
     "pagination": "עמוד {{page}} מתוך {{totalPages}} | סה\"כ {{total}} רשומות"
   },
   "table": {

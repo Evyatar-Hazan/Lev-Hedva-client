@@ -4,13 +4,13 @@ import {
   AuditLogResponseDto,
   CreateAuditLogDto, 
   AuditLogsQueryDto, 
-  PaginatedResponse
+  AuditPaginatedResponse
 } from '../../lib/types';
 
 export class AuditClient {
   private static readonly BASE_PATH = '/audit';
 
-  static async getAuditLogs(query?: AuditLogsQueryDto): Promise<PaginatedResponse<AuditLogResponseDto>> {
+  static async getAuditLogs(query?: AuditLogsQueryDto): Promise<AuditPaginatedResponse<AuditLogResponseDto>> {
     const params = new URLSearchParams();
     
     if (query) {
@@ -22,7 +22,7 @@ export class AuditClient {
       });
     }
 
-    const response = await apiClient.get<PaginatedResponse<AuditLogResponseDto>>(
+    const response = await apiClient.get<AuditPaginatedResponse<AuditLogResponseDto>>(
       `${this.BASE_PATH}?${params.toString()}`
     );
     return response.data;

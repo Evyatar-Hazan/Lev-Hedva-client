@@ -204,6 +204,15 @@ export interface PaginatedResponse<T> {
   };
 }
 
+// Audit specific response (flat structure)
+export interface AuditPaginatedResponse<T> {
+  data: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;

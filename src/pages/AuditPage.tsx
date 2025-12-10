@@ -26,6 +26,7 @@ import {
   CardActions,
   useMediaQuery,
   useTheme,
+  Button,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -35,8 +36,9 @@ import {
   Security as SecurityIcon,
   Person as PersonIcon,
   Timeline as TimelineIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
-import { useAuditLogs } from '../hooks';
+import { useInfiniteAuditLogs, useAuditStats } from '../hooks';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 
@@ -47,22 +49,36 @@ const AuditPage: React.FC = () => {
   
   const [search, setSearch] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
-  const [page, setPage] = useState(1);
   
   // שימוש בהוכים החדשים
-  const { data: auditData, isLoading, error } = useAuditLogs({ 
-    page,
-    limit: 10
-  });
+  const { 
+    data: infiniteData, 
+    isLoading, 
+    error, 
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteAuditLogs();
+
+  // קבלת סטטיסטיקות מדויקות מהשרת
+  const { data: statsData, isLoading: statsLoading } = useAuditStats();
+
+  // Debug: בואו נראה מה אנו מקבלים
+  console.log('infiniteData:', infiniteData);
+
+  // קבלת הסטטיסטיקות הכלליות מהדף הראשון
+  const totalCount = (infiniteData?.pages[0] as any)?.total || 0;
+  
+  // איחוד כל הדפים לרשימה אחת
+  const auditLogs = infiniteData?.pages?.flatMap((page: any) => page?.data || []) || [];
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
-    setPage(1);
   };
 
   const handleActionFilterChange = (event: any) => {
     setActionFilter(event.target.value);
-    setPage(1);
   };
 
   const getActionColor = (action: string) => {
@@ -111,21 +127,66 @@ const AuditPage: React.FC = () => {
     );
   }
 
-  const auditLogs = auditData?.data || [];
+  // הנתונים כבר מוגדרים למעלה
 
-  // חישוב סטטיסטיקות
+  // סינון לוגים לפי חיפוש ופילטר
+  const filteredLogs = auditLogs.filter(log => {
+    // סינון לפי חיפוש
+    const searchLower = search.toLowerCase();
+    const matchesSearch = !search || 
+      log.action.toLowerCase().includes(searchLower) ||
+      log.description.toLowerCase().includes(searchLower) ||
+      log.entityType.toLowerCase().includes(searchLower) ||
+      log.user?.firstName?.toLowerCase().includes(searchLower) ||
+      log.user?.lastName?.toLowerCase().includes(searchLower) ||
+      log.user?.email?.toLowerCase().includes(searchLower);
+
+    // סינון לפי פעולה
+    const matchesFilter = actionFilter === 'all' || (() => {
+      switch (actionFilter) {
+        case 'login':
+          return log.action.toLowerCase().includes('login') || log.action.toLowerCase().includes('logout');
+        case 'create':
+          return log.action.toLowerCase().includes('create') || log.action.toLowerCase().includes('register');
+        case 'update':
+          return log.action.toLowerCase().includes('update') || log.action.toLowerCase().includes('edit');
+        case 'delete':
+          return log.action.toLowerCase().includes('delete') || log.action.toLowerCase().includes('remove');
+        case 'permission':
+          return log.action.toLowerCase().includes('permission') || log.action.toLowerCase().includes('grant') || log.action.toLowerCase().includes('revoke');
+        default:
+          return true;
+      }
+    })();
+
+    return matchesSearch && matchesFilter;
+  });
+
+  // חישוב סטטיסטיקות - משילוב נתונים מהשרת ונתונים מקומיים
   const actionsCount = new Map();
   const usersCount = new Set();
+  
+  // חישוב פעולות היום מהנתונים הנטענים
   const entitiesToday = auditLogs.filter(log => {
     const logDate = new Date(log.createdAt);
     const today = new Date();
     return logDate.toDateString() === today.toDateString();
   });
-
-  auditLogs.forEach(log => {
+  
+  // חישוב מקומי לנתונים המסוננים
+  filteredLogs.forEach(log => {
     actionsCount.set(log.action, (actionsCount.get(log.action) || 0) + 1);
     if (log.user?.id) usersCount.add(log.user.id);
   });
+
+  // שימוש בסטטיסטיקות מהשרת לנתונים הכוללים
+  const totalActionsFromServer = statsData?.totalLogs || totalCount;
+  const todayActionsCount = auditLogs.filter(log => {
+    const today = new Date().toDateString();
+    return new Date(log.createdAt).toDateString() === today;
+  }).length;
+  const uniqueUsersFromServer = statsData ? Object.keys(statsData.logsByUser || {}).length : usersCount.size;
+  const uniqueActionsFromServer = statsData ? Object.keys(statsData.logsByAction || {}).length : actionsCount.size;
 
   return (
     <Box sx={{ p: 3 }}>
@@ -133,9 +194,14 @@ const AuditPage: React.FC = () => {
         <Typography variant="h4" component="h1" fontWeight="bold">
           {t('audit.title')}
         </Typography>
-        <IconButton title="ייצוא נתונים">
-          <GetAppIcon />
-        </IconButton>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <IconButton title="רענן נתונים" onClick={() => refetch()}>
+            <RefreshIcon />
+          </IconButton>
+          <IconButton title="ייצוא נתונים">
+            <GetAppIcon />
+          </IconButton>
+        </Box>
       </Box>
 
       {/* סטטיסטיקות מהירות */}
@@ -145,7 +211,7 @@ const AuditPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center' }}>
               <SecurityIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" color="primary">
-                {auditData?.pagination?.total || 0}
+                {statsLoading ? '...' : totalActionsFromServer}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t('audit.stats.totalActions')}
@@ -158,7 +224,7 @@ const AuditPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center' }}>
               <TimelineIcon color="info" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" color="info.main">
-                {entitiesToday.length}
+                {statsLoading ? '...' : todayActionsCount}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t('audit.stats.todayActions')}
@@ -171,7 +237,7 @@ const AuditPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center' }}>
               <PersonIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" color="success.main">
-                {usersCount.size}
+                {statsLoading ? '...' : uniqueUsersFromServer}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t('audit.stats.activeUsers')}
@@ -184,7 +250,7 @@ const AuditPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center' }}>
               <AssessmentIcon color="warning" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" color="warning.main">
-                {actionsCount.size}
+                {statsLoading ? '...' : uniqueActionsFromServer}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t('audit.stats.actionTypes')}
@@ -234,12 +300,12 @@ const AuditPage: React.FC = () => {
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <CircularProgress />
             </Box>
-          ) : auditLogs.length === 0 ? (
+          ) : filteredLogs.length === 0 ? (
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <Typography>{t('audit.noAuditRecords')}</Typography>
             </Paper>
           ) : (
-            auditLogs.map((log: any) => (
+            filteredLogs.map((log: any) => (
               <Card key={log.id}>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -293,9 +359,24 @@ const AuditPage: React.FC = () => {
               </Card>
             ))
           )}
+          
+          {/* כפתור טען עוד למובייל */}
+          {hasNextPage && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <Button 
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                variant="outlined"
+                startIcon={isFetchingNextPage ? <CircularProgress size={20} /> : null}
+              >
+                {isFetchingNextPage ? 'טוען...' : 'טען עוד פעולות'}
+              </Button>
+            </Box>
+          )}
         </Box>
       ) : (
         // תצוגת טבלה לדסקטופ
+        <>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -318,7 +399,7 @@ const AuditPage: React.FC = () => {
                     </Box>
                   </TableCell>
                 </TableRow>
-              ) : auditLogs.length === 0 ? (
+              ) : filteredLogs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} align="center">
                     <Typography variant="body2" color="text.secondary">
@@ -327,7 +408,7 @@ const AuditPage: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                auditLogs.map((log: any) => (
+                filteredLogs.map((log: any) => (
                   <TableRow key={log.id}>
                     <TableCell>
                       <Typography variant="body2" fontSize="0.8rem">
@@ -384,20 +465,29 @@ const AuditPage: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* כפתור טען עוד */}
+        {hasNextPage && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <Button 
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              variant="outlined"
+              startIcon={isFetchingNextPage ? <CircularProgress size={20} /> : null}
+            >
+              {isFetchingNextPage ? 'טוען...' : 'טען עוד פעולות'}
+            </Button>
+          </Box>
+        )}
+        </>
       )}
 
-      {/* דף */}
-      {auditData?.pagination && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('audit.pagination', { 
-              page: auditData.pagination.page, 
-              totalPages: Math.ceil(auditData.pagination.total / auditData.pagination.limit),
-              total: auditData.pagination.total 
-            })}
-          </Typography>
-        </Box>
-      )}
+      {/* מידע על הנתונים שנטענו */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+        <Typography variant="body2" color="text.secondary">
+          {t('audit.loadedEntries', { loaded: auditLogs.length, total: totalCount })}
+        </Typography>
+      </Box>
     </Box>
   );
 };
