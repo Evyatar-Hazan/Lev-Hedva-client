@@ -47,4 +47,12 @@ export class AuthClient {
     );
     return response.data;
   }
+
+  static async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+    const response = await apiClient.patch<{ message: string }>(
+      `${this.BASE_PATH}/change-password`,
+      { currentPassword, newPassword }
+    );
+    return response.data;
+  }
 }

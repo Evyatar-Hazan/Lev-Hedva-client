@@ -127,6 +127,7 @@
     "passwordChangeSuccess": "הסיסמה שונתה בהצלחה",
     "passwordChangeError": "שגיאה בשינוי הסיסמה",
     "passwordMismatch": "הסיסמאות אינן תואמות",
+    "passwordTooShort": "הסיסמה חייבת להכיל לפחות 8 תווים",
     "memberSince": "חבר מאז",
     "userId": "מזהה משתמש",
     "roleAdmin": "מנהל",

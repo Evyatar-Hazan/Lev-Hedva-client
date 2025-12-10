@@ -14,6 +14,7 @@ import {
   CircularProgress,
   Chip,
   Stack,
+  InputAdornment,
 } from '@mui/material';
 import {
   Edit,
@@ -25,10 +26,13 @@ import {
   Badge as BadgeIcon,
   Person,
   Lock,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import { useAuth } from '../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
 import { COLORS } from '../theme/colors';
+import { AuthClient } from '../api/clients/auth.client';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -50,6 +54,12 @@ const ProfilePage: React.FC = () => {
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
+  });
+
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
   });
 
   const handleEdit = () => {
@@ -101,15 +111,17 @@ const ProfilePage: React.FC = () => {
       return;
     }
 
+    if (passwordData.newPassword.length < 8) {
+      setErrorMessage(t('profile.passwordTooShort', 'הסיסמה חייבת להכיל לפחות 8 תווים'));
+      return;
+    }
+
     setIsSaving(true);
     setSuccessMessage('');
     setErrorMessage('');
 
     try {
-      // TODO: Add API call to change password
-      // await changePassword(passwordData);
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await AuthClient.changePassword(passwordData.currentPassword, passwordData.newPassword);
       
       setSuccessMessage(t('profile.passwordChangeSuccess'));
       setPasswordData({
@@ -117,8 +129,14 @@ const ProfilePage: React.FC = () => {
         newPassword: '',
         confirmPassword: '',
       });
-    } catch (error) {
-      setErrorMessage(t('profile.passwordChangeError'));
+      setShowPasswords({
+        current: false,
+        new: false,
+        confirm: false,
+      });
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || t('profile.passwordChangeError');
+      setErrorMessage(errorMsg);
     } finally {
       setIsSaving(false);
     }
@@ -380,12 +398,23 @@ const ProfilePage: React.FC = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    type="password"
+                    type={showPasswords.current ? 'text' : 'password'}
                     label={t('profile.currentPassword')}
                     value={passwordData.currentPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                     InputProps={{
                       startAdornment: <Lock sx={{ mr: 1, color: 'action.active' }} />,
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                            edge="end"
+                          >
+                            {showPasswords.current ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                   />
                 </Grid>
@@ -393,12 +422,23 @@ const ProfilePage: React.FC = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    type="password"
+                    type={showPasswords.new ? 'text' : 'password'}
                     label={t('profile.newPassword')}
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                     InputProps={{
                       startAdornment: <Lock sx={{ mr: 1, color: 'action.active' }} />,
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                            edge="end"
+                          >
+                            {showPasswords.new ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                   />
                 </Grid>
@@ -406,12 +446,23 @@ const ProfilePage: React.FC = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    type="password"
+                    type={showPasswords.confirm ? 'text' : 'password'}
                     label={t('profile.confirmPassword')}
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                     InputProps={{
                       startAdornment: <Lock sx={{ mr: 1, color: 'action.active' }} />,
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                            edge="end"
+                          >
+                            {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                   />
                 </Grid>
