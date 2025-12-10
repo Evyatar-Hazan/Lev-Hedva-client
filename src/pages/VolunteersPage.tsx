@@ -33,6 +33,7 @@ import {
   DialogContent,
   DialogActions,
   Autocomplete,
+  Pagination,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -43,6 +44,7 @@ import {
   AccessTime as TimeIcon,
   Star as StarIcon,
   Visibility as VisibilityIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useVolunteerActivities, useCreateVolunteerActivity, useUpdateVolunteerActivity } from '../hooks';
 import { useUsers } from '../hooks/useUsers';
@@ -70,9 +72,9 @@ const VolunteersPage: React.FC = () => {
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   
   // שימוש בהוכים החדשים
-  const { data: activitiesData, isLoading, error } = useVolunteerActivities({ 
+  const { data: activitiesData, isLoading, error, refetch } = useVolunteerActivities({ 
     page,
-    limit: 10
+    limit: 20
   });
   
   const { data: usersData } = useUsers();
@@ -184,6 +186,10 @@ const VolunteersPage: React.FC = () => {
     setSelectedActivity(null);
   };
 
+  const handlePageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+    setPage(newPage);
+  };
+
   if (error) {
     return (
       <Box sx={{ p: 3 }}>
@@ -196,9 +202,24 @@ const VolunteersPage: React.FC = () => {
 
   const activities = activitiesData?.data || [];
 
+  // סינון פעילויות לפי חיפוש ופילטר
+  const filteredActivities = activities.filter(activity => {
+    // סינון לפי חיפוש
+    const searchLower = search.toLowerCase();
+    const matchesSearch = !search || 
+      activity.description.toLowerCase().includes(searchLower) ||
+      activity.activityType.toLowerCase().includes(searchLower) ||
+      `${activity.volunteer?.firstName} ${activity.volunteer?.lastName}`.toLowerCase().includes(searchLower);
+
+    // סינון לפי סוג פעילות
+    const matchesFilter = statusFilter === 'all' || activity.activityType === statusFilter;
+
+    return matchesSearch && matchesFilter;
+  });
+
   // קבלת סטטיסטיקות מתנדבים
   const volunteerStats = new Map();
-  activities.forEach(activity => {
+  filteredActivities.forEach(activity => {
     const volunteerName = `${activity.volunteer?.firstName} ${activity.volunteer?.lastName}`;
     if (!volunteerStats.has(volunteerName)) {
       volunteerStats.set(volunteerName, {
@@ -221,14 +242,23 @@ const VolunteersPage: React.FC = () => {
         <Typography variant="h4" component="h1" fontWeight="bold">
           {t('volunteers.title')}
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          size="large"
-          onClick={handleAddActivity}
-        >
-          {t('volunteers.addActivity')}
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={() => refetch()}
+          >
+            {t('common.refresh')}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            size="large"
+            onClick={handleAddActivity}
+          >
+            {t('volunteers.addActivity')}
+          </Button>
+        </Box>
       </Box>
 
       {/* סטטיסטיקות מהירות */}
@@ -327,12 +357,12 @@ const VolunteersPage: React.FC = () => {
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <CircularProgress />
             </Box>
-          ) : activities.length === 0 ? (
+          ) : filteredActivities.length === 0 ? (
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <Typography>{t('volunteers.noActivities')}</Typography>
             </Paper>
           ) : (
-            activities.map((activity: any) => (
+            filteredActivities.map((activity: any) => (
               <Card key={activity.id}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -411,7 +441,7 @@ const VolunteersPage: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                activities.map((activity: any) => (
+                filteredActivities.map((activity: any) => (
                   <TableRow key={activity.id}>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -466,9 +496,18 @@ const VolunteersPage: React.FC = () => {
         </TableContainer>
       )}
 
-      {/* דף */}
-      {activitiesData?.pagination && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+      {/* פגינציה */}
+      {activitiesData?.pagination && activitiesData.pagination.totalPages > 1 && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, gap: 2 }}>
+          <Pagination 
+            count={Math.ceil(activitiesData.pagination.total / activitiesData.pagination.limit)}
+            page={activitiesData.pagination.page}
+            onChange={handlePageChange}
+            color="primary"
+            size="large"
+            showFirstButton
+            showLastButton
+          />
           <Typography variant="body2" color="text.secondary">
             {t('volunteers.pagination', { 
               page: activitiesData.pagination.page, 
