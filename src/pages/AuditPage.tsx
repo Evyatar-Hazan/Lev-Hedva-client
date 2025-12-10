@@ -27,6 +27,10 @@ import {
   useMediaQuery,
   useTheme,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -49,6 +53,57 @@ const AuditPage: React.FC = () => {
   
   const [search, setSearch] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
+  const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+
+  // פונקציה לייצוא נתונים
+  const handleExportData = () => {
+    try {
+      // יצירת CSV של הנתונים הנוכחיים
+      const csvData = filteredLogs.map(log => ({
+        'זמן': format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: he }),
+        'משתמש': log.user ? `${log.user.firstName} ${log.user.lastName}` : 'משתמש לא ידוע',
+        'פעולה': getActionText(log.action),
+        'ישות': log.entityType || 'לא זמין',
+        'תיאור': log.description || 'אין תיאור',
+        'כתובת IP': log.ipAddress || 'N/A'
+      }));
+
+      // המרת JSON ל-CSV
+      const headers = Object.keys(csvData[0] || {});
+      const csvContent = [
+        headers.join(','),
+        ...csvData.map(row => headers.map(header => `"${(row as any)[header] || ''}"`).join(','))
+      ].join('\n');
+
+      // יצירת בלוב והורדה
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `audit-logs-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('שגיאה בייצוא הנתונים:', error);
+      alert('שגיאה בייצוא הנתונים');
+    }
+  };
+
+  // פונקציה לצפייה בפרטי לוג
+  const handleViewDetails = (logId: string) => {
+    setSelectedLogId(logId);
+    setViewDialogOpen(true);
+  };
+
+  // פונקציה לסגירת דיאלוג הצפייה
+  const handleCloseViewDialog = () => {
+    setViewDialogOpen(false);
+    setSelectedLogId(null);
+  };
   
   // שימוש בהוכים החדשים
   const { 
@@ -166,13 +221,6 @@ const AuditPage: React.FC = () => {
   const actionsCount = new Map();
   const usersCount = new Set();
   
-  // חישוב פעולות היום מהנתונים הנטענים
-  const entitiesToday = auditLogs.filter(log => {
-    const logDate = new Date(log.createdAt);
-    const today = new Date();
-    return logDate.toDateString() === today.toDateString();
-  });
-  
   // חישוב מקומי לנתונים המסוננים
   filteredLogs.forEach(log => {
     actionsCount.set(log.action, (actionsCount.get(log.action) || 0) + 1);
@@ -182,8 +230,9 @@ const AuditPage: React.FC = () => {
   // שימוש בסטטיסטיקות מהשרת לנתונים הכוללים
   const totalActionsFromServer = statsData?.totalLogs || totalCount;
   const todayActionsCount = auditLogs.filter(log => {
-    const today = new Date().toDateString();
-    return new Date(log.createdAt).toDateString() === today;
+    const logDate = new Date(log.createdAt);
+    const today = new Date();
+    return logDate.toDateString() === today.toDateString();
   }).length;
   const uniqueUsersFromServer = statsData ? Object.keys(statsData.logsByUser || {}).length : usersCount.size;
   const uniqueActionsFromServer = statsData ? Object.keys(statsData.logsByAction || {}).length : actionsCount.size;
@@ -198,7 +247,7 @@ const AuditPage: React.FC = () => {
           <IconButton title="רענן נתונים" onClick={() => refetch()}>
             <RefreshIcon />
           </IconButton>
-          <IconButton title="ייצוא נתונים">
+          <IconButton title="ייצוא נתונים" onClick={handleExportData}>
             <GetAppIcon />
           </IconButton>
         </Box>
@@ -352,7 +401,7 @@ const AuditPage: React.FC = () => {
                 </CardContent>
                 
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
-                  <IconButton size="small" title="צפה בפרטים">
+                  <IconButton size="small" title="צפה בפרטים" onClick={() => handleViewDetails(log.id)}>
                     <VisibilityIcon />
                   </IconButton>
                 </CardActions>
@@ -455,7 +504,7 @@ const AuditPage: React.FC = () => {
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" title="צפה בפרטים">
+                      <IconButton size="small" title="צפה בפרטים" onClick={() => handleViewDetails(log.id)}>
                         <VisibilityIcon />
                       </IconButton>
                     </TableCell>
@@ -488,6 +537,112 @@ const AuditPage: React.FC = () => {
           {t('audit.loadedEntries', { loaded: auditLogs.length, total: totalCount })}
         </Typography>
       </Box>
+
+      {/* דיאלוג צפייה בפרטים */}
+      <Dialog open={viewDialogOpen} onClose={handleCloseViewDialog} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Typography variant="h6">
+            {t('audit.viewDetails.title')}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          {selectedLogId && (() => {
+            const selectedLog = auditLogs.find(log => log.id === selectedLogId);
+            if (!selectedLog) return <Typography>{t('audit.viewDetails.notFound')}</Typography>;
+            
+            return (
+              <Box sx={{ pt: 2 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('audit.viewDetails.time')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                      {format(new Date(selectedLog.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: he })}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('audit.viewDetails.user')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                      {selectedLog.user ? 
+                        `${selectedLog.user.firstName} ${selectedLog.user.lastName} (${selectedLog.user.email})` : 
+                        t('audit.viewDetails.unknownUser')
+                      }
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('audit.viewDetails.actionType')}
+                    </Typography>
+                    <Chip 
+                      label={getActionText(selectedLog.action)}
+                      color={getActionColor(selectedLog.action)}
+                      size="small"
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('audit.viewDetails.entity')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                      {selectedLog.entityType || t('audit.viewDetails.notAvailable')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('audit.viewDetails.entityId')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2, fontFamily: 'monospace' }}>
+                      {selectedLog.entityId || t('audit.viewDetails.notAvailable')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('audit.viewDetails.ipAddress')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2, fontFamily: 'monospace' }}>
+                      {selectedLog.ipAddress || 'N/A'}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('audit.viewDetails.description')}
+                    </Typography>
+                    <Paper sx={{ p: 2, backgroundColor: 'grey.50', mt: 1 }}>
+                      <Typography variant="body2">
+                        {selectedLog.description || t('audit.viewDetails.noDescription')}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  {selectedLog.metadata && (
+                    <Grid item xs={12}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        {t('audit.viewDetails.metadata')}
+                      </Typography>
+                      <Paper sx={{ p: 2, backgroundColor: 'grey.50', mt: 1 }}>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                          {typeof selectedLog.metadata === 'string' 
+                            ? selectedLog.metadata 
+                            : JSON.stringify(selectedLog.metadata, null, 2)
+                          }
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  )}
+                </Grid>
+              </Box>
+            );
+          })()}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseViewDialog} color="primary">
+            {t('common.close')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
