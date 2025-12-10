@@ -12,7 +12,7 @@ import {
 export class UsersClient {
   private static readonly BASE_PATH = '/users';
 
-  static async getUsers(query?: UsersQueryDto): Promise<PaginatedResponse<User>> {
+  static async getUsers(query?: UsersQueryDto): Promise<{users: User[], total: number, page: number, limit: number, totalPages: number}> {
     const params = new URLSearchParams();
     
     if (query) {
@@ -28,16 +28,10 @@ export class UsersClient {
       `${this.BASE_PATH}?${params.toString()}`
     );
     
-    // המרה לפורמט הצפוי על ידי הקליינט
-    return {
-      data: response.data.users,
-      pagination: {
-        page: response.data.page,
-        limit: response.data.limit,
-        total: response.data.total,
-        totalPages: response.data.totalPages
-      }
-    };
+    console.log('👥 Users API Response:', response.data);
+    
+    // החזרת הנתונים כפי שהם מהשרת
+    return response.data;
   }
 
   static async getUserById(id: string): Promise<User> {

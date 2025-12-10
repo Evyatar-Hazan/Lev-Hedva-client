@@ -500,9 +500,9 @@ const LoansPage: React.FC = () => {
         <DialogContent>
           <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Autocomplete
-              options={usersData?.data || []}
+              options={usersData?.users || []}
               getOptionLabel={(option: any) => `${option.firstName} ${option.lastName} (${option.email})`}
-              value={usersData?.data?.find((u: any) => u.id === newLoan.userId) || null}
+              value={usersData?.users?.find((u: any) => u.id === newLoan.userId) || null}
               onChange={(_, newValue: any) => {
                 setNewLoan(prev => ({ ...prev, userId: newValue?.id || '' }));
               }}

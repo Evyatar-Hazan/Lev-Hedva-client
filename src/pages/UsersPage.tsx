@@ -92,7 +92,8 @@ const UsersPage: React.FC = () => {
     error,
     search,
     roleFilter,
-    page
+    page,
+    usersCount: usersData?.users?.length
   });
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -237,7 +238,7 @@ const UsersPage: React.FC = () => {
           {t('users.debug', { 
             loading: isLoading, 
             error: error ? (error as any).message || t('common.error') : t('common.no'), 
-            data: usersData ? `${(usersData as any).users?.length || 0} מתוך ${(usersData as any).total || 0}` : t('common.no')
+            data: usersData ? `${usersData.users?.length || 0} מתוך ${usersData.total || 0}` : t('common.no')
           })}
         </Typography>
       </Alert>
@@ -282,12 +283,12 @@ const UsersPage: React.FC = () => {
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <CircularProgress />
             </Box>
-          ) : (usersData as any)?.users?.length === 0 ? (
+          ) : usersData?.users?.length === 0 ? (
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <Typography>{t('users.noUsers')}</Typography>
             </Paper>
           ) : (
-            (usersData as any)?.users?.map((user: any) => (
+            usersData?.users?.map((user: any) => (
               <Card key={user.id} sx={{ p: 0 }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -379,14 +380,14 @@ const UsersPage: React.FC = () => {
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ) : (usersData as any)?.users?.length === 0 ? (
+              ) : usersData?.users?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
                     {t('users.noUsers')}
                   </TableCell>
                 </TableRow>
               ) : (
-                (usersData as any)?.users?.map((user: any) => (
+                usersData?.users?.map((user: any) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       {user.firstName} {user.lastName}
@@ -447,12 +448,12 @@ const UsersPage: React.FC = () => {
       )}
 
       {/* Pagination */}
-      {(usersData as any)?.total && (
+      {usersData?.total && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <Typography variant="body2">
             {t('users.pagination', { 
-              showing: (usersData as any).users?.length || 0, 
-              total: (usersData as any).total 
+              showing: usersData.users?.length || 0, 
+              total: usersData.total 
             })}
           </Typography>
         </Box>

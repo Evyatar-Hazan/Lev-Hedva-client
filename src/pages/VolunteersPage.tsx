@@ -28,6 +28,11 @@ import {
   Avatar,
   useMediaQuery,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Autocomplete,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -39,7 +44,8 @@ import {
   Star as StarIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
-import { useVolunteerActivities } from '../hooks';
+import { useVolunteerActivities, useCreateVolunteerActivity } from '../hooks';
+import { useUsers } from '../hooks/useUsers';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 
@@ -51,12 +57,24 @@ const VolunteersPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newActivity, setNewActivity] = useState({
+    volunteerId: '',
+    activityType: '',
+    description: '',
+    hours: '',
+    date: ''
+  });
+  const [submitError, setSubmitError] = useState<string | null>(null);
   
   // שימוש בהוכים החדשים
   const { data: activitiesData, isLoading, error } = useVolunteerActivities({ 
     page,
     limit: 10
   });
+  
+  const { data: usersData } = useUsers();
+  const createActivityMutation = useCreateVolunteerActivity();
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -87,6 +105,39 @@ const VolunteersPage: React.FC = () => {
       case 'maintenance': return 'תחזוקה';
       case 'other': return 'אחר';
       default: return type;
+    }
+  };
+
+  const handleAddActivity = () => {
+    setIsAddDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsAddDialogOpen(false);
+    setNewActivity({
+      volunteerId: '',
+      activityType: '',
+      description: '',
+      hours: '',
+      date: ''
+    });
+    setSubmitError(null);
+  };
+
+  const handleSubmitActivity = async () => {
+    setSubmitError(null);
+    try {
+      await createActivityMutation.mutateAsync({
+        volunteerId: newActivity.volunteerId,
+        activityType: newActivity.activityType,
+        description: newActivity.description,
+        hours: parseInt(newActivity.hours),
+        date: newActivity.date
+      });
+      handleCloseDialog();
+    } catch (error: any) {
+      console.error('Error creating activity:', error);
+      setSubmitError(error?.response?.data?.message || error?.message || 'שגיאה ביצירת הפעילות');
     }
   };
 
@@ -131,6 +182,7 @@ const VolunteersPage: React.FC = () => {
           variant="contained"
           startIcon={<AddIcon />}
           size="large"
+          onClick={handleAddActivity}
         >
           {t('volunteers.addActivity')}
         </Button>
@@ -383,6 +435,108 @@ const VolunteersPage: React.FC = () => {
           </Typography>
         </Box>
       )}
+
+      {/* דיאלוג הוספת פעילות */}
+      <Dialog open={isAddDialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+        <DialogTitle>{t('volunteers.addActivity')}</DialogTitle>
+        <DialogContent>
+          {submitError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {submitError}
+            </Alert>
+          )}
+          <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Autocomplete
+              options={usersData?.users || []}
+              getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+              value={usersData?.users?.find(u => u.id === newActivity.volunteerId) || null}
+              onChange={(event, value) => {
+                setNewActivity(prev => ({
+                  ...prev,
+                  volunteerId: value?.id || ''
+                }));
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t('volunteers.volunteer')}
+                  required
+                />
+              )}
+            />
+            
+            <FormControl fullWidth required>
+              <InputLabel>{t('volunteers.activityType')}</InputLabel>
+              <Select
+                value={newActivity.activityType}
+                onChange={(e) => setNewActivity(prev => ({
+                  ...prev,
+                  activityType: e.target.value
+                }))}
+                label={t('volunteers.activityType')}
+              >
+                <MenuItem value="delivery">{getActivityTypeText('delivery')}</MenuItem>
+                <MenuItem value="home_visit">{getActivityTypeText('home_visit')}</MenuItem>
+                <MenuItem value="phone_call">{getActivityTypeText('phone_call')}</MenuItem>
+                <MenuItem value="maintenance">{getActivityTypeText('maintenance')}</MenuItem>
+                <MenuItem value="other">{getActivityTypeText('other')}</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField
+              label={t('volunteers.description')}
+              value={newActivity.description}
+              onChange={(e) => setNewActivity(prev => ({
+                ...prev,
+                description: e.target.value
+              }))}
+              multiline
+              rows={3}
+              required
+            />
+
+            <TextField
+              label={t('volunteers.hours')}
+              type="number"
+              value={newActivity.hours}
+              onChange={(e) => setNewActivity(prev => ({
+                ...prev,
+                hours: e.target.value
+              }))}
+              required
+            />
+
+            <TextField
+              label={t('volunteers.date')}
+              type="date"
+              value={newActivity.date}
+              onChange={(e) => setNewActivity(prev => ({
+                ...prev,
+                date: e.target.value
+              }))}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              required
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={handleSubmitActivity}
+            disabled={!newActivity.volunteerId || !newActivity.activityType || 
+                     !newActivity.description || !newActivity.hours || !newActivity.date ||
+                     createActivityMutation.isPending}
+            startIcon={createActivityMutation.isPending ? <CircularProgress size={20} /> : null}
+          >
+            {t('common.add')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
