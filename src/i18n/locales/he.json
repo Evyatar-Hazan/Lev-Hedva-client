@@ -335,7 +335,9 @@
       "activeVolunteers": "מתנדבים פעילים",
       "yearActivities": "פעילויות השנה",
       "volunteerHours": "שעות התנדבות",
-      "goldVolunteers": "מתנדבי זהב"
+      "goldVolunteers": "מתנדבי זהב",
+      "totalHours": "סה\"כ שעות",
+      "avgHoursPerVolunteer": "ממוצע שעות למתנדב"
     },
     "filter": {
       "activityType": "סוג פעילות"

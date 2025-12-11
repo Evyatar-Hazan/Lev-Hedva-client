@@ -330,7 +330,9 @@
       "activeVolunteers": "Active Volunteers",
       "yearActivities": "Year Activities",
       "volunteerHours": "Volunteer Hours",
-      "goldVolunteers": "Gold Volunteers"
+      "goldVolunteers": "Gold Volunteers",
+      "totalHours": "Total Hours",
+      "avgHoursPerVolunteer": "Avg Hours Per Volunteer"
     },
     "filter": {
       "activityType": "Activity Type"
