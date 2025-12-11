@@ -42,6 +42,7 @@ import {
   Timeline as TimelineIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
+import StatsGrid from '../components/StatsGrid';
 import { useInfiniteAuditLogs, useAuditStats } from '../hooks';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
@@ -255,60 +256,36 @@ const AuditPage: React.FC = () => {
       </Box>
 
       {/* סטטיסטיקות מהירות */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <SecurityIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="primary">
-                {statsLoading ? '...' : totalActionsFromServer}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('audit.stats.totalActions')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <TimelineIcon color="info" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="info.main">
-                {statsLoading ? '...' : todayActionsCount}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('audit.stats.todayActions')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <PersonIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="success.main">
-                {statsLoading ? '...' : uniqueUsersFromServer}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('audit.stats.activeUsers')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <AssessmentIcon color="warning" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="warning.main">
-                {statsLoading ? '...' : uniqueActionsFromServer}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('audit.stats.actionTypes')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <StatsGrid stats={[
+        {
+          icon: <SecurityIcon />,
+          value: totalActionsFromServer,
+          label: t('audit.stats.totalActions'),
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          loading: statsLoading,
+        },
+        {
+          icon: <TimelineIcon />,
+          value: todayActionsCount,
+          label: t('audit.stats.todayActions'),
+          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          loading: statsLoading,
+        },
+        {
+          icon: <PersonIcon />,
+          value: uniqueUsersFromServer,
+          label: t('audit.stats.activeUsers'),
+          gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+          loading: statsLoading,
+        },
+        {
+          icon: <AssessmentIcon />,
+          value: uniqueActionsFromServer,
+          label: t('audit.stats.actionTypes'),
+          gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+          loading: statsLoading,
+        },
+      ]} />
 
       {/* חיפוש וסינון */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
