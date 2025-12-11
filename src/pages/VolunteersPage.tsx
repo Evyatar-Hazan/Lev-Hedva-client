@@ -21,7 +21,6 @@ import {
   Select,
   CircularProgress,
   Alert,
-  Grid,
   Card,
   CardContent,
   CardActions,
@@ -46,6 +45,7 @@ import {
   Visibility as VisibilityIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
+import StatsGrid from '../components/StatsGrid';
 import { useVolunteerActivities, useCreateVolunteerActivity, useUpdateVolunteerActivity } from '../hooks';
 import { useUsers } from '../hooks/useUsers';
 import { format } from 'date-fns';
@@ -263,60 +263,34 @@ const VolunteersPage: React.FC = () => {
       </Box>
 
       {/* סטטיסטיקות מהירות */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <VolunteerIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="primary">
-                {volunteerStatsArray.length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('volunteers.stats.activeVolunteers')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <EventIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="success.main">
-                {activitiesData?.pagination?.total || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('volunteers.stats.yearActivities')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <TimeIcon color="info" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="info.main">
-                {volunteerStatsArray.reduce((sum, v) => sum + v.totalHours, 0)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('volunteers.stats.volunteerHours')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <StarIcon color="warning" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="warning.main">
-                {volunteerStatsArray.filter(v => v.totalHours > 100).length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('volunteers.stats.goldVolunteers')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <StatsGrid stats={[
+        {
+          icon: <VolunteerIcon />,
+          value: volunteerStatsArray.length,
+          label: t('volunteers.stats.activeVolunteers'),
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        },
+        {
+          icon: <EventIcon />,
+          value: activitiesData?.pagination?.total || 0,
+          label: t('volunteers.stats.yearActivities'),
+          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        },
+        {
+          icon: <TimeIcon />,
+          value: volunteerStatsArray.reduce((sum, v) => sum + v.totalHours, 0),
+          label: t('volunteers.stats.totalHours'),
+          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        },
+        {
+          icon: <StarIcon />,
+          value: volunteerStatsArray.length > 0 
+            ? Math.round(volunteerStatsArray.reduce((sum, v) => sum + v.totalHours, 0) / volunteerStatsArray.length * 10) / 10
+            : 0,
+          label: t('volunteers.stats.avgHoursPerVolunteer'),
+          gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        },
+      ]} />
 
       {/* חיפוש וסינון */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>

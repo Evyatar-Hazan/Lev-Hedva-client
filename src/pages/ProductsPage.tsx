@@ -42,6 +42,7 @@ import {
   Close as CloseIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
+import StatsGrid from '../components/StatsGrid';
 import { useProducts, useProductInstances, useCreateProduct, useUpdateProduct, useUpdateProductInstance, useCreateProductInstance, useDeleteProductInstance, useProductCategories, useProductManufacturers } from '../hooks';
 import { CreateProductDto, UpdateProductDto, UpdateProductInstanceDto, CreateProductInstanceDto } from '../lib/types';
 import { COLORS } from '../theme/colors';
@@ -886,60 +887,32 @@ const ProductsPage: React.FC = () => {
       </Alert>
 
       {/* סטטיסטיקות מהירות */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <InventoryIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="primary">
-                {(productsData as any)?.total || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('products.stats.totalProducts')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <QrCodeIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="success.main">
-                {productInstances?.length || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('products.stats.productInstances')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <VisibilityIcon color="info" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="info.main">
-                {productInstances?.filter(i => i.isAvailable).length || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('products.available')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <InventoryIcon color="warning" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="warning.main">
-                {productInstances?.filter(i => !i.isAvailable).length || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('products.borrowed')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <StatsGrid stats={[
+        {
+          icon: <InventoryIcon />,
+          value: (productsData as any)?.total || 0,
+          label: t('products.stats.totalProducts'),
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        },
+        {
+          icon: <QrCodeIcon />,
+          value: productInstances?.length || 0,
+          label: t('products.stats.productInstances'),
+          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        },
+        {
+          icon: <VisibilityIcon />,
+          value: productInstances?.filter(i => i.isAvailable).length || 0,
+          label: t('products.available'),
+          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        },
+        {
+          icon: <InventoryIcon />,
+          value: productInstances?.filter(i => !i.isAvailable).length || 0,
+          label: t('products.borrowed'),
+          gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        },
+      ]} />
 
       {/* חיפוש וסינון */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>

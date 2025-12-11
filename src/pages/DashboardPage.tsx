@@ -2,10 +2,6 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Grid,
-  Card,
-  CardContent,
-  CircularProgress,
   Alert,
 } from '@mui/material';
 import {
@@ -14,6 +10,7 @@ import {
   Assignment,
   Warning,
 } from '@mui/icons-material';
+import StatsGrid from '../components/StatsGrid';
 import { useUsers, useProducts, useLoanStats } from '../hooks';
 import { useAuth } from '../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
@@ -65,117 +62,46 @@ const DashboardPage: React.FC = () => {
         {t('dashboard.title')}
       </Typography>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
+      <Alert severity="info" sx={{ mb: 2 }}>
         <Typography>
           <strong>{t('dashboard.debug')}</strong> {t('dashboard.debugInfo', { userCount, productCount, activeLoans })}
         </Typography>
       </Alert>
       
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              cursor: 'pointer',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: 3,
-              }
-            }}
-            onClick={() => navigate('/users')}
-          >
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Person color="primary" sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h4" color="primary">
-                    {usersLoading ? <CircularProgress size={24} /> : userCount}
-                  </Typography>
-                  <Typography variant="body2">{t('dashboard.users')}</Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              cursor: 'pointer',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: 3,
-              }
-            }}
-            onClick={() => navigate('/products')}
-          >
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Inventory color="success" sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h4" color="success.main">
-                    {productsLoading ? <CircularProgress size={24} /> : productCount}
-                  </Typography>
-                  <Typography variant="body2">{t('dashboard.products')}</Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              cursor: 'pointer',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: 3,
-              }
-            }}
-            onClick={() => navigate('/loans')}
-          >
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Assignment color="info" sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h4" color="info.main">
-                    {statsLoading ? <CircularProgress size={24} /> : activeLoans}
-                  </Typography>
-                  <Typography variant="body2">{t('dashboard.activeLoans')}</Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              cursor: 'pointer',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: 3,
-              }
-            }}
-            onClick={() => navigate('/loans')}
-          >
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Warning color="error" sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h4" color="error.main">
-                    {statsLoading ? <CircularProgress size={24} /> : overdueLoans}
-                  </Typography>
-                  <Typography variant="body2">{t('dashboard.overdue')}</Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <StatsGrid stats={[
+        {
+          icon: <Person />,
+          value: userCount,
+          label: t('dashboard.users'),
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          onClick: () => navigate('/users'),
+          loading: usersLoading,
+        },
+        {
+          icon: <Inventory />,
+          value: productCount,
+          label: t('dashboard.products'),
+          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          onClick: () => navigate('/products'),
+          loading: productsLoading,
+        },
+        {
+          icon: <Assignment />,
+          value: activeLoans,
+          label: t('dashboard.activeLoans'),
+          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          onClick: () => navigate('/loans'),
+          loading: statsLoading,
+        },
+        {
+          icon: <Warning />,
+          value: overdueLoans,
+          label: t('dashboard.overdue'),
+          gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+          onClick: () => navigate('/loans'),
+          loading: statsLoading,
+        },
+      ]} />
     </Box>
   );
 };

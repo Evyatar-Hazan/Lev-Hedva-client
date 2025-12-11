@@ -21,7 +21,6 @@ import {
   Select,
   CircularProgress,
   Alert,
-  Grid,
   Card,
   CardContent,
   CardActions,
@@ -41,6 +40,7 @@ import {
   Edit as EditIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
+import StatsGrid from '../components/StatsGrid';
 import { useLoans, useLoanStats, useReturnLoan, useCreateLoan, useUpdateLoan } from '../hooks';
 import { useUsers } from '../hooks/useUsers';
 import { useProductInstances } from '../hooks/useProducts';
@@ -251,60 +251,32 @@ const LoansPage: React.FC = () => {
       </Box>
 
       {/* סטטיסטיקות מהירות */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <AssignmentIcon color="info" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="info.main">
-                {loanStats?.totalActiveLoans || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('loans.stats.activeLoans')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <UndoIcon color="error" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="error.main">
-                {loanStats?.totalOverdueLoans || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('loans.stats.overdue')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <PersonIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="success.main">
-                {loanStats?.totalReturnedLoans || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('loans.stats.returned')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <AssignmentIcon color="warning" sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" color="warning.main">
-                {loanStats?.totalLostItems || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('loans.stats.lost')}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <StatsGrid stats={[
+        {
+          icon: <AssignmentIcon />,
+          value: loanStats?.totalActiveLoans || 0,
+          label: t('loans.stats.activeLoans'),
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        },
+        {
+          icon: <UndoIcon />,
+          value: loanStats?.totalOverdueLoans || 0,
+          label: t('loans.stats.overdue'),
+          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        },
+        {
+          icon: <PersonIcon />,
+          value: loanStats?.totalReturnedLoans || 0,
+          label: t('loans.stats.returned'),
+          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        },
+        {
+          icon: <AssignmentIcon />,
+          value: loanStats?.totalLostItems || 0,
+          label: t('loans.stats.lost'),
+          gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        },
+      ]} />
 
       {/* סרגל חיפוש וסינון */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
