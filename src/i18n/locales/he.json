@@ -38,8 +38,6 @@
     "noData": "לא נמצאו נתונים",
     "serverError": "שגיאה בחיבור לשרת"
   },
-  "editProduct": "עריכת מוצר",
-  "editInstance": "עריכת מופע",
   "connection": {
     "waitingForServer": "ממתין לתגובה מ-http://localhost:3001",
     "connectionError": "❌ שגיאה בחיבור לשרת",
@@ -224,7 +222,7 @@
     "physical_condition": "מצב פיזי",
     "instance_available": "זמין",
     "instance_borrowed": "מושאל",
-    "edit_instance": "ערוך",
+    "edit_instance": "עריכת מופע",
     "delete_instance": "מחק",
     "view_instances": "צפה במופעים",
     "instancesTitle": "מופעי מוצר",
@@ -234,6 +232,8 @@
     "location": "מיקום",
     "notes": "הערות",
     "add_first_instance": "הוסף מופע ראשון כדי להתחיל לעקוב אחר מלאי",
+    "editProduct": "עריכת מוצר",
+    "editInstance": "עריכת מופע",
     "productName": "שם המוצר",
     "description": "תיאור",
     "category": "קטגוריה",

@@ -221,8 +221,14 @@
     "physical_condition": "Physical Condition",
     "instance_available": "Available",
     "instance_borrowed": "Borrowed",
-    "edit_instance": "Edit",
+    "edit_instance": "Edit Instance",
     "delete_instance": "Delete",
+    "view_instances": "View Instances",
+    "instancesTitle": "Product Instances",
+    "serial_number": "Serial Number",
+    "barcode": "Barcode",
+    "editProduct": "Edit Product",
+    "editInstance": "Edit Instance",
     "productName": "Product Name",
     "description": "Description",
     "category": "Category",
@@ -240,7 +246,22 @@
       "hearing_aids": "Hearing Aids",
       "vision_aids": "Vision Aids",
       "bathing_aids": "Bathing Aids",
-      "other": "Other"
+      "other": "Other",
+      "add_new": "Add New Category",
+      "new_category": "New Category Name"
+    },
+    "conditions": {
+      "new": "New",
+      "used_good": "Used - Good Condition",
+      "used_fair": "Used - Fair Condition",
+      "needs_repair": "Needs Repair",
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "manufacturers": {
+      "add_new": "Add New Manufacturer"
     },
     "stats": {
       "totalProducts": "Total Products",
@@ -347,7 +368,23 @@
     },
     "noAuditRecords": "No audit records found",
     "loadError": "Error loading audit data:",
-    "pagination": "Page {{page}} of {{totalPages}} | Total {{total}} records"
+    "loadedEntries": "Loaded {{loaded}} of {{total}} actions",
+    "pagination": "Page {{page}} of {{totalPages}} | Total {{total}} records",
+    "viewDetails": {
+      "title": "Audit Log Record Details",
+      "notFound": "Record not found",
+      "time": "Action Time:",
+      "user": "User:",
+      "actionType": "Action Type:",
+      "entity": "Entity:",
+      "entityId": "Entity ID:",
+      "ipAddress": "IP Address:",
+      "description": "Action Description:",
+      "metadata": "Additional Metadata:",
+      "noDescription": "No description available for this action",
+      "unknownUser": "Unknown User",
+      "notAvailable": "Not Available"
+    }
   },
   "table": {
     "actions": "Actions",
