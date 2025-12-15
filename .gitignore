@@ -39,7 +39,10 @@ yarn-error.log*
 lerna-debug.log*
 
 # IDE files
-.vscode/
+# .vscode/ מוערם - נשמור settings.json ו-extensions.json לשיתוף
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.iml
 *.sublime-project

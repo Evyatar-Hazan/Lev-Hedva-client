@@ -1,0 +1,177 @@
+# ===================================
+# קובץ הגדרות Netlify - Lev Hedva Frontend
+# ===================================
+# קובץ זה מגדיר את כל ההגדרות הנדרשות לפריסה אוטומטית ב-Netlify
+# כולל: Build Settings, Redirects, Headers, ו-Environment Variables
+
+# ===================================
+# Build Settings
+# ===================================
+[build]
+  # תיקיית הקוד המקור (אם הקליינט נמצא בתיקייה משנה)
+  # base = "Lev-Hedva-client"
+  
+  # תיקיית הפלט אחרי build
+  publish = "build"
+  
+  # פקודת Build
+  command = "npm run build"
+  
+  # Node Version
+  environment = { NODE_VERSION = "18" }
+
+# ===================================
+# Redirects - חשוב ל-React Router (SPA)
+# ===================================
+# כל הבקשות שאינן קבצים סטטיים יופנו ל-index.html
+# זה מאפשר ל-React Router לטפל בניווט
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+  
+# הפניית HTTP ל-HTTPS (אופציונלי)
+[[redirects]]
+  from = "http://*"
+  to = "https://:splat"
+  status = 301
+  force = true
+
+# ===================================
+# Security Headers
+# ===================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # XSS Protection
+    X-XSS-Protection = "1; mode=block"
+    
+    # Prevent clickjacking
+    X-Frame-Options = "DENY"
+    
+    # Prevent MIME sniffing
+    X-Content-Type-Options = "nosniff"
+    
+    # Referrer Policy
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Permissions Policy
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=()"
+    
+    # Content Security Policy (CSP)
+    # התאם את זה לפי הצרכים שלך
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://*.onrender.com; frame-ancestors 'none';"
+
+# ===================================
+# Headers for Static Assets (Cache)
+# ===================================
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    # Cache for 1 year (files have hash in name)
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ===================================
+# Headers for index.html (No Cache)
+# ===================================
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# ===================================
+# Deploy Context - Production
+# ===================================
+[context.production]
+  command = "npm run build"
+  
+  [context.production.environment]
+    REACT_APP_API_URL = "https://your-backend.onrender.com/api"
+    NODE_ENV = "production"
+
+# ===================================
+# Deploy Context - Branch Deploys (Preview)
+# ===================================
+[context.branch-deploy]
+  command = "npm run build"
+  
+  [context.branch-deploy.environment]
+    REACT_APP_API_URL = "https://your-backend-staging.onrender.com/api"
+    NODE_ENV = "development"
+
+# ===================================
+# Deploy Context - Local Development
+# ===================================
+[context.dev]
+  command = "npm run start"
+  
+  [context.dev.environment]
+    REACT_APP_API_URL = "http://localhost:3001/api"
+
+# ===================================
+# Functions (אופציונלי - אם תרצה Serverless Functions)
+# ===================================
+# [functions]
+#   directory = "netlify/functions"
+#   node_bundler = "esbuild"
+
+# ===================================
+# Plugins (אופציונלי)
+# ===================================
+# [[plugins]]
+#   package = "@netlify/plugin-lighthouse"
+
+# ===================================
+# הערות חשובות:
+# ===================================
+# 1. Environment Variables:
+#    - **חובה! שנה את REACT_APP_API_URL לכתובת ה-Render שלך**
+#    - אפשר להגדיר אותם גם ב-Netlify Dashboard > Site Settings > Environment Variables
+#    - משתנים שמוגדרים ב-Dashboard גוברים על אלה בקובץ
+#
+# 2. Redirects:
+#    - הגדרת /* -> /index.html חיונית ל-React Router
+#    - בלי זה, רענון דף יגרום ל-404
+#
+# 3. Headers:
+#    - Headers אלה משפרים את האבטחה
+#    - CSP (Content Security Policy) חשוב מאוד
+#    - התאם את ה-CSP לפי הצרכים שלך (API URLs, CDNs, etc.)
+#
+# 4. Caching:
+#    - קבצים סטטיים עם hash נשמרים ל-1 שנה
+#    - index.html לא נשמר בכלל (must-revalidate)
+#    - זה מאפשר עדכונים מהירים
+#
+# 5. Deploy Contexts:
+#    - Production: main/master branch
+#    - Branch Deploy: כל בראנץ' אחר (preview)
+#    - אפשר להגדיר משתני סביבה שונים לכל סביבה
+#
+# 6. Free Tier:
+#    - 100GB bandwidth לחודש
+#    - 300 build minutes לחודש
+#    - צריך לשדרג אם עוברים את זה
+#
+# 7. Custom Domain (אופציונלי):
+#    - אפשר להוסיף דומיין משלך ב-Netlify Dashboard
+#    - Netlify מספק SSL אוטומטי (Let's Encrypt)
+#
+# 8. Deploy Previews:
+#    - כל PR מקבל preview deployment אוטומטי
+#    - שימושי לבדיקות לפני merge
+#
+# 9. Build Plugins:
+#    - אפשר להוסיף plugins לשיפור הביצועים
+#    - לדוגמה: Lighthouse, Image Optimization, etc.
