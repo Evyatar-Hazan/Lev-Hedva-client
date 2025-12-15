@@ -14,11 +14,11 @@
   # תיקיית הפלט אחרי build
   publish = "build"
   
-  # פקודת Build
-  command = "npm run build"
+  # פקודת Build - with legacy peer deps for TypeScript compatibility
+  command = "npm install --legacy-peer-deps && npm run build"
   
   # Node Version
-  environment = { NODE_VERSION = "18" }
+  environment = { NODE_VERSION = "18", NPM_FLAGS = "--legacy-peer-deps" }
 
 # ===================================
 # Redirects - חשוב ל-React Router (SPA)
