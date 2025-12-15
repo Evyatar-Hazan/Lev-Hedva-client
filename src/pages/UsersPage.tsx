@@ -230,10 +230,13 @@ const UsersPage: React.FC = () => {
 
   const handleSaveUser = async () => {
     try {
-      await createUserMutation.mutateAsync(newUser);
+      console.log('Creating user with data:', newUser);
+      const result = await createUserMutation.mutateAsync(newUser);
+      console.log('User created successfully:', result);
       handleCloseAddDialog();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating user:', error);
+      alert(error?.response?.data?.message || error?.message || 'שגיאה ביצירת משתמש');
     }
   };
 
@@ -649,9 +652,20 @@ const UsersPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button 
-            onClick={handleSaveUser}
+            onClick={() => {
+              console.log('Save button clicked');
+              console.log('New user data:', newUser);
+              console.log('Is pending:', createUserMutation.isPending);
+              handleSaveUser();
+            }}
             variant="contained"
-            disabled={createUserMutation.isPending || !newUser.email || !newUser.password || !newUser.firstName || !newUser.lastName}
+            disabled={
+              createUserMutation.isPending || 
+              !newUser.email?.trim() || 
+              !newUser.password?.trim() || 
+              !newUser.firstName?.trim() || 
+              !newUser.lastName?.trim()
+            }
           >
             {createUserMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
           </Button>

@@ -4,7 +4,7 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "es2017"
+      "es2019"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -20,7 +20,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
-  "types": ["jest", "@testing-library/jest-dom"],
+  "types": ["jest", "@testing-library/jest-dom", "node"],
     "paths": {
       "@/*": ["*"],
       "@/components/*": ["components/*"],

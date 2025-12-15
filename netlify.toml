@@ -10,13 +10,13 @@
 [build]
   # תיקיית הקוד המקור (אם הקליינט נמצא בתיקייה משנה)
   # base = "Lev-Hedva-client"
-  
+
   # תיקיית הפלט אחרי build
   publish = "build"
-  
+
   # פקודת Build
   command = "CI=false npm run build"
-  
+
   # Node Version
   environment = { NODE_VERSION = "18", CI = "false" }
 
@@ -30,7 +30,7 @@
   to = "/index.html"
   status = 200
   force = false
-  
+
 # הפניית HTTP ל-HTTPS (אופציונלי)
 [[redirects]]
   from = "http://*"
@@ -46,19 +46,19 @@
   [headers.values]
     # XSS Protection
     X-XSS-Protection = "1; mode=block"
-    
+
     # Prevent clickjacking
     X-Frame-Options = "DENY"
-    
+
     # Prevent MIME sniffing
     X-Content-Type-Options = "nosniff"
-    
+
     # Referrer Policy
     Referrer-Policy = "strict-origin-when-cross-origin"
-    
+
     # Permissions Policy
     Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=()"
-    
+
     # Content Security Policy (CSP)
     # התאם את זה לפי הצרכים שלך
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://*.onrender.com; frame-ancestors 'none';"
@@ -95,7 +95,7 @@
 # ===================================
 [context.production]
   command = "npm run build"
-  
+
   [context.production.environment]
     REACT_APP_API_URL = "https://levhedva-backend.onrender.com/api"
     NODE_ENV = "production"
@@ -105,7 +105,7 @@
 # ===================================
 [context.branch-deploy]
   command = "npm run build"
-  
+
   [context.branch-deploy.environment]
     REACT_APP_API_URL = "https://levhedva-backend.onrender.com/api"
     NODE_ENV = "development"
@@ -115,7 +115,7 @@
 # ===================================
 [context.dev]
   command = "npm run start"
-  
+
   [context.dev.environment]
     REACT_APP_API_URL = "http://localhost:3001/api"
 

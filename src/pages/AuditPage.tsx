@@ -95,7 +95,7 @@ const AuditPage: React.FC = () => {
   const handleExportData = () => {
     try {
       // יצירת CSV של הנתונים הנוכחיים
-      const csvData = filteredLogs.map(log => ({
+      const csvData = filteredLogs.map((log: any) => ({
         'זמן': format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: he }),
         'משתמש': log.user ? `${log.user.firstName} ${log.user.lastName}` : 'משתמש לא ידוע',
         'פעולה': getActionText(log.action),
@@ -108,7 +108,7 @@ const AuditPage: React.FC = () => {
       const headers = Object.keys(csvData[0] || {});
       const csvContent = [
         headers.join(','),
-        ...csvData.map(row => headers.map(header => `"${(row as any)[header] || ''}"`).join(','))
+        ...csvData.map((row: any) => headers.map(header => `"${(row as any)[header] || ''}"`).join(','))
       ].join('\n');
 
       // יצירת בלוב והורדה
@@ -243,7 +243,7 @@ const AuditPage: React.FC = () => {
   // הנתונים כבר מוגדרים למעלה
 
   // סינון לוגים לפי חיפוש ופילטרים
-  const filteredLogs = auditLogs.filter(log => {
+  const filteredLogs = auditLogs.filter((log: any) => {
     // סינון לפי חיפוש
     const searchLower = search.toLowerCase();
     const matchesSearch = !search || 
@@ -291,14 +291,14 @@ const AuditPage: React.FC = () => {
   const usersCount = new Set();
   
   // חישוב מקומי לנתונים המסוננים
-  filteredLogs.forEach(log => {
+  filteredLogs.forEach((log: any) => {
     actionsCount.set(log.action, (actionsCount.get(log.action) || 0) + 1);
     if (log.user?.id) usersCount.add(log.user.id);
   });
 
   // שימוש בסטטיסטיקות מהשרת לנתונים הכוללים
   const totalActionsFromServer = statsData?.totalLogs || totalCount;
-  const todayActionsCount = auditLogs.filter(log => {
+  const todayActionsCount = auditLogs.filter((log: any) => {
     const logDate = new Date(log.createdAt);
     const today = new Date();
     return logDate.toDateString() === today.toDateString();
@@ -573,7 +573,7 @@ const AuditPage: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           {selectedLogId && (() => {
-            const selectedLog = auditLogs.find(log => log.id === selectedLogId);
+            const selectedLog = auditLogs.find((log: any) => log.id === selectedLogId);
             if (!selectedLog) return <Typography>{t('audit.viewDetails.notFound')}</Typography>;
             
             return (
