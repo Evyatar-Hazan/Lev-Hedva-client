@@ -36,7 +36,11 @@
     "showing": "מציג",
     "entries": "רשומות",
     "noData": "לא נמצאו נתונים",
-    "serverError": "שגיאה בחיבור לשרת"
+    "serverError": "שגיאה בחיבור לשרת",
+    "add_filter": "הוסף פילטר",
+    "clear_all": "נקה הכל",
+    "select_filter": "בחר פילטר",
+    "apply": "החל"
   },
   "connection": {
     "waitingForServer": "ממתין לתגובה מ-http://localhost:3001",
@@ -172,6 +176,7 @@
     "newLoan": "השאלה חדשה",
     "createNewLoan": "יצירת השאלה חדשה",
     "editLoan": "עריכת השאלה",
+    "searchPlaceholder": "חיפוש השאלות...",
     "selectUser": "בחירת משתמש",
     "selectProduct": "בחירת מוצר",
     "expectedReturnDate": "תאריך החזרה צפוי",
@@ -208,6 +213,7 @@
     "title": "ניהול מוצרים",
     "addProduct": "הוספת מוצר",
     "addInstance": "הוספת מופע חדש",
+    "searchPlaceholder": "חיפוש מוצרים...",
     "view_product": "צפייה במוצר",
     "edit_product": "עריכת מוצר",
     "manage_instances": "ניהול מופעים",
@@ -273,7 +279,10 @@
       "productInstances": "מופעי מוצרים"
     },
     "filter": {
-      "category": "קטגוריה"
+      "category": "קטגוריה",
+      "availability": "זמינות",
+      "hasAvailable": "זמין להשאלה",
+      "unavailable": "לא זמין"
     },
     "noProducts": "לא נמצאו מוצרים",
     "loadError": "שגיאה בטעינת נתוני המוצרים:",
@@ -284,6 +293,7 @@
     "title": "ניהול משתמשים",
     "addUser": "הוספת משתמש",
     "editUser": "עריכת משתמש",
+    "searchPlaceholder": "חיפוש משתמשים...",
     "fullName": "שם מלא",
     "firstName": "שם פרטי",
     "lastName": "שם משפחה",
@@ -292,7 +302,11 @@
     "phone": "טלפון",
     "address": "כתובת",
     "role": "תפקיד",
-    "status": "סטטוס",
+    "status": {
+      "label": "סטטוס",
+      "active": "פעיל",
+      "inactive": "לא פעיל"
+    },
     "joinDate": "תאריך הצטרפות",
     "activeUser": "משתמש פעיל",
     "confirmDelete": "האם אתה בטוח שברצונך למחוק את המשתמש?",
@@ -304,7 +318,10 @@
       "user": "משתמש"
     },
     "filter": {
-      "role": "תפקיד"
+      "role": "תפקיד",
+      "status": "סטטוס",
+      "phonePlaceholder": "חפש לפי טלפון",
+      "emailPlaceholder": "חפש לפי אימייל"
     },
     "noUsers": "לא נמצאו משתמשים",
     "loadError": "שגיאה בטעינת נתוני המשתמשים:",
@@ -316,6 +333,7 @@
     "addActivity": "הוספת פעילות",
     "editActivity": "עריכת פעילות",
     "viewActivity": "צפייה בפעילות",
+    "searchPlaceholder": "חיפוש פעילויות...",
     "volunteer": "מתנדב",
     "activityType": "סוג פעילות",
     "description": "תיאור",
@@ -340,7 +358,11 @@
       "avgHoursPerVolunteer": "ממוצע שעות למתנדב"
     },
     "filter": {
-      "activityType": "סוג פעילות"
+      "activityType": "סוג פעילות",
+      "volunteer": "מתנדב",
+      "date": "תאריך",
+      "minHours": "מינימום שעות",
+      "minHoursPlaceholder": "הכנס מספר שעות"
     },
     "noActivities": "לא נמצאו פעילויות התנדבות",
     "loadError": "שגיאה בטעינת נתוני המתנדבים:",
@@ -350,6 +372,7 @@
   },
   "audit": {
     "title": "יומן ביקורת",
+    "searchPlaceholder": "חיפוש ביומן ביקורת...",
     "time": "זמן",
     "user": "משתמש",
     "action": "פעולה", 
@@ -362,6 +385,13 @@
       "activeUsers": "משתמשים פעילים",
       "actionTypes": "סוגי פעולות"
     },
+    "entities": {
+      "user": "משתמש",
+      "product": "מוצר",
+      "loan": "השאלה",
+      "volunteer": "פעילות מתנדבים",
+      "permission": "הרשאה"
+    },
     "actions": {
       "all": "כל הפעולות",
       "login": "התחברות",
@@ -371,7 +401,11 @@
       "permissions": "הרשאות"
     },
     "filter": {
-      "actionType": "סוג פעולה"
+      "actionType": "סוג פעולה",
+      "entityType": "סוג ישות",
+      "date": "תאריך",
+      "ipAddress": "כתובת IP",
+      "ipPlaceholder": "חפש לפי כתובת IP"
     },
     "noAuditRecords": "לא נמצאו רשומות ביקורת",
     "loadError": "שגיאה בטעינת נתוני הביקורת:",

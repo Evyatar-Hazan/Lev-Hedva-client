@@ -14,11 +14,6 @@ import {
   Chip,
   IconButton,
   TextField,
-  InputAdornment,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   CircularProgress,
   Alert,
   Card,
@@ -31,15 +26,19 @@ import {
   DialogContent,
   DialogActions,
   Autocomplete,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Search as SearchIcon,
   Assignment as AssignmentIcon,
   Undo as UndoIcon,
   Edit as EditIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
+import SearchAndFilter, { FilterOption, ActiveFilter } from '../components/SearchAndFilter';
 import StatsGrid from '../components/StatsGrid';
 import { useLoans, useLoanStats, useReturnLoan, useCreateLoan, useUpdateLoan } from '../hooks';
 import { useUsers } from '../hooks/useUsers';
@@ -52,7 +51,7 @@ const LoansPage: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [page, setPage] = useState(1);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -68,7 +67,7 @@ const LoansPage: React.FC = () => {
     notes: '',
     status: ''
   });
-  
+
   // שימוש בהוכים החדשים
   const { data: loansData, isLoading, error } = useLoans({ 
     page,
@@ -82,43 +81,143 @@ const LoansPage: React.FC = () => {
   const { data: usersData } = useUsers();
   const { data: productInstancesData } = useProductInstances();
 
-  // סינון השאלות לפי סטטוס
+  // הגדרת הפילטרים הזמינים (אחרי קריאת ה-hooks)
+  const availableFilters: FilterOption[] = [
+    {
+      id: 'status',
+      label: t('loans.filter.status'),
+      type: 'select',
+      options: [
+        { value: 'active', label: t('loans.status.active') },
+        { value: 'overdue', label: t('loans.status.overdue') },
+        { value: 'returned', label: t('loans.status.returned') },
+        { value: 'lost', label: t('loans.status.lost') },
+      ],
+    },
+    {
+      id: 'user',
+      label: t('loans.filter.borrower'),
+      type: 'autocomplete',
+      autocompleteOptions: usersData?.users || [],
+      getOptionLabel: (option: any) => `${option.firstName} ${option.lastName} (${option.email})`,
+    },
+    {
+      id: 'product',
+      label: t('loans.filter.product'),
+      type: 'autocomplete',
+      autocompleteOptions: (productInstancesData || []).map((inst: any) => ({
+        ...inst,
+        displayName: `${inst.product?.name || ''} - ${inst.barcode}`,
+      })),
+      getOptionLabel: (option: any) => option.displayName || '',
+    },
+    {
+      id: 'loanDate',
+      label: t('loans.filter.loanDate'),
+      type: 'date',
+    },
+    {
+      id: 'returnDate',
+      label: t('loans.filter.expectedReturn'),
+      type: 'date',
+    },
+  ];
+
+  // פונקציות לניהול פילטרים
+  const handleFilterAdd = (filterId: string, value: any) => {
+    const filterDef = availableFilters.find(f => f.id === filterId);
+    if (!filterDef) return;
+
+    let displayValue = value;
+    if (filterDef.type === 'select' && filterDef.options) {
+      const option = filterDef.options.find(o => o.value === value);
+      displayValue = option?.label || value;
+    }
+
+    setActiveFilters(prev => [
+      ...prev.filter(f => f.id !== filterId),
+      {
+        id: filterId,
+        value,
+        label: filterDef.label,
+        displayValue,
+      },
+    ]);
+    setPage(1);
+  };
+
+  const handleFilterRemove = (filterId: string) => {
+    setActiveFilters(prev => prev.filter(f => f.id !== filterId));
+    setPage(1);
+  };
+
+  const handleClearAll = () => {
+    setSearch('');
+    setActiveFilters([]);
+    setPage(1);
+  };
+
+  // סינון השאלות לפי סטטוס ופילטרים נוספים
   const getFilteredLoans = () => {
     if (!loansData?.loans) return [];
     
-    if (statusFilter === 'all') return loansData.loans;
-    
-    return loansData.loans.filter(loan => {
-      const today = new Date();
-      const expectedReturn = loan.expectedReturnDate ? new Date(loan.expectedReturnDate) : null;
-      const isOverdue = loan.status === 'ACTIVE' && expectedReturn && expectedReturn < today;
-      
-      switch (statusFilter) {
-        case 'active':
-          return loan.status?.toLowerCase() === 'active' && !isOverdue;
-        case 'overdue':
-          return loan.status?.toLowerCase() === 'overdue' || isOverdue;
-        case 'returned':
-          return loan.status?.toLowerCase() === 'returned';
-        case 'lost':
-          return loan.status?.toLowerCase() === 'lost';
-        default:
-          return true;
+    let filtered = loansData.loans;
+
+    // יישום כל הפילטרים הפעילים
+    activeFilters.forEach(filter => {
+      if (filter.id === 'status') {
+        filtered = filtered.filter(loan => {
+          const today = new Date();
+          const expectedReturn = loan.expectedReturnDate ? new Date(loan.expectedReturnDate) : null;
+          const isOverdue = loan.status === 'ACTIVE' && expectedReturn && expectedReturn < today;
+          
+          switch (filter.value) {
+            case 'active':
+              return loan.status?.toLowerCase() === 'active' && !isOverdue;
+            case 'overdue':
+              return loan.status?.toLowerCase() === 'overdue' || isOverdue;
+            case 'returned':
+              return loan.status?.toLowerCase() === 'returned';
+            case 'lost':
+              return loan.status?.toLowerCase() === 'lost';
+            default:
+              return true;
+          }
+        });
+      } else if (filter.id === 'user') {
+        filtered = filtered.filter(loan => loan.userId === filter.value.id);
+      } else if (filter.id === 'product') {
+        filtered = filtered.filter(loan => loan.productInstanceId === filter.value.id);
+      } else if (filter.id === 'loanDate') {
+        const filterDate = new Date(filter.value);
+        filtered = filtered.filter(loan => {
+          const loanDate = new Date(loan.createdAt);
+          return loanDate.toDateString() === filterDate.toDateString();
+        });
+      } else if (filter.id === 'returnDate') {
+        const filterDate = new Date(filter.value);
+        filtered = filtered.filter(loan => {
+          if (!loan.expectedReturnDate) return false;
+          const returnDate = new Date(loan.expectedReturnDate);
+          return returnDate.toDateString() === filterDate.toDateString();
+        });
       }
     });
+
+    // סינון לפי חיפוש
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(loan => {
+        const userName = `${loan.user?.firstName || ''} ${loan.user?.lastName || ''}`.toLowerCase();
+        const productName = loan.productInstance?.product?.name?.toLowerCase() || '';
+        return userName.includes(searchLower) || productName.includes(searchLower);
+      });
+    }
+    
+    return filtered;
   };
 
   const filteredLoans = getFilteredLoans();
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setPage(1);
-  };
-
-  const handleStatusFilterChange = (event: any) => {
-    setStatusFilter(event.target.value);
-    setPage(1);
-  };
 
   const handleReturnLoan = async (loanId: string) => {
     try {
@@ -278,37 +377,21 @@ const LoansPage: React.FC = () => {
         },
       ]} />
 
-      {/* סרגל חיפוש וסינון */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <TextField
-          fullWidth
-          placeholder="חיפוש השאלות..."
-          value={search}
-          onChange={handleSearch}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ maxWidth: 400 }}
-        />
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>{t('loans.filter.status')}</InputLabel>
-          <Select
-            value={statusFilter}
-            onChange={handleStatusFilterChange}
-            label={t('loans.filter.status')}
-          >
-            <MenuItem value="all">{t('loans.filter.allStatuses')}</MenuItem>
-            <MenuItem value="active">{t('loans.status.active')}</MenuItem>
-            <MenuItem value="overdue">{t('loans.status.overdue')}</MenuItem>
-            <MenuItem value="returned">{t('loans.status.returned')}</MenuItem>
-            <MenuItem value="lost">{t('loans.status.lost')}</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      {/* קומפוננטת חיפוש ופילטר */}
+      <SearchAndFilter
+        searchValue={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
+        searchPlaceholder={t('loans.searchPlaceholder')}
+        availableFilters={availableFilters}
+        activeFilters={activeFilters}
+        onFilterAdd={handleFilterAdd}
+        onFilterRemove={handleFilterRemove}
+        onClearAll={handleClearAll}
+        disabled={isLoading}
+      />
 
       {/* טבלת השאלות / כרטיסיות למובייל */}
       {isMobile ? (

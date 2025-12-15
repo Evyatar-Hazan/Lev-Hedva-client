@@ -12,12 +12,6 @@ import {
   Paper,
   Chip,
   IconButton,
-  TextField,
-  InputAdornment,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   CircularProgress,
   Alert,
   Grid,
@@ -33,7 +27,6 @@ import {
   DialogActions,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
   Visibility as VisibilityIcon,
   GetApp as GetAppIcon,
   Assessment as AssessmentIcon,
@@ -42,6 +35,7 @@ import {
   Timeline as TimelineIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
+import SearchAndFilter, { FilterOption, ActiveFilter } from '../components/SearchAndFilter';
 import StatsGrid from '../components/StatsGrid';
 import { useInfiniteAuditLogs, useAuditStats } from '../hooks';
 import { format } from 'date-fns';
@@ -54,9 +48,48 @@ const AuditPage: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [search, setSearch] = useState('');
-  const [actionFilter, setActionFilter] = useState('all');
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+
+  // הגדרת הפילטרים הזמינים
+  const availableFilters: FilterOption[] = [
+    {
+      id: 'action',
+      label: t('audit.filter.actionType'),
+      type: 'select',
+      options: [
+        { value: 'LOGIN', label: t('audit.actions.login') },
+        { value: 'CREATE', label: t('audit.actions.create') },
+        { value: 'UPDATE', label: t('audit.actions.update') },
+        { value: 'DELETE', label: t('audit.actions.delete') },
+        { value: 'PERMISSIONS', label: t('audit.actions.permissions') },
+      ],
+    },
+    {
+      id: 'entityType',
+      label: t('audit.filter.entityType'),
+      type: 'select',
+      options: [
+        { value: 'User', label: t('audit.entities.user') },
+        { value: 'Product', label: t('audit.entities.product') },
+        { value: 'Loan', label: t('audit.entities.loan') },
+        { value: 'VolunteerActivity', label: t('audit.entities.volunteer') },
+        { value: 'Permission', label: t('audit.entities.permission') },
+      ],
+    },
+    {
+      id: 'date',
+      label: t('audit.filter.date'),
+      type: 'date',
+    },
+    {
+      id: 'ipAddress',
+      label: t('audit.filter.ipAddress'),
+      type: 'text',
+      placeholder: t('audit.filter.ipPlaceholder'),
+    },
+  ];
 
   // פונקציה לייצוא נתונים
   const handleExportData = () => {
@@ -130,12 +163,35 @@ const AuditPage: React.FC = () => {
   // איחוד כל הדפים לרשימה אחת
   const auditLogs = infiniteData?.pages?.flatMap((page: any) => page?.data || []) || [];
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+  // פונקציות לניהול פילטרים
+  const handleFilterAdd = (filterId: string, value: any) => {
+    const filterDef = availableFilters.find(f => f.id === filterId);
+    if (!filterDef) return;
+
+    let displayValue = value;
+    if (filterDef.type === 'select' && filterDef.options) {
+      const option = filterDef.options.find(o => o.value === value);
+      displayValue = option?.label || value;
+    }
+
+    setActiveFilters(prev => [
+      ...prev.filter(f => f.id !== filterId),
+      {
+        id: filterId,
+        value,
+        label: filterDef.label,
+        displayValue,
+      },
+    ]);
   };
 
-  const handleActionFilterChange = (event: any) => {
-    setActionFilter(event.target.value);
+  const handleFilterRemove = (filterId: string) => {
+    setActiveFilters(prev => prev.filter(f => f.id !== filterId));
+  };
+
+  const handleClearAll = () => {
+    setSearch('');
+    setActiveFilters([]);
   };
 
   const getActionColor = (action: string) => {
@@ -186,7 +242,7 @@ const AuditPage: React.FC = () => {
 
   // הנתונים כבר מוגדרים למעלה
 
-  // סינון לוגים לפי חיפוש ופילטר
+  // סינון לוגים לפי חיפוש ופילטרים
   const filteredLogs = auditLogs.filter(log => {
     // סינון לפי חיפוש
     const searchLower = search.toLowerCase();
@@ -198,25 +254,36 @@ const AuditPage: React.FC = () => {
       log.user?.lastName?.toLowerCase().includes(searchLower) ||
       log.user?.email?.toLowerCase().includes(searchLower);
 
-    // סינון לפי פעולה
-    const matchesFilter = actionFilter === 'all' || (() => {
-      switch (actionFilter) {
-        case 'login':
-          return log.action.toLowerCase().includes('login') || log.action.toLowerCase().includes('logout');
-        case 'create':
-          return log.action.toLowerCase().includes('create') || log.action.toLowerCase().includes('register');
-        case 'update':
-          return log.action.toLowerCase().includes('update') || log.action.toLowerCase().includes('edit');
-        case 'delete':
-          return log.action.toLowerCase().includes('delete') || log.action.toLowerCase().includes('remove');
-        case 'permission':
-          return log.action.toLowerCase().includes('permission') || log.action.toLowerCase().includes('grant') || log.action.toLowerCase().includes('revoke');
-        default:
-          return true;
+    // יישום כל הפילטרים הפעילים
+    const matchesFilters = activeFilters.every(filter => {
+      if (filter.id === 'action') {
+        switch (filter.value) {
+          case 'LOGIN':
+            return log.action.toLowerCase().includes('login') || log.action.toLowerCase().includes('logout');
+          case 'CREATE':
+            return log.action.toLowerCase().includes('create') || log.action.toLowerCase().includes('register');
+          case 'UPDATE':
+            return log.action.toLowerCase().includes('update') || log.action.toLowerCase().includes('edit');
+          case 'DELETE':
+            return log.action.toLowerCase().includes('delete') || log.action.toLowerCase().includes('remove');
+          case 'PERMISSIONS':
+            return log.action.toLowerCase().includes('permission') || log.action.toLowerCase().includes('grant') || log.action.toLowerCase().includes('revoke');
+          default:
+            return true;
+        }
+      } else if (filter.id === 'entityType') {
+        return log.entityType === filter.value;
+      } else if (filter.id === 'date') {
+        const filterDate = new Date(filter.value);
+        const logDate = new Date(log.timestamp);
+        return logDate.toDateString() === filterDate.toDateString();
+      } else if (filter.id === 'ipAddress') {
+        return log.ipAddress?.toLowerCase().includes(filter.value.toLowerCase());
       }
-    })();
+      return true;
+    });
 
-    return matchesSearch && matchesFilter;
+    return matchesSearch && matchesFilters;
   });
 
   // חישוב סטטיסטיקות - משילוב נתונים מהשרת ונתונים מקומיים
@@ -287,37 +354,18 @@ const AuditPage: React.FC = () => {
         },
       ]} />
 
-      {/* חיפוש וסינון */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <TextField
-          placeholder="חיפוש ביומן הביקורת..."
-          value={search}
-          onChange={handleSearch}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ minWidth: 300 }}
-        />
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>{t('audit.filter.actionType')}</InputLabel>
-          <Select
-            value={actionFilter}
-            label="סוג פעולה"
-            onChange={handleActionFilterChange}
-          >
-            <MenuItem value="all">{t('audit.actions.all')}</MenuItem>
-            <MenuItem value="login">{t('audit.actions.login')}</MenuItem>
-            <MenuItem value="create">{t('audit.actions.create')}</MenuItem>
-            <MenuItem value="update">{t('audit.actions.update')}</MenuItem>
-            <MenuItem value="delete">{t('audit.actions.delete')}</MenuItem>
-            <MenuItem value="permission">{t('audit.actions.permissions')}</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      {/* קומפוננטת חיפוש ופילטר */}
+      <SearchAndFilter
+        searchValue={search}
+        onSearchChange={(value) => setSearch(value)}
+        searchPlaceholder={t('audit.searchPlaceholder')}
+        availableFilters={availableFilters}
+        activeFilters={activeFilters}
+        onFilterAdd={handleFilterAdd}
+        onFilterRemove={handleFilterRemove}
+        onClearAll={handleClearAll}
+        disabled={isLoading}
+      />
 
       {/* טבלת יומן ביקורת / כרטיסיות למובייל */}
       {isMobile ? (

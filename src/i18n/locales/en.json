@@ -35,7 +35,11 @@
     "showing": "Showing",
     "entries": "entries",
     "noData": "No data found",
-    "serverError": "Server connection error"
+    "serverError": "Server connection error",
+    "add_filter": "Add Filter",
+    "clear_all": "Clear All",
+    "select_filter": "Select Filter",
+    "apply": "Apply"
   },
   "connection": {
     "waitingForServer": "Waiting for response from http://localhost:3001",
@@ -171,6 +175,7 @@
     "newLoan": "New Loan",
     "createNewLoan": "Create New Loan",
     "editLoan": "Edit Loan",
+    "searchPlaceholder": "Search loans...",
     "selectUser": "Select User",
     "selectProduct": "Select Product",
     "expectedReturnDate": "Expected Return Date",
@@ -197,7 +202,11 @@
     },
     "filter": {
       "status": "Status",
-      "allStatuses": "All Statuses"
+      "allStatuses": "All Statuses",
+      "borrower": "Borrower",
+      "product": "Product",
+      "loanDate": "Loan Date",
+      "expectedReturn": "Expected Return Date"
     },
     "noLoans": "No loans found",
     "loadError": "Error loading loans data:",
@@ -206,6 +215,7 @@
   "products": {
     "title": "Products Management",
     "addProduct": "Add Product",
+    "searchPlaceholder": "Search products...",
     "view_product": "View Product",
     "edit_product": "Edit Product",
     "manage_instances": "Manage Instances",
@@ -268,7 +278,10 @@
       "productInstances": "Product Instances"
     },
     "filter": {
-      "category": "Category"
+      "category": "Category",
+      "availability": "Availability",
+      "hasAvailable": "Available for Loan",
+      "unavailable": "Unavailable"
     },
     "noProducts": "No products found",
     "loadError": "Error loading products data:",
@@ -279,6 +292,7 @@
     "title": "Users Management",
     "addUser": "Add User",
     "editUser": "Edit User",
+    "searchPlaceholder": "Search users...",
     "fullName": "Full Name",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -287,7 +301,11 @@
     "phone": "Phone",
     "address": "Address",
     "role": "Role",
-    "status": "Status",
+    "status": {
+      "label": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
     "joinDate": "Join Date",
     "activeUser": "Active User",
     "confirmDelete": "Are you sure you want to delete this user?",
@@ -299,7 +317,10 @@
       "user": "User"
     },
     "filter": {
-      "role": "Role"
+      "role": "Role",
+      "status": "Status",
+      "phonePlaceholder": "Search by phone",
+      "emailPlaceholder": "Search by email"
     },
     "noUsers": "No users found",
     "loadError": "Error loading users data:",
@@ -311,6 +332,7 @@
     "addActivity": "Add Activity",
     "editActivity": "Edit Activity",
     "viewActivity": "View Activity",
+    "searchPlaceholder": "Search activities...",
     "volunteer": "Volunteer",
     "activityType": "Activity Type",
     "description": "Description",
@@ -335,7 +357,11 @@
       "avgHoursPerVolunteer": "Avg Hours Per Volunteer"
     },
     "filter": {
-      "activityType": "Activity Type"
+      "activityType": "Activity Type",
+      "volunteer": "Volunteer",
+      "date": "Date",
+      "minHours": "Minimum Hours",
+      "minHoursPlaceholder": "Enter number of hours"
     },
     "noActivities": "No volunteer activities found",
     "loadError": "Error loading volunteers data:",
@@ -345,6 +371,7 @@
   },
   "audit": {
     "title": "Audit Log",
+    "searchPlaceholder": "Search audit log...",
     "time": "Time",
     "user": "User",
     "action": "Action",
@@ -357,6 +384,13 @@
       "activeUsers": "Active Users",
       "actionTypes": "Action Types"
     },
+    "entities": {
+      "user": "User",
+      "product": "Product",
+      "loan": "Loan",
+      "volunteer": "Volunteer Activity",
+      "permission": "Permission"
+    },
     "actions": {
       "all": "All Actions",
       "login": "Login",
@@ -366,7 +400,11 @@
       "permissions": "Permissions"
     },
     "filter": {
-      "actionType": "Action Type"
+      "actionType": "Action Type",
+      "entityType": "Entity Type",
+      "date": "Date",
+      "ipAddress": "IP Address",
+      "ipPlaceholder": "Search by IP address"
     },
     "noAuditRecords": "No audit records found",
     "loadError": "Error loading audit data:",

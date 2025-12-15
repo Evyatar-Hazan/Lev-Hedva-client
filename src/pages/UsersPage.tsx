@@ -13,12 +13,6 @@ import {
   Paper,
   Chip,
   IconButton,
-  TextField,
-  InputAdornment,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   CircularProgress,
   Alert,
   Dialog,
@@ -33,18 +27,23 @@ import {
   CardActions,
   useMediaQuery,
   useTheme,
+  TextField,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Search as SearchIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Lock as LockIcon,
   LockOpen as LockOpenIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
+import SearchAndFilter, { FilterOption, ActiveFilter } from '../components/SearchAndFilter';
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, useToggleUserStatus } from '../hooks';
-import { UserRole, CreateUserDto, UpdateUserDto } from '../lib/types';
+import { UserRole, CreateUserDto } from '../lib/types';
 import { format } from 'date-fns';
 import { COLORS } from '../theme/colors';
 
@@ -54,7 +53,7 @@ const UsersPage: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [page, setPage] = useState(1);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
@@ -68,6 +67,46 @@ const UsersPage: React.FC = () => {
     role: UserRole.CLIENT,
     isActive: true,
   });
+
+  // הגדרת הפילטרים הזמינים
+  const availableFilters: FilterOption[] = [
+    {
+      id: 'role',
+      label: t('users.filter.role'),
+      type: 'select',
+      options: [
+        { value: UserRole.ADMIN, label: t('users.roles.admin') },
+        { value: UserRole.WORKER, label: t('users.roles.manager') },
+        { value: UserRole.VOLUNTEER, label: t('users.roles.volunteer') },
+        { value: UserRole.CLIENT, label: t('users.roles.user') },
+      ],
+    },
+    {
+      id: 'status',
+      label: t('users.filter.status'),
+      type: 'select',
+      options: [
+        { value: 'active', label: t('users.status.active') },
+        { value: 'inactive', label: t('users.status.inactive') },
+      ],
+    },
+    {
+      id: 'phone',
+      label: t('users.phone'),
+      type: 'text',
+      placeholder: t('users.filter.phonePlaceholder'),
+    },
+    {
+      id: 'email',
+      label: t('users.email'),
+      type: 'text',
+      placeholder: t('users.filter.emailPlaceholder'),
+    },
+  ];
+
+  // חישוב הפילטרים לשליחה לשרת
+  const roleFilter = activeFilters.find(f => f.id === 'role')?.value;
+  const statusFilter = activeFilters.find(f => f.id === 'status')?.value;
   
   // שימוש בהוק החדש
   const { 
@@ -76,7 +115,8 @@ const UsersPage: React.FC = () => {
     error 
   } = useUsers({ 
     search: search || undefined,
-    role: roleFilter !== 'all' ? (roleFilter as UserRole) : undefined,
+    role: roleFilter,
+    isActive: statusFilter === 'active' ? true : statusFilter === 'inactive' ? false : undefined,
     page,
     limit: 10
   });
@@ -86,26 +126,90 @@ const UsersPage: React.FC = () => {
   const deleteUserMutation = useDeleteUser();
   const toggleUserStatusMutation = useToggleUserStatus();
 
+  // פונקציות לניהול פילטרים
+  const handleFilterAdd = (filterId: string, value: any) => {
+    const filterDef = availableFilters.find(f => f.id === filterId);
+    if (!filterDef) return;
+
+    let displayValue = value;
+    if (filterDef.type === 'select' && filterDef.options) {
+      const option = filterDef.options.find(o => o.value === value);
+      displayValue = option?.label || value;
+    }
+
+    setActiveFilters(prev => [
+      ...prev.filter(f => f.id !== filterId),
+      {
+        id: filterId,
+        value,
+        label: filterDef.label,
+        displayValue,
+      },
+    ]);
+    setPage(1);
+  };
+
+  const handleFilterRemove = (filterId: string) => {
+    setActiveFilters(prev => prev.filter(f => f.id !== filterId));
+    setPage(1);
+  };
+
+  const handleClearAll = () => {
+    setSearch('');
+    setActiveFilters([]);
+    setPage(1);
+  };
+
   // Debug logging
   console.log('👥 Users Page Debug:', {
     usersData,
     isLoading,
     error,
     search,
-    roleFilter,
+    activeFilters,
     page,
     usersCount: usersData?.users?.length
   });
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setPage(1); // איפוס לעמוד ראשון בחיפוש
+  // סינון המשתמשים לפי חיפוש ופילטרים
+  const getFilteredUsers = () => {
+    if (!usersData?.users) return [];
+    
+    let filtered = usersData.users;
+
+    // יישום כל הפילטרים הפעילים
+    activeFilters.forEach(filter => {
+      if (filter.id === 'role') {
+        filtered = filtered.filter((user: any) => user.role === filter.value);
+      } else if (filter.id === 'status') {
+        const isActive = filter.value === 'active';
+        filtered = filtered.filter((user: any) => user.isActive === isActive);
+      } else if (filter.id === 'phone') {
+        filtered = filtered.filter((user: any) => 
+          user.phone?.toLowerCase().includes(filter.value.toLowerCase())
+        );
+      } else if (filter.id === 'email') {
+        filtered = filtered.filter((user: any) => 
+          user.email?.toLowerCase().includes(filter.value.toLowerCase())
+        );
+      }
+    });
+
+    // סינון לפי חיפוש כללי
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter((user: any) => 
+        user.firstName?.toLowerCase().includes(searchLower) ||
+        user.lastName?.toLowerCase().includes(searchLower) ||
+        user.email?.toLowerCase().includes(searchLower) ||
+        user.phone?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return filtered;
   };
 
-  const handleRoleFilterChange = (event: any) => {
-    setRoleFilter(event.target.value);
-    setPage(1);
-  };
+  const filteredUsers = getFilteredUsers();
 
   const handleAddUser = () => {
     setIsAddDialogOpen(true);
@@ -244,37 +348,21 @@ const UsersPage: React.FC = () => {
         </Typography>
       </Alert>
 
-      {/* סרגל חיפוש וסינון */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <TextField
-          fullWidth
-          placeholder="חיפוש משתמשים..."
-          value={search}
-          onChange={handleSearch}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ maxWidth: 400 }}
-        />
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>{t('users.filter.role')}</InputLabel>
-          <Select
-            value={roleFilter}
-            onChange={handleRoleFilterChange}
-            label="תפקיד"
-          >
-            <MenuItem value="all">{t('users.roles.all')}</MenuItem>
-            <MenuItem value={UserRole.ADMIN}>{t('users.roles.admin')}</MenuItem>
-            <MenuItem value={UserRole.WORKER}>{t('users.roles.manager')}</MenuItem>
-            <MenuItem value={UserRole.VOLUNTEER}>{t('users.roles.volunteer')}</MenuItem>
-            <MenuItem value={UserRole.CLIENT}>{t('users.roles.user')}</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      {/* קומפוננטת חיפוש ופילטר */}
+      <SearchAndFilter
+        searchValue={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
+        searchPlaceholder={t('users.searchPlaceholder')}
+        availableFilters={availableFilters}
+        activeFilters={activeFilters}
+        onFilterAdd={handleFilterAdd}
+        onFilterRemove={handleFilterRemove}
+        onClearAll={handleClearAll}
+        disabled={isLoading}
+      />
 
       {/* טבלת משתמשים / כרטיסיות למובייל */}
       {isMobile ? (
@@ -284,12 +372,12 @@ const UsersPage: React.FC = () => {
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <CircularProgress />
             </Box>
-          ) : usersData?.users?.length === 0 ? (
+          ) : filteredUsers?.length === 0 ? (
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <Typography>{t('users.noUsers')}</Typography>
             </Paper>
           ) : (
-            usersData?.users?.map((user: any) => (
+            filteredUsers?.map((user: any) => (
               <Card key={user.id} sx={{ p: 0 }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -381,14 +469,14 @@ const UsersPage: React.FC = () => {
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ) : usersData?.users?.length === 0 ? (
+              ) : filteredUsers?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
+                  <TableCell colSpan={7} align="center">
                     {t('users.noUsers')}
                   </TableCell>
                 </TableRow>
               ) : (
-                usersData?.users?.map((user: any) => (
+                filteredUsers?.map((user: any) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       {user.firstName} {user.lastName}

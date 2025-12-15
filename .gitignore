@@ -1,21 +1,66 @@
-node_modules
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # Build directory
 build/
+dist/
 
 # Production builds
 *.tgz
 
-# Environment variables
+# Environment variables - חשוב! אל תעלה קבצי .env ל-Git
+.env
 .env.local
 .env.development.local
 .env.test.local
+.env.production
 .env.production.local
+
+# Testing
+coverage/
+.nyc_output/
+
+# Storybook
+storybook-static/
+
+# Playwright
+playwright-report/
+playwright/.cache/
+test-results/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # IDE files
 .vscode/
 .idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
 
 # OS generated files
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*~
+
+# Cache
+.cache/
+.eslintcache
+.node_repl_history
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Debug
+.env.debug

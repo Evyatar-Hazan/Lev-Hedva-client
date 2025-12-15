@@ -14,7 +14,6 @@ import {
   Chip,
   IconButton,
   TextField,
-  InputAdornment,
   MenuItem,
   FormControl,
   InputLabel,
@@ -36,7 +35,6 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Search as SearchIcon,
   Edit as EditIcon,
   VolunteerActivism as VolunteerIcon,
   Event as EventIcon,
@@ -45,6 +43,7 @@ import {
   Visibility as VisibilityIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
+import SearchAndFilter, { FilterOption, ActiveFilter } from '../components/SearchAndFilter';
 import StatsGrid from '../components/StatsGrid';
 import { useVolunteerActivities, useCreateVolunteerActivity, useUpdateVolunteerActivity } from '../hooks';
 import { useUsers } from '../hooks/useUsers';
@@ -58,8 +57,9 @@ const VolunteersPage: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [page, setPage] = useState(1);
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newActivity, setNewActivity] = useState({
     volunteerId: '',
@@ -82,13 +82,71 @@ const VolunteersPage: React.FC = () => {
   const createActivityMutation = useCreateVolunteerActivity();
   const updateActivityMutation = useUpdateVolunteerActivity();
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+  // הגדרת הפילטרים הזמינים (אחרי קריאת ה-hooks)
+  const availableFilters: FilterOption[] = [
+    {
+      id: 'activityType',
+      label: t('volunteers.filter.activityType'),
+      type: 'select',
+      options: [
+        { value: 'delivery', label: t('volunteers.activities.delivery') },
+        { value: 'home_visit', label: t('volunteers.activities.home_visit') },
+        { value: 'phone_call', label: t('volunteers.activities.phone_call') },
+        { value: 'maintenance', label: t('volunteers.activities.maintenance') },
+        { value: 'other', label: t('volunteers.activities.other') },
+      ],
+    },
+    {
+      id: 'volunteer',
+      label: t('volunteers.filter.volunteer'),
+      type: 'autocomplete',
+      autocompleteOptions: usersData?.users?.filter((u: any) => u.role === 'VOLUNTEER') || [],
+      getOptionLabel: (option: any) => `${option.firstName} ${option.lastName}`,
+    },
+    {
+      id: 'date',
+      label: t('volunteers.filter.date'),
+      type: 'date',
+    },
+    {
+      id: 'minHours',
+      label: t('volunteers.filter.minHours'),
+      type: 'text',
+      placeholder: t('volunteers.filter.minHoursPlaceholder'),
+    },
+  ];
+
+  // פונקציות לניהול פילטרים
+  const handleFilterAdd = (filterId: string, value: any) => {
+    const filterDef = availableFilters.find(f => f.id === filterId);
+    if (!filterDef) return;
+
+    let displayValue = value;
+    if (filterDef.type === 'select' && filterDef.options) {
+      const option = filterDef.options.find(o => o.value === value);
+      displayValue = option?.label || value;
+    }
+
+    setActiveFilters(prev => [
+      ...prev.filter(f => f.id !== filterId),
+      {
+        id: filterId,
+        value,
+        label: filterDef.label,
+        displayValue,
+      },
+    ]);
     setPage(1);
   };
 
-  const handleStatusFilterChange = (event: any) => {
-    setStatusFilter(event.target.value);
+  const handleFilterRemove = (filterId: string) => {
+    setActiveFilters(prev => prev.filter(f => f.id !== filterId));
+    setPage(1);
+  };
+
+  const handleClearAll = () => {
+    setSearch('');
+    setActiveFilters([]);
     setPage(1);
   };
 
@@ -203,7 +261,7 @@ const VolunteersPage: React.FC = () => {
 
   const activities = activitiesData?.data || [];
 
-  // סינון פעילויות לפי חיפוש ופילטר
+  // סינון פעילויות לפי חיפוש ופילטרים
   const filteredActivities = activities.filter(activity => {
     // סינון לפי חיפוש
     const searchLower = search.toLowerCase();
@@ -212,10 +270,24 @@ const VolunteersPage: React.FC = () => {
       activity.activityType.toLowerCase().includes(searchLower) ||
       `${activity.volunteer?.firstName} ${activity.volunteer?.lastName}`.toLowerCase().includes(searchLower);
 
-    // סינון לפי סוג פעילות
-    const matchesFilter = statusFilter === 'all' || activity.activityType === statusFilter;
+    // יישום כל הפילטרים הפעילים
+    const matchesFilters = activeFilters.every(filter => {
+      if (filter.id === 'activityType') {
+        return activity.activityType === filter.value;
+      } else if (filter.id === 'volunteer') {
+        return activity.volunteerId === filter.value.id;
+      } else if (filter.id === 'date') {
+        const filterDate = new Date(filter.value);
+        const activityDate = new Date(activity.date);
+        return activityDate.toDateString() === filterDate.toDateString();
+      } else if (filter.id === 'minHours') {
+        const minHours = parseFloat(filter.value);
+        return activity.hours >= minHours;
+      }
+      return true;
+    });
 
-    return matchesSearch && matchesFilter;
+    return matchesSearch && matchesFilters;
   });
 
   // קבלת סטטיסטיקות מתנדבים
@@ -292,37 +364,21 @@ const VolunteersPage: React.FC = () => {
         },
       ]} />
 
-      {/* חיפוש וסינון */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <TextField
-          placeholder="חיפוש מתנדבים או פעילויות..."
-          value={search}
-          onChange={handleSearch}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ minWidth: 300 }}
-        />
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>{t('volunteers.filter.activityType')}</InputLabel>
-          <Select
-            value={statusFilter}
-            label={t('volunteers.filter.activityType')}
-            onChange={handleStatusFilterChange}
-          >
-            <MenuItem value="all">{t('volunteers.activities.all')}</MenuItem>
-            <MenuItem value="delivery">{t('volunteers.activities.delivery')}</MenuItem>
-            <MenuItem value="home_visit">{t('volunteers.activities.home_visit')}</MenuItem>
-            <MenuItem value="phone_call">{t('volunteers.activities.phone_call')}</MenuItem>
-            <MenuItem value="maintenance">{t('volunteers.activities.maintenance')}</MenuItem>
-            <MenuItem value="other">{t('volunteers.activities.other')}</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      {/* קומפוננטת חיפוש ופילטר */}
+      <SearchAndFilter
+        searchValue={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
+        searchPlaceholder={t('volunteers.searchPlaceholder')}
+        availableFilters={availableFilters}
+        activeFilters={activeFilters}
+        onFilterAdd={handleFilterAdd}
+        onFilterRemove={handleFilterRemove}
+        onClearAll={handleClearAll}
+        disabled={isLoading}
+      />
 
       {/* טבלת פעילויות מתנדבים / כרטיסיות למובייל */}
       {isMobile ? (

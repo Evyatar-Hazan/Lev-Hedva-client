@@ -14,7 +14,6 @@ import {
   Chip,
   IconButton,
   TextField,
-  InputAdornment,
   MenuItem,
   FormControl,
   InputLabel,
@@ -34,7 +33,6 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Search as SearchIcon,
   Edit as EditIcon,
   Inventory as InventoryIcon,
   QrCode as QrCodeIcon,
@@ -42,6 +40,7 @@ import {
   Close as CloseIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
+import SearchAndFilter, { FilterOption, ActiveFilter } from '../components/SearchAndFilter';
 import StatsGrid from '../components/StatsGrid';
 import { useProducts, useProductInstances, useCreateProduct, useUpdateProduct, useUpdateProductInstance, useCreateProductInstance, useDeleteProductInstance, useProductCategories, useProductManufacturers } from '../hooks';
 import { CreateProductDto, UpdateProductDto, UpdateProductInstanceDto, CreateProductInstanceDto } from '../lib/types';
@@ -174,7 +173,7 @@ const ProductsPage: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [page, setPage] = useState(1);
   
   // משתנים לקטגוריות חדשות
@@ -243,6 +242,76 @@ const ProductsPage: React.FC = () => {
   const { data: categories = [] } = useProductCategories();
   const { data: manufacturers = [] } = useProductManufacturers();
 
+  // הגדרת הפילטרים הזמינים
+  const availableFilters: FilterOption[] = [
+    {
+      id: 'category',
+      label: t('products.filter.category'),
+      type: 'select',
+      options: categories.map((cat: string) => ({ value: cat, label: cat })),
+    },
+    {
+      id: 'manufacturer',
+      label: t('products.manufacturer'),
+      type: 'select',
+      options: manufacturers.map((mfr: string) => ({ value: mfr, label: mfr })),
+    },
+    {
+      id: 'availability',
+      label: t('products.filter.availability'),
+      type: 'select',
+      options: [
+        { value: 'available', label: t('products.filter.hasAvailable') },
+        { value: 'unavailable', label: t('products.filter.unavailable') },
+      ],
+    },
+    {
+      id: 'condition',
+      label: t('products.condition'),
+      type: 'select',
+      options: [
+        { value: 'excellent', label: t('products.conditions.excellent') },
+        { value: 'good', label: t('products.conditions.good') },
+        { value: 'fair', label: t('products.conditions.fair') },
+        { value: 'poor', label: t('products.conditions.poor') },
+      ],
+    },
+  ];
+
+  // פונקציות לניהול פילטרים
+  const handleFilterAdd = (filterId: string, value: any) => {
+    const filterDef = availableFilters.find(f => f.id === filterId);
+    if (!filterDef) return;
+
+    let displayValue = value;
+    if (filterDef.type === 'select' && filterDef.options) {
+      const option = filterDef.options.find(o => o.value === value);
+      displayValue = option?.label || value;
+    }
+
+    setActiveFilters(prev => [
+      ...prev.filter(f => f.id !== filterId),
+      {
+        id: filterId,
+        value,
+        label: filterDef.label,
+        displayValue,
+      },
+    ]);
+    setPage(1);
+  };
+
+  const handleFilterRemove = (filterId: string) => {
+    setActiveFilters(prev => prev.filter(f => f.id !== filterId));
+    setPage(1);
+  };
+
+  const handleClearAll = () => {
+    setSearch('');
+    setActiveFilters([]);
+    setPage(1);
+  };
+
   // Debug logging
   console.log('📦 Products Page Debug:', {
     productsData,
@@ -250,19 +319,9 @@ const ProductsPage: React.FC = () => {
     isLoading,
     error,
     search,
-    categoryFilter,
+    activeFilters,
     page
   });
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setPage(1);
-  };
-
-  const handleCategoryFilterChange = (event: any) => {
-    setCategoryFilter(event.target.value);
-    setPage(1);
-  };
 
   const getStatusColor = (availableCount: number, totalCount: number) => {
     if (availableCount === 0) return 'error';
@@ -609,10 +668,10 @@ const ProductsPage: React.FC = () => {
     );
   }
 
-  const products = (productsData as any)?.products || [];
-  const productInstancesMap = new Map();
+  let products = (productsData as any)?.products || [];
   
-  // יצירת מפה של מופעי מוצרים לפי מוצר
+  // יצירת מפה של מופעי מוצרים לפי מוצר (לפני הפילטור)
+  const productInstancesMap = new Map();
   productInstances?.forEach(instance => {
     if (!productInstancesMap.has(instance.productId)) {
       productInstancesMap.set(instance.productId, { total: 0, available: 0 });
@@ -621,7 +680,44 @@ const ProductsPage: React.FC = () => {
     counts.total += 1;
     if (instance.isAvailable) counts.available += 1;
   });
-
+  
+  // סינון המוצרים לפי חיפוש ופילטרים
+  if (search) {
+    const searchLower = search.toLowerCase();
+    products = products.filter((product: any) => 
+      product.name?.toLowerCase().includes(searchLower) ||
+      product.description?.toLowerCase().includes(searchLower) ||
+      product.category?.toLowerCase().includes(searchLower) ||
+      product.manufacturer?.toLowerCase().includes(searchLower) ||
+      product.model?.toLowerCase().includes(searchLower)
+    );
+  }
+  
+  // יישום כל הפילטרים הפעילים
+  activeFilters.forEach(filter => {
+    if (filter.id === 'category') {
+      products = products.filter((product: any) => product.category === filter.value);
+    } else if (filter.id === 'manufacturer') {
+      products = products.filter((product: any) => product.manufacturer === filter.value);
+    } else if (filter.id === 'availability') {
+      // נצטרך לבדוק את מספר המופעים הזמינים
+      products = products.filter((product: any) => {
+        const instanceCounts = productInstancesMap.get(product.id) || { available: 0 };
+        if (filter.value === 'available') {
+          return instanceCounts.available > 0;
+        } else {
+          return instanceCounts.available === 0;
+        }
+      });
+    } else if (filter.id === 'condition') {
+      // נצטרך לבדוק אם יש מופעים במצב מסוים
+      products = products.filter((product: any) => {
+        const instances = productInstances?.filter(inst => inst.productId === product.id) || [];
+        return instances.some((inst: any) => inst.condition === filter.value);
+      });
+    }
+  });
+  
   // אם נבחר מוצר, מציגים את המופעים שלו
   if (isViewingInstances && selectedProduct) {
     return (
@@ -914,35 +1010,21 @@ const ProductsPage: React.FC = () => {
         },
       ]} />
 
-      {/* חיפוש וסינון */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <TextField
-          placeholder="חיפוש מוצרים..."
-          value={search}
-          onChange={handleSearch}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ minWidth: 300 }}
-        />
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>{t('products.filter.category')}</InputLabel>
-          <Select
-            value={categoryFilter}
-            label="קטגוריה"
-            onChange={handleCategoryFilterChange}
-          >
-            <MenuItem value="all">{t('products.categories.all')}</MenuItem>
-            {categories.map(category => (
-              <MenuItem key={category} value={category}>{category}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
+      {/* קומפוננטת חיפוש ופילטר */}
+      <SearchAndFilter
+        searchValue={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
+        searchPlaceholder={t('products.searchPlaceholder')}
+        availableFilters={availableFilters}
+        activeFilters={activeFilters}
+        onFilterAdd={handleFilterAdd}
+        onFilterRemove={handleFilterRemove}
+        onClearAll={handleClearAll}
+        disabled={isLoading}
+      />
 
       {/* טבלת מוצרים / כרטיסיות למובייל */}
       {isMobile ? (
