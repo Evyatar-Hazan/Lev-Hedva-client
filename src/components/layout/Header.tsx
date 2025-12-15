@@ -186,12 +186,14 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             sx={{
               display: "flex",
               alignItems: "center",
-              padding: "4px",
-              borderRadius: "8px",
+              padding: "8px 12px",
+              borderRadius: "12px",
               backgroundColor: colorUtils.withOpacity(
                 COLORS.text.onPrimary,
-                0.1
+                0.25
               ),
+              backdropFilter: 'blur(8px)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <img
