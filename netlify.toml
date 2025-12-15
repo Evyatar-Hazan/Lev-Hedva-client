@@ -14,8 +14,8 @@
   # תיקיית הפלט אחרי build
   publish = "build"
   
-  # פקודת Build - force install to handle TypeScript version conflict
-  command = "npm install --force && CI=false npm run build"
+  # פקודת Build
+  command = "CI=false npm run build"
   
   # Node Version
   environment = { NODE_VERSION = "18", CI = "false" }
