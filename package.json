@@ -29,6 +29,7 @@
     "react-scripts": "5.0.1",
     "stylis": "^4.3.0",
     "stylis-plugin-rtl": "^2.1.1",
+    "typescript": "^5.3.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -57,8 +58,7 @@
     "jest-axe": "^8.0.0",
     "msw": "^2.0.11",
     "prop-types": "^15.8.1",
-    "storybook": "^7.6.6",
-    "typescript": "^5.3.3"
+    "storybook": "^7.6.6"
   },
   "scripts": {
     "start": "react-scripts start",
