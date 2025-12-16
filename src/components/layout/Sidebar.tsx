@@ -218,7 +218,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             {user?.firstName?.charAt(0)}
             {user?.lastName?.charAt(0)}
           </Avatar>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             <Typography
               variant="subtitle2"
               sx={{
@@ -226,12 +226,13 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
+                color: COLORS.text.onPrimary,
               }}
             >
               {user?.firstName} {user?.lastName}
             </Typography>
             <Chip
-              label={user?.role === "ADMIN" ? "מנהל" : "משתמש"}
+              label={user?.role ? t(`sidebar.role${user.role.charAt(0) + user.role.slice(1).toLowerCase()}`) : t("sidebar.roleUser")}
               size="small"
               sx={{
                 height: "18px",
@@ -241,7 +242,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
                   0.2
                 ),
                 color: COLORS.text.onPrimary,
-                mt: 0.5,
+                mt: 0,
               }}
             />
           </Box>

@@ -104,6 +104,9 @@
     "welcomeUser": "ברוך הבא, {{firstName}} {{lastName}}",
     "userRole": "תפקיד: {{role}}",
     "roleAdmin": "מנהל",
+    "roleWorker": "עובד",
+    "roleVolunteer": "מתנדב",
+    "roleClient": "לקוח",
     "roleUser": "משתמש",
     "version": "גרסה 1.0.0 © לב חדוה"
   },
@@ -133,6 +136,9 @@
     "memberSince": "חבר מאז",
     "userId": "מזהה משתמש",
     "roleAdmin": "מנהל",
+    "roleWorker": "עובד",
+    "roleVolunteer": "מתנדב",
+    "roleClient": "לקוח",
     "roleUser": "משתמש",
     "address": "כתובת"
   },
