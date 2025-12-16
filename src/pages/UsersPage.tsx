@@ -62,7 +62,7 @@ const UsersPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { user: currentUser } = useAuth();
-  
+
   // Check if current user can manage users (create/edit/delete)
   // Workers can only view users, not manage them
   const canManageUsers = currentUser?.role === UserRole.ADMIN;
@@ -91,7 +91,7 @@ const UsersPage: React.FC = () => {
       type: "select",
       options: [
         { value: UserRole.ADMIN, label: t("users.roles.admin") },
-        { value: UserRole.WORKER, label: t("users.roles.manager") },
+        { value: UserRole.WORKER, label: t("users.roles.worker") },
         { value: UserRole.VOLUNTEER, label: t("users.roles.volunteer") },
         { value: UserRole.CLIENT, label: t("users.roles.user") },
       ],
@@ -538,7 +538,10 @@ const UsersPage: React.FC = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={canManageUsers ? 7 : 6} sx={{ textAlign: "center", py: 4 }}>
+                  <TableCell
+                    colSpan={canManageUsers ? 7 : 6}
+                    sx={{ textAlign: "center", py: 4 }}
+                  >
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
@@ -717,7 +720,7 @@ const UsersPage: React.FC = () => {
                     {t("users.roles.volunteer")}
                   </MenuItem>
                   <MenuItem value={UserRole.WORKER}>
-                    {t("users.roles.manager")}
+                    {t("users.roles.worker")}
                   </MenuItem>
                   <MenuItem value={UserRole.ADMIN}>
                     {t("users.roles.admin")}
@@ -854,7 +857,7 @@ const UsersPage: React.FC = () => {
                     {t("users.roles.volunteer")}
                   </MenuItem>
                   <MenuItem value={UserRole.WORKER}>
-                    {t("users.roles.manager")}
+                    {t("users.roles.worker")}
                   </MenuItem>
                   <MenuItem value={UserRole.ADMIN}>
                     {t("users.roles.admin")}

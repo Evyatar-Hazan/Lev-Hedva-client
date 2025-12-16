@@ -1,17 +1,17 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../features/auth/hooks';
-import { Layout } from '../components/layout';
-import LoginPage from '../pages/LoginPage';
-import DashboardPage from '../pages/DashboardPage';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../features/auth/hooks";
+import { Layout } from "../components/layout";
+import LoginPage from "../pages/LoginPage";
+import DashboardPage from "../pages/DashboardPage";
 // Import placeholder pages - will create them next
-import UsersPage from '../pages/UsersPage';
-import ProductsPage from '../pages/ProductsPage';
-import LoansPage from '../pages/LoansPage';
-import VolunteersPage from '../pages/VolunteersPage';
-import AuditPage from '../pages/AuditPage';
-import ProfilePage from '../pages/ProfilePage';
-import { UserRole } from '../lib/types';
+import UsersPage from "../pages/UsersPage";
+import ProductsPage from "../pages/ProductsPage";
+import LoansPage from "../pages/LoansPage";
+import VolunteersPage from "../pages/VolunteersPage";
+import AuditPage from "../pages/AuditPage";
+import ProfilePage from "../pages/ProfilePage";
+import { UserRole } from "../lib/types";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -30,7 +30,11 @@ function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   }
 
   // Check if user role is allowed
-  if (allowedRoles && user?.role && !allowedRoles.includes(user.role as UserRole)) {
+  if (
+    allowedRoles &&
+    user?.role &&
+    !allowedRoles.includes(user.role as UserRole)
+  ) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -44,7 +48,9 @@ function AppRoutes() {
     <Routes>
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />
+        }
       />
       <Route
         path="/dashboard"
@@ -105,7 +111,11 @@ function AppRoutes() {
       <Route
         path="/"
         element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+          isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/login" replace />
+          )
         }
       />
       <Route path="*" element={<Navigate to="/login" replace />} />

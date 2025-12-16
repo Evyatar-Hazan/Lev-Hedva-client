@@ -315,8 +315,8 @@
     "confirmDelete": "Are you sure you want to delete this user?",
     "roles": {
       "all": "All Roles",
-      "admin": "System Administrator",
-      "manager": "Manager",
+      "admin": "Admin",
+      "worker": "Worker",
       "volunteer": "Volunteer",
       "user": "User"
     },
