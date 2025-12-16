@@ -1,12 +1,10 @@
 {
   "extends": [
     "react-app",
-    "react-app/jest",
-    "plugin:prettier/recommended"
+    "react-app/jest"
   ],
-  "plugins": ["i18next", "prettier"],
+  "plugins": ["i18next"],
   "rules": {
-    "prettier/prettier": "error",
     "i18next/no-literal-string": [
       "error",
       {

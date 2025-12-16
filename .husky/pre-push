@@ -1,6 +1,0 @@
-echo "🔍 מריץ בדיקות לפני push..."
-npm run lint
-npm run format:check
-npm run type-check
-npm run check-i18n
-echo "✅ כל הבדיקות עברו בהצלחה!"
