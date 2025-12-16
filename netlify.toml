@@ -14,11 +14,11 @@
   # תיקיית הפלט אחרי build
   publish = "build"
 
-  # פקודת Build - מתקין עם production=false כדי לכלול devDependencies
-  command = "npm install --legacy-peer-deps --production=false && CI=false npm run build"
+  # פקודת Build
+  command = "CI=false npm run build"
 
-  # Node Version
-  environment = { NODE_VERSION = "18", CI = "false", NODE_ENV = "development" }
+  # Node Version - לא לדרוס את NODE_ENV
+  environment = { NODE_VERSION = "18", CI = "false" }
 
 # ===================================
 # Redirects - חשוב ל-React Router (SPA)
