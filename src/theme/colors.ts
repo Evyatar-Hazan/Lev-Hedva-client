@@ -4,27 +4,27 @@
  * נגזרת מצבעי הלוגו של הארגון
  */
 
-// צבעי הבסיס מהלוגו
+// Base colors from logo
 export const BRAND_COLORS = {
-  // צבע ראשי - האדום המרכזי של הלוגו
+  // Primary color - the main red from logo
   PRIMARY: '#DA2037',
 
-  // וריאציות של הצבע הראשי
+  // Primary color variations
   PRIMARY_DARK: '#B51A2D',
   PRIMARY_LIGHT: '#F05467',
 
-  // צבעי טקסט בסיסיים
+  // Basic text colors
   TEXT_PRIMARY: '#000000',
   TEXT_ON_PRIMARY: '#FFFFFF',
 
-  // צבעי רקע
+  // Background colors
   BACKGROUND: '#FFFFFF',
   BACKGROUND_SOFT: '#F4F4F4',
 } as const;
 
-// מערכת צבעים מורחבת נגזרת מצבעי הבסיס
+// Extended color system derived from base colors
 export const COLORS = {
-  // צבעים ראשיים - מבוסס על הלוגו
+  // Primary colors - based on logo
   primary: {
     main: BRAND_COLORS.PRIMARY,
     dark: BRAND_COLORS.PRIMARY_DARK,
@@ -32,7 +32,7 @@ export const COLORS = {
     contrast: BRAND_COLORS.TEXT_ON_PRIMARY,
   },
 
-  // צבע משני - גוון כחול מקצועי שמתאים לאדום
+  // Secondary color - professional blue shade that matches red
   secondary: {
     main: '#1976d2',
     dark: '#1565c0',
@@ -40,7 +40,7 @@ export const COLORS = {
     contrast: BRAND_COLORS.TEXT_ON_PRIMARY,
   },
 
-  // צבעי רקע
+  // Background colors
   background: {
     default: BRAND_COLORS.BACKGROUND,
     paper: BRAND_COLORS.BACKGROUND,
@@ -60,7 +60,7 @@ export const COLORS = {
     linkHover: BRAND_COLORS.PRIMARY_DARK,
   },
 
-  // צבעי גבולות
+  // Border colors
   border: {
     light: '#E0E0E0',
     medium: '#BDBDBD',
@@ -68,7 +68,7 @@ export const COLORS = {
     focus: BRAND_COLORS.PRIMARY,
   },
 
-  // צבעי מצבים
+  // Status colors
   status: {
     success: '#4CAF50',
     successLight: '#A5D6A7',
@@ -87,9 +87,9 @@ export const COLORS = {
     infoDark: '#1976D2',
   },
 
-  // צבעי אינטראקציה
+  // Interaction colors
   action: {
-    hover: 'rgba(218, 32, 55, 0.04)', // הובר בהיר על בסיס הצבע הראשי
+    hover: 'rgba(218, 32, 55, 0.04)', // Light hover based on primary color
     hoverStrong: 'rgba(218, 32, 55, 0.08)',
     selected: 'rgba(218, 32, 55, 0.12)',
     disabled: 'rgba(0, 0, 0, 0.26)',
@@ -97,7 +97,7 @@ export const COLORS = {
     focus: 'rgba(218, 32, 55, 0.12)',
   },
 
-  // צבעי גרייסקייל
+  // Grayscale colors
   grey: {
     50: '#FAFAFA',
     100: '#F5F5F5',
@@ -111,29 +111,29 @@ export const COLORS = {
     900: '#212121',
   },
 
-  // צבעי רכיבי UI ספציפיים
+  // Specific UI component colors
   button: {
-    // כפתור ראשי
+    // Primary button
     primaryBackground: BRAND_COLORS.PRIMARY,
     primaryBackgroundHover: BRAND_COLORS.PRIMARY_DARK,
     primaryBackgroundDisabled: '#BDBDBD',
     primaryText: BRAND_COLORS.TEXT_ON_PRIMARY,
     primaryTextDisabled: 'rgba(255, 255, 255, 0.5)',
 
-    // כפתור משני
+    // Secondary button
     secondaryBackground: 'transparent',
     secondaryBackgroundHover: 'rgba(218, 32, 55, 0.04)',
     secondaryBorder: BRAND_COLORS.PRIMARY,
     secondaryText: BRAND_COLORS.PRIMARY,
     secondaryTextHover: BRAND_COLORS.PRIMARY_DARK,
 
-    // כפתור רגיל
+    // Regular button
     defaultBackground: '#F5F5F5',
     defaultBackgroundHover: '#EEEEEE',
     defaultText: BRAND_COLORS.TEXT_PRIMARY,
   },
 
-  // צבעי שדות קלט
+  // Input field colors
   input: {
     background: BRAND_COLORS.BACKGROUND,
     border: '#E0E0E0',
@@ -146,7 +146,7 @@ export const COLORS = {
     disabled: '#F5F5F5',
   },
 
-  // צבעי כרטיסים
+  // Card colors
   card: {
     background: BRAND_COLORS.BACKGROUND,
     shadow: 'rgba(0, 0, 0, 0.1)',
@@ -154,7 +154,7 @@ export const COLORS = {
     border: '#F0F0F0',
   },
 
-  // צבעי ניווט
+  // Navigation colors
   navigation: {
     background: BRAND_COLORS.BACKGROUND,
     text: BRAND_COLORS.TEXT_PRIMARY,
@@ -164,7 +164,7 @@ export const COLORS = {
     shadow: 'rgba(0, 0, 0, 0.1)',
   },
 
-  // צבעי טבלאות
+  // Table colors
   table: {
     headerBackground: BRAND_COLORS.BACKGROUND_SOFT,
     headerText: BRAND_COLORS.TEXT_PRIMARY,
@@ -174,7 +174,7 @@ export const COLORS = {
     border: '#E0E0E0',
   },
 
-  // צבעי אייקונים
+  // Icon colors
   icon: {
     default: '#757575',
     primary: BRAND_COLORS.PRIMARY,
@@ -187,7 +187,7 @@ export const COLORS = {
   },
 } as const;
 
-// פונקציות עזר ליצירת וריאציות צבע - מוגדרות קודם
+// Helper functions to create color variations - defined earlier
 const withOpacity = (color: string, opacity: number): string => {
   if (color.startsWith('#')) {
     const hex = color.slice(1);
@@ -216,7 +216,7 @@ export const colorUtils = {
    * מחזיר צבע הובר לצבע נתון
    */
   getHoverColor: (baseColor: string): string => {
-    // אם זה הצבע הראשי, החזר את הגרסה הכהה
+    // If this is the primary color, return the dark version
     if (baseColor === BRAND_COLORS.PRIMARY) {
       return BRAND_COLORS.PRIMARY_DARK;
     }

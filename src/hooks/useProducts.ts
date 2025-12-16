@@ -11,16 +11,16 @@ import {
 const PRODUCTS_QUERY_KEY = ['products'];
 const PRODUCT_INSTANCES_QUERY_KEY = ['product-instances'];
 
-// Hook לקבלת רשימת מוצרים
+// Hook to get list of products
 export const useProducts = (params?: ProductsQueryDto) => {
   return useQuery({
     queryKey: [...PRODUCTS_QUERY_KEY, params],
     queryFn: () => ProductsClient.getProducts(params),
-    staleTime: 5 * 60 * 1000, // 5 דקות
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
-// Hook לקבלת מוצר בודד
+// Hook to get single product
 export const useProduct = (id: string) => {
   return useQuery({
     queryKey: [...PRODUCTS_QUERY_KEY, id],
@@ -29,7 +29,7 @@ export const useProduct = (id: string) => {
   });
 };
 
-// Hook ליצירת מוצר חדש
+// Hook to create new product
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
 
@@ -43,7 +43,7 @@ export const useCreateProduct = () => {
   });
 };
 
-// Hook לעדכון מוצר
+// Hook to update product
 export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
 
@@ -59,7 +59,7 @@ export const useUpdateProduct = () => {
   });
 };
 
-// Hook למחיקת מוצר
+// Hook to delete product
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
 
@@ -74,16 +74,16 @@ export const useDeleteProduct = () => {
 };
 
 // Product Instances hooks
-// Hook לקבלת רשימת מופעי מוצרים
+// Hook to get list of product instances
 export const useProductInstances = (productId?: string) => {
   return useQuery({
     queryKey: [...PRODUCT_INSTANCES_QUERY_KEY, productId],
     queryFn: () => ProductsClient.getProductInstances(productId),
-    staleTime: 2 * 60 * 1000, // 2 דקות
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
 
-// Hook לקבלת מופע מוצר בודד
+// Hook to get single product instance
 export const useProductInstance = (id: string) => {
   return useQuery({
     queryKey: [...PRODUCT_INSTANCES_QUERY_KEY, id],
@@ -92,7 +92,7 @@ export const useProductInstance = (id: string) => {
   });
 };
 
-// Hook ליצירת מופע מוצר חדש
+// Hook to create new product instance
 export const useCreateProductInstance = () => {
   const queryClient = useQueryClient();
 
@@ -106,7 +106,7 @@ export const useCreateProductInstance = () => {
   });
 };
 
-// Hook לעדכון מופע מוצר
+// Hook to update product instance
 export const useUpdateProductInstance = () => {
   const queryClient = useQueryClient();
 
@@ -120,7 +120,7 @@ export const useUpdateProductInstance = () => {
   });
 };
 
-// Hook למחיקת מופע מוצר
+// Hook to delete product instance
 export const useDeleteProductInstance = () => {
   const queryClient = useQueryClient();
 
@@ -133,29 +133,29 @@ export const useDeleteProductInstance = () => {
   });
 };
 
-// Hook לקבלת מופעי מוצרים זמינים
+// Hook to get available product instances
 export const useAvailableInstances = () => {
   return useQuery({
     queryKey: [...PRODUCT_INSTANCES_QUERY_KEY, 'available'],
     queryFn: () => ProductsClient.getAvailableInstances(),
-    staleTime: 30 * 1000, // 30 שניות
+    staleTime: 30 * 1000, // 30 seconds
   });
 };
 
-// Hook לקבלת קטגוריות מוצרים
+// Hook to get product categories
 export const useProductCategories = () => {
   return useQuery({
     queryKey: ['product-categories'],
     queryFn: () => ProductsClient.getProductCategories(),
-    staleTime: 10 * 60 * 1000, // 10 דקות
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
-// Hook לקבלת יצרנים
+// Hook to get manufacturers
 export const useProductManufacturers = () => {
   return useQuery({
     queryKey: ['product-manufacturers'],
     queryFn: () => ProductsClient.getProductManufacturers(),
-    staleTime: 10 * 60 * 1000, // 10 דקות
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };

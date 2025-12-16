@@ -47,7 +47,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
 
     checkConnection();
 
-    // בדיקה מחדש כל 30 שניות אם יש שגיאה
+    // Recheck every 30 seconds if there's an error
     const interval = setInterval(() => {
       if (connectionStatus === 'error') {
         checkConnection();

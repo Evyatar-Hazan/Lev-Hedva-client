@@ -1,29 +1,29 @@
 # Lev-Hedva Client 💻
 
-אפליקציית React frontend למערכת ניהול ארגון "לב חדוה".
+React frontend application for the "Lev Hedva" organization management system.
 
-## 📚 תיעוד
+## 📚 Documentation
 
-התיעוד המפורט נמצא בתיקיית **[docs/](docs/INDEX.md)**:
+Detailed documentation can be found in the **[docs/](docs/INDEX.md)** directory:
 
-- **[I18N-GUIDE.md](I18N-GUIDE.md)** - מדריך תרגומים ובינלאום
-- **[מדריכים נוספים](docs/INDEX.md)** - תיעוד טכני מפורט
+- **[I18N-GUIDE.md](I18N-GUIDE.md)** - Translation and internationalization guide
+- **[Additional guides](docs/INDEX.md)** - Detailed technical documentation
 
-## 🚀 התחלה מהירה
+## 🚀 Quick Start
 
 ```bash
-# התקנת תלויות
+# Install dependencies
 npm install
 
-# הרצה בסביבת פיתוח
+# Run in development mode
 npm start
 
-# בנייה לייצור
+# Build for production
 npm run build
 ```
 
-## 🔗 קישורים
+## 🔗 Links
 
-- [README ראשי](../README.md)
-- [תיעוד כללי](../docs/)
-- [תיעוד סרבר](../Lev-Hedva-sever/docs/)
+- [Main README](../README.md)
+- [General Documentation](../docs/)
+- [Server Documentation](../Lev-Hedva-sever/docs/)

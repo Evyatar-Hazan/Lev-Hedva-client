@@ -52,7 +52,7 @@ const AuditPage: React.FC = () => {
   const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
-  // הגדרת הפילטרים הזמינים
+  // Define available filters
   const availableFilters: FilterOption[] = [
     {
       id: 'action',
@@ -91,10 +91,10 @@ const AuditPage: React.FC = () => {
     },
   ];
 
-  // פונקציה לייצוא נתונים
+  // Function to export data
   const handleExportData = () => {
     try {
-      // יצירת CSV של הנתונים הנוכחיים
+      // Create CSV of current data
       const csvData = filteredLogs.map((log: any) => ({
         זמן: format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm:ss', {
           locale: he,
@@ -106,7 +106,7 @@ const AuditPage: React.FC = () => {
         'כתובת IP': log.ipAddress || 'N/A',
       }));
 
-      // המרת JSON ל-CSV
+      // Convert JSON to CSV
       const headers = Object.keys(csvData[0] || {});
       const csvContent = [
         headers.join(','),
@@ -115,7 +115,7 @@ const AuditPage: React.FC = () => {
         ),
       ].join('\n');
 
-      // יצירת בלוב והורדה
+      // Create blob and download
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
@@ -132,19 +132,19 @@ const AuditPage: React.FC = () => {
     }
   };
 
-  // פונקציה לצפייה בפרטי לוג
+  // Function to view log details
   const handleViewDetails = (logId: string) => {
     setSelectedLogId(logId);
     setViewDialogOpen(true);
   };
 
-  // פונקציה לסגירת דיאלוג הצפייה
+  // Function to close view dialog
   const handleCloseViewDialog = () => {
     setViewDialogOpen(false);
     setSelectedLogId(null);
   };
 
-  // שימוש בהוכים החדשים
+  // Using new hooks
   const {
     data: infiniteData,
     isLoading,
@@ -155,19 +155,19 @@ const AuditPage: React.FC = () => {
     isFetchingNextPage,
   } = useInfiniteAuditLogs();
 
-  // קבלת סטטיסטיקות מדויקות מהשרת
+  // Get exact statistics from server
   const { data: statsData, isLoading: statsLoading } = useAuditStats();
 
-  // Debug: בואו נראה מה אנו מקבלים
+  // Debug: Let's see what we're getting
   console.log('infiniteData:', infiniteData);
 
-  // קבלת הסטטיסטיקות הכלליות מהדף הראשון
+  // Get general statistics from first page
   const totalCount = (infiniteData?.pages[0] as any)?.total || 0;
 
-  // איחוד כל הדפים לרשימה אחת
+  // Merge all pages into one list
   const auditLogs = infiniteData?.pages?.flatMap((page: any) => page?.data || []) || [];
 
-  // פונקציות לניהול פילטרים
+  // Functions for filter management
   const handleFilterAdd = (filterId: string, value: any) => {
     const filterDef = availableFilters.find(f => f.id === filterId);
     if (!filterDef) return;
@@ -262,11 +262,11 @@ const AuditPage: React.FC = () => {
     );
   }
 
-  // הנתונים כבר מוגדרים למעלה
+  // Data is already defined above
 
-  // סינון לוגים לפי חיפוש ופילטרים
+  // Filter logs by search and filters
   const filteredLogs = auditLogs.filter((log: any) => {
-    // סינון לפי חיפוש
+    // Filter by search
     const searchLower = search.toLowerCase();
     const matchesSearch =
       !search ||
@@ -277,7 +277,7 @@ const AuditPage: React.FC = () => {
       log.user?.lastName?.toLowerCase().includes(searchLower) ||
       log.user?.email?.toLowerCase().includes(searchLower);
 
-    // יישום כל הפילטרים הפעילים
+    // Apply all active filters
     const matchesFilters = activeFilters.every(filter => {
       if (filter.id === 'action') {
         switch (filter.value) {
@@ -325,17 +325,17 @@ const AuditPage: React.FC = () => {
     return matchesSearch && matchesFilters;
   });
 
-  // חישוב סטטיסטיקות - משילוב נתונים מהשרת ונתונים מקומיים
+  // Calculate statistics - from server and local data
   const actionsCount = new Map();
   const usersCount = new Set();
 
-  // חישוב מקומי לנתונים המסוננים
+  // Local calculation for filtered data
   filteredLogs.forEach((log: any) => {
     actionsCount.set(log.action, (actionsCount.get(log.action) || 0) + 1);
     if (log.user?.id) usersCount.add(log.user.id);
   });
 
-  // שימוש בסטטיסטיקות מהשרת לנתונים הכוללים
+  // Use server statistics for total data
   const totalActionsFromServer = statsData?.totalLogs || totalCount;
   const todayActionsCount = auditLogs.filter((log: any) => {
     const logDate = new Date(log.createdAt);
@@ -372,7 +372,7 @@ const AuditPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* סטטיסטיקות מהירות */}
+      {/* Quick statistics */}
       <StatsGrid
         stats={[
           {
@@ -406,7 +406,7 @@ const AuditPage: React.FC = () => {
         ]}
       />
 
-      {/* קומפוננטת חיפוש ופילטר */}
+      {/* Search and filter component */}
       <SearchAndFilter
         searchValue={search}
         onSearchChange={value => setSearch(value)}
@@ -419,9 +419,9 @@ const AuditPage: React.FC = () => {
         disabled={isLoading}
       />
 
-      {/* טבלת יומן ביקורת / כרטיסיות למובייל */}
+      {/* Audit log table / mobile cards */}
       {isMobile ? (
-        // תצוגת כרטיסיות למובייל
+        // Mobile cards view
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {isLoading ? (
             <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -508,7 +508,7 @@ const AuditPage: React.FC = () => {
             ))
           )}
 
-          {/* כפתור טען עוד למובייל */}
+          {/* Load more button for mobile */}
           {hasNextPage && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
               <Button
@@ -523,7 +523,7 @@ const AuditPage: React.FC = () => {
           )}
         </Box>
       ) : (
-        // תצוגת טבלה לדסקטופ
+        // Desktop table view
         <>
           <TableContainer component={Paper}>
             <Table>
@@ -618,7 +618,7 @@ const AuditPage: React.FC = () => {
             </Table>
           </TableContainer>
 
-          {/* כפתור טען עוד */}
+          {/* Load more button */}
           {hasNextPage && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
               <Button
@@ -634,7 +634,7 @@ const AuditPage: React.FC = () => {
         </>
       )}
 
-      {/* מידע על הנתונים שנטענו */}
+      {/* Information about loaded data */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
         <Typography variant="body2" color="text.secondary">
           {t('audit.loadedEntries', {
@@ -644,7 +644,7 @@ const AuditPage: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* דיאלוג צפייה בפרטים */}
+      {/* View details dialog */}
       <Dialog open={viewDialogOpen} onClose={handleCloseViewDialog} maxWidth="md" fullWidth>
         <DialogTitle>
           <Typography variant="h6">{t('audit.viewDetails.title')}</Typography>

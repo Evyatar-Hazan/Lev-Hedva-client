@@ -76,12 +76,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   const handleProfileClick = () => {
     handleUserMenuClose();
-    navigate('/profile'); // ניווט לעמוד הפרופיל
+    navigate('/profile'); // Navigate to profile page
   };
 
   const handleSettingsClick = () => {
     handleUserMenuClose();
-    navigate('/audit'); // ניווט לעמוד הביקורת/הגדרות
+    navigate('/audit'); // Navigate to audit/settings page
   };
 
   const handleNotificationClick = (notification: any) => {
@@ -135,8 +135,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       <Toolbar
         sx={{
           minHeight: { xs: 56, sm: 64 },
-          px: 0, // הסרת padding מהצדדים
-          mx: { xs: 2, sm: 3 }, // margin פנימי במקום padding
+          px: 0, // Remove padding from sides
+          mx: { xs: 2, sm: 3 }, // Internal margin instead of padding
         }}
       >
         {/* Menu Button */}

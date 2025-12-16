@@ -76,7 +76,7 @@ const VolunteersPage: React.FC = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
 
-  // שימוש בהוכים החדשים
+  // Using new hooks
   const {
     data: activitiesData,
     isLoading,
@@ -91,7 +91,7 @@ const VolunteersPage: React.FC = () => {
   const createActivityMutation = useCreateVolunteerActivity();
   const updateActivityMutation = useUpdateVolunteerActivity();
 
-  // הגדרת הפילטרים הזמינים (אחרי קריאת ה-hooks)
+  // Define available filters (after hooks are called)
   const availableFilters: FilterOption[] = [
     {
       id: 'activityType',
@@ -125,7 +125,7 @@ const VolunteersPage: React.FC = () => {
     },
   ];
 
-  // פונקציות לניהול פילטרים
+  // Functions for managing filters
   const handleFilterAdd = (filterId: string, value: any) => {
     const filterDef = availableFilters.find(f => f.id === filterId);
     if (!filterDef) return;
@@ -214,7 +214,7 @@ const VolunteersPage: React.FC = () => {
     setSubmitError(null);
     try {
       if (selectedActivity) {
-        // עדכון פעילות קיימת - ללא volunteerId
+        // Update existing activity - without volunteerId
         const activityData = {
           activityType: newActivity.activityType,
           description: newActivity.description,
@@ -226,7 +226,7 @@ const VolunteersPage: React.FC = () => {
           activityData,
         });
       } else {
-        // יצירת פעילות חדשה - עם volunteerId
+        // Create new activity - with volunteerId
         const activityData = {
           volunteerId: newActivity.volunteerId,
           activityType: newActivity.activityType,
@@ -282,9 +282,9 @@ const VolunteersPage: React.FC = () => {
 
   const activities = activitiesData?.data || [];
 
-  // סינון פעילויות לפי חיפוש ופילטרים
+  // Filter activities by search and filters
   const filteredActivities = activities.filter(activity => {
-    // סינון לפי חיפוש
+    // Filter by search
     const searchLower = search.toLowerCase();
     const matchesSearch =
       !search ||
@@ -294,7 +294,7 @@ const VolunteersPage: React.FC = () => {
         .toLowerCase()
         .includes(searchLower);
 
-    // יישום כל הפילטרים הפעילים
+    // Apply all active filters
     const matchesFilters = activeFilters.every(filter => {
       if (filter.id === 'activityType') {
         return activity.activityType === filter.value;
@@ -314,7 +314,7 @@ const VolunteersPage: React.FC = () => {
     return matchesSearch && matchesFilters;
   });
 
-  // קבלת סטטיסטיקות מתנדבים
+  // Get volunteer statistics
   const volunteerStats = new Map();
   filteredActivities.forEach(activity => {
     const volunteerName = `${activity.volunteer?.firstName} ${activity.volunteer?.lastName}`;
@@ -354,7 +354,7 @@ const VolunteersPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* סטטיסטיקות מהירות */}
+      {/* Quick statistics */}
       <StatsGrid
         stats={[
           {
@@ -391,7 +391,7 @@ const VolunteersPage: React.FC = () => {
         ]}
       />
 
-      {/* קומפוננטת חיפוש ופילטר */}
+      {/* Search and filter component */}
       <SearchAndFilter
         searchValue={search}
         onSearchChange={value => {
@@ -407,9 +407,9 @@ const VolunteersPage: React.FC = () => {
         disabled={isLoading}
       />
 
-      {/* טבלת פעילויות מתנדבים / כרטיסיות למובייל */}
+      {/* Activities table / mobile cards */}
       {isMobile ? (
-        // תצוגת כרטיסיות למובייל
+        // Mobile card view
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {isLoading ? (
             <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -475,7 +475,7 @@ const VolunteersPage: React.FC = () => {
           )}
         </Box>
       ) : (
-        // תצוגת טבלה לדסקטופ
+        // Desktop table view
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -568,7 +568,7 @@ const VolunteersPage: React.FC = () => {
         </TableContainer>
       )}
 
-      {/* פגינציה */}
+      {/* Pagination */}
       {activitiesData?.pagination && activitiesData.pagination.totalPages > 1 && (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, gap: 2 }}>
           <Pagination
@@ -592,7 +592,7 @@ const VolunteersPage: React.FC = () => {
         </Box>
       )}
 
-      {/* דיאלוג הוספת/עריכת פעילות */}
+      {/* Add/Edit activity dialog */}
       <Dialog open={isAddDialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle>
           {selectedActivity ? t('volunteers.editActivity') : t('volunteers.addActivity')}
@@ -708,7 +708,7 @@ const VolunteersPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* דיאלוג צפייה בפעילות */}
+      {/* View activity dialog */}
       <Dialog open={viewDialogOpen} onClose={handleCloseViewDialog} maxWidth="md" fullWidth>
         <DialogTitle>{t('volunteers.viewActivity')}</DialogTitle>
         <DialogContent>

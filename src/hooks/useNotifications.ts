@@ -29,14 +29,14 @@ export const useNotifications = () => {
     const notifs: Notification[] = [];
     const now = new Date();
 
-    // התראות על הלוואות מושגות
+    // Notifications about returned loans
     if (loanStats?.totalOverdueLoans && loanStats.totalOverdueLoans > 0) {
       notifs.push({
         id: 'overdue-loans',
         title: t('notifications.overdueLoans.title'),
         message: t('notifications.overdueLoans.message', { count: loanStats.totalOverdueLoans }),
         type: 'error',
-        timestamp: new Date(now.getTime() - 10 * 60 * 1000), // לפני 10 דקות
+        timestamp: new Date(now.getTime() - 10 * 60 * 1000), // 10 minutes ago
         isRead: false,
         action: {
           label: t('notifications.viewLoans'),
@@ -45,7 +45,7 @@ export const useNotifications = () => {
       });
     }
 
-    // התראות על הלוואות חדשות שנוצרו היום
+    // Notifications about new loans created today
     if (loansData?.loans) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -58,7 +58,7 @@ export const useNotifications = () => {
           title: t('notifications.newLoans.title'),
           message: t('notifications.newLoans.message', { count: todayLoans.length }),
           type: 'info',
-          timestamp: new Date(now.getTime() - 30 * 60 * 1000), // לפני 30 דקות
+          timestamp: new Date(now.getTime() - 30 * 60 * 1000), // 30 minutes ago
           isRead: false,
           action: {
             label: t('notifications.viewLoans'),
@@ -68,7 +68,7 @@ export const useNotifications = () => {
       }
     }
 
-    // התראות על מוצרים חדשים
+    // Notifications about new products
     if (productsData?.data) {
       const recentProducts = productsData.data.filter((product: Product) => {
         const createdDate = new Date(product.createdAt);
@@ -82,7 +82,7 @@ export const useNotifications = () => {
           title: t('notifications.newProducts.title'),
           message: t('notifications.newProducts.message', { count: recentProducts.length }),
           type: 'success',
-          timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000), // לפני 2 שעות
+          timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000), // 2 hours ago
           isRead: false,
           action: {
             label: t('notifications.viewProducts'),
@@ -92,7 +92,7 @@ export const useNotifications = () => {
       }
     }
 
-    // התראת דוח חודשי מוכן (סימולציה)
+    // Monthly report ready notification (simulation)
     const isFirstOfMonth = now.getDate() === 1;
     if (isFirstOfMonth || loanStats?.totalActiveLoans) {
       notifs.push({
@@ -100,7 +100,7 @@ export const useNotifications = () => {
         title: t('notifications.monthlyReport.title'),
         message: t('notifications.monthlyReport.message'),
         type: 'info',
-        timestamp: new Date(now.getTime() - 24 * 60 * 60 * 1000), // אתמול
+        timestamp: new Date(now.getTime() - 24 * 60 * 60 * 1000), // yesterday
         isRead: true,
         action: {
           label: t('notifications.viewReport'),
@@ -109,7 +109,7 @@ export const useNotifications = () => {
       });
     }
 
-    // התראות על משתמשים חדשים
+    // Notifications about new users
     if (usersData?.users) {
       const recentUsers = usersData.users.filter((user: User) => {
         const createdDate = new Date(user.createdAt);
@@ -123,7 +123,7 @@ export const useNotifications = () => {
           title: t('notifications.newUsers.title'),
           message: t('notifications.newUsers.message', { count: recentUsers.length }),
           type: 'info',
-          timestamp: new Date(now.getTime() - 6 * 60 * 60 * 1000), // לפני 6 שעות
+          timestamp: new Date(now.getTime() - 6 * 60 * 60 * 1000), // 6 hours ago
           isRead: false,
           action: {
             label: t('notifications.viewUsers'),

@@ -4,26 +4,26 @@ import { CreateAuditLogDto, AuditLogsQueryDto } from '../lib/types';
 
 const AUDIT_QUERY_KEY = ['audit'];
 
-// Hook לקבלת רשימת לוגי ביקורת
+// Hook to get list of audit logs
 export const useAuditLogs = (params?: AuditLogsQueryDto) => {
   return useQuery({
     queryKey: [...AUDIT_QUERY_KEY, params],
     queryFn: () => AuditClient.getAuditLogs(params),
-    staleTime: 60 * 1000, // דקה אחת
+    staleTime: 60 * 1000, // one minute
   });
 };
 
-// Hook לקבלת רשימת לוגי ביקורת עם infinite scroll
+// Hook to get list of audit logs with infinite scroll
 export const useInfiniteAuditLogs = (limit = 50) => {
   return useInfiniteQuery({
     queryKey: [...AUDIT_QUERY_KEY, 'infinite', limit],
     queryFn: ({ pageParam = 1 }: { pageParam?: number }) =>
       AuditClient.getAuditLogs({ page: pageParam, limit }),
     getNextPageParam: (lastPage: any, allPages: any[]) => {
-      // Debug: בואו נראה מה אנו מקבלים
+      // Debug: Let's see what we're getting
       console.log('lastPage:', lastPage);
 
-      // השרת מחזיר מבנה שטוח ללא pagination wrapper
+      // Server returns flat structure without pagination wrapper
       if (!lastPage) {
         console.log('No lastPage');
         return undefined;
@@ -46,7 +46,7 @@ export const useInfiniteAuditLogs = (limit = 50) => {
   });
 };
 
-// Hook לקבלת לוג ביקורת בודד
+// Hook to get single audit log
 export const useAuditLog = (id: string) => {
   return useQuery({
     queryKey: [...AUDIT_QUERY_KEY, id],
@@ -55,7 +55,7 @@ export const useAuditLog = (id: string) => {
   });
 };
 
-// Hook ליצירת לוג ביקורת חדש
+// Hook to create new audit log
 export const useCreateAuditLog = () => {
   const queryClient = useQueryClient();
 
@@ -67,7 +67,7 @@ export const useCreateAuditLog = () => {
   });
 };
 
-// Hook לקבלת פעילות של משתמש מסוים
+// Hook to get activity of specific user
 export const useUserActivity = (userId: string, dateFrom?: string, dateTo?: string) => {
   return useQuery({
     queryKey: [...AUDIT_QUERY_KEY, 'user', userId, dateFrom, dateTo],
@@ -77,11 +77,11 @@ export const useUserActivity = (userId: string, dateFrom?: string, dateTo?: stri
   });
 };
 
-// Hook לקבלת סטטיסטיקות ביקורת
+// Hook to get audit statistics
 export const useAuditStats = () => {
   return useQuery({
     queryKey: [...AUDIT_QUERY_KEY, 'stats'],
     queryFn: () => AuditClient.getAuditStats(),
-    staleTime: 5 * 60 * 1000, // 5 דקות
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Typography,
@@ -30,7 +30,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -39,9 +39,12 @@ import {
   Visibility as VisibilityIcon,
   Close as CloseIcon,
   ArrowBack as ArrowBackIcon,
-} from '@mui/icons-material';
-import SearchAndFilter, { FilterOption, ActiveFilter } from '../components/SearchAndFilter';
-import StatsGrid from '../components/StatsGrid';
+} from "@mui/icons-material";
+import SearchAndFilter, {
+  FilterOption,
+  ActiveFilter,
+} from "../components/SearchAndFilter";
+import StatsGrid from "../components/StatsGrid";
 import {
   useProducts,
   useProductInstances,
@@ -52,16 +55,16 @@ import {
   useDeleteProductInstance,
   useProductCategories,
   useProductManufacturers,
-} from '../hooks';
+} from "../hooks";
 import {
   CreateProductDto,
   UpdateProductDto,
   UpdateProductInstanceDto,
   CreateProductInstanceDto,
-} from '../lib/types';
-import { COLORS } from '../theme/colors';
+} from "../lib/types";
+import { COLORS } from "../theme/colors";
 
-// רכיב פשוט לתצוגת מופעים
+// Simple component for displaying product instances
 const ProductInstancesView: React.FC<{
   product: any;
   instances: any[];
@@ -72,13 +75,15 @@ const ProductInstancesView: React.FC<{
 
   if (!instances || instances.length === 0) {
     return (
-      <Box sx={{ textAlign: 'center', py: 8 }}>
-        <InventoryIcon sx={{ fontSize: 80, color: COLORS.icon.disabled, mb: 2 }} />
+      <Box sx={{ textAlign: "center", py: 8 }}>
+        <InventoryIcon
+          sx={{ fontSize: 80, color: COLORS.icon.disabled, mb: 2 }}
+        />
         <Typography variant="h5" gutterBottom color="text.secondary">
-          {t('products.no_instances')}
+          {t("products.no_instances")}
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          {t('products.add_first_instance')}
+          {t("products.add_first_instance")}
         </Typography>
       </Box>
     );
@@ -87,19 +92,19 @@ const ProductInstancesView: React.FC<{
   return (
     <Box>
       <Grid container spacing={3}>
-        {instances.map(instance => (
+        {instances.map((instance) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={instance.id}>
             <Card
               sx={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                '&:hover': { boxShadow: 4 },
-                transition: 'box-shadow 0.2s ease-in-out',
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                "&:hover": { boxShadow: 4 },
+                transition: "box-shadow 0.2s ease-in-out",
               }}
             >
               <CardContent sx={{ flexGrow: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <QrCodeIcon sx={{ mr: 1, color: COLORS.icon.primary }} />
                   <Typography variant="h6" fontWeight="bold">
                     {instance.barcode || `מופע ${instance.id.slice(-4)}`}
@@ -107,33 +112,52 @@ const ProductInstancesView: React.FC<{
                 </Box>
 
                 {instance.serialNumber && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    <strong>{t('products.serial_number')}:</strong> {instance.serialNumber}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
+                    <strong>{t("products.serial_number")}:</strong>{" "}
+                    {instance.serialNumber}
                   </Typography>
                 )}
 
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                   <Typography variant="body2" color="text.secondary">
-                    <strong>{t('products.condition')}:</strong>
-                  </Typography>
-                  <Chip label={instance.condition} size="small" variant="outlined" sx={{ ml: 1 }} />
-                </Box>
-
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>{t('products.status')}:</strong>
+                    <strong>{t("products.condition")}:</strong>
                   </Typography>
                   <Chip
-                    label={instance.isAvailable ? t('products.available') : t('products.borrowed')}
-                    color={instance.isAvailable ? 'success' : 'warning'}
+                    label={instance.condition}
+                    size="small"
+                    variant="outlined"
+                    sx={{ ml: 1 }}
+                  />
+                </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>{t("products.status")}:</strong>
+                  </Typography>
+                  <Chip
+                    label={
+                      instance.isAvailable
+                        ? t("products.available")
+                        : t("products.borrowed")
+                    }
+                    color={instance.isAvailable ? "success" : "warning"}
                     size="small"
                     sx={{ ml: 1 }}
                   />
                 </Box>
 
                 {instance.location && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    <strong>{t('products.location')}:</strong> {instance.location}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
+                    <strong>{t("products.location")}:</strong>{" "}
+                    {instance.location}
                   </Typography>
                 )}
 
@@ -142,26 +166,28 @@ const ProductInstancesView: React.FC<{
                     variant="body2"
                     color="text.secondary"
                     sx={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      display: '-webkit-box',
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
                       WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
+                      WebkitBoxOrient: "vertical",
                     }}
                   >
-                    <strong>{t('products.notes')}:</strong> {instance.notes}
+                    <strong>{t("products.notes")}:</strong> {instance.notes}
                   </Typography>
                 )}
               </CardContent>
 
-              <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+              <CardActions
+                sx={{ justifyContent: "space-between", px: 2, pb: 2 }}
+              >
                 <Button
                   size="small"
                   startIcon={<EditIcon />}
                   onClick={() => onEditInstance(instance)}
                   variant="outlined"
                 >
-                  {t('common.edit')}
+                  {t("common.edit")}
                 </Button>
                 <Button
                   size="small"
@@ -170,7 +196,7 @@ const ProductInstancesView: React.FC<{
                   onClick={() => onDeleteInstance(instance)}
                   variant="outlined"
                 >
-                  {t('common.delete')}
+                  {t("common.delete")}
                 </Button>
               </CardActions>
             </Card>
@@ -184,71 +210,72 @@ const ProductInstancesView: React.FC<{
 const ProductsPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [page, setPage] = useState(1);
 
-  // משתנים לקטגוריות חדשות
-  const [customCategory, setCustomCategory] = useState('');
-  const [customManufacturer, setCustomManufacturer] = useState('');
+  // Variables for new categories
+  const [customCategory, setCustomCategory] = useState("");
+  const [customManufacturer, setCustomManufacturer] = useState("");
   const [showCustomCategory, setShowCustomCategory] = useState(false);
   const [showCustomManufacturer, setShowCustomManufacturer] = useState(false);
 
-  // משתנים לניהול תצוגה
+  // Variables for managing view state
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isViewingInstances, setIsViewingInstances] = useState(false);
 
-  // דיאלוגי פעולות מוצרים
+  // Product action dialogs
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isAddInstanceDialogOpen, setIsAddInstanceDialogOpen] = useState(false);
   const [isEditProductDialogOpen, setIsEditProductDialogOpen] = useState(false);
-  const [isEditInstanceDialogOpen, setIsEditInstanceDialogOpen] = useState(false);
+  const [isEditInstanceDialogOpen, setIsEditInstanceDialogOpen] =
+    useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [editingInstance, setEditingInstance] = useState<any>(null);
 
   const [newProduct, setNewProduct] = useState<CreateProductDto>({
-    name: '',
-    description: '',
-    category: '',
-    manufacturer: '',
-    model: '',
+    name: "",
+    description: "",
+    category: "",
+    manufacturer: "",
+    model: "",
   });
 
   const [newInstance, setNewInstance] = useState<CreateProductInstanceDto>({
-    productId: '',
-    barcode: '',
-    serialNumber: '',
-    condition: 'חדש',
-    location: '',
-    notes: '',
+    productId: "",
+    barcode: "",
+    serialNumber: "",
+    condition: "חדש",
+    location: "",
+    notes: "",
   });
 
   const [editProduct, setEditProduct] = useState<UpdateProductDto>({
-    name: '',
-    description: '',
-    category: '',
-    manufacturer: '',
-    model: '',
+    name: "",
+    description: "",
+    category: "",
+    manufacturer: "",
+    model: "",
   });
 
   const [editInstance, setEditInstance] = useState<UpdateProductInstanceDto>({
-    barcode: '',
-    serialNumber: '',
-    condition: '',
-    location: '',
-    notes: '',
+    barcode: "",
+    serialNumber: "",
+    condition: "",
+    location: "",
+    notes: "",
   });
 
-  // שימוש בהוכים
+  // Using hooks
   const {
     data: productsData,
     isLoading,
     error,
   } = useProducts({
     page,
-    limit: 100, // מספר גבוה יותר למוצרים רבים
+    limit: 100, // Higher number for many products
   });
 
   const createProductMutation = useCreateProduct();
@@ -260,55 +287,55 @@ const ProductsPage: React.FC = () => {
   const { data: categories = [] } = useProductCategories();
   const { data: manufacturers = [] } = useProductManufacturers();
 
-  // הגדרת הפילטרים הזמינים
+  // Define available filters
   const availableFilters: FilterOption[] = [
     {
-      id: 'category',
-      label: t('products.filter.category'),
-      type: 'select',
+      id: "category",
+      label: t("products.filter.category"),
+      type: "select",
       options: categories.map((cat: string) => ({ value: cat, label: cat })),
     },
     {
-      id: 'manufacturer',
-      label: t('products.manufacturer'),
-      type: 'select',
+      id: "manufacturer",
+      label: t("products.manufacturer"),
+      type: "select",
       options: manufacturers.map((mfr: string) => ({ value: mfr, label: mfr })),
     },
     {
-      id: 'availability',
-      label: t('products.filter.availability'),
-      type: 'select',
+      id: "availability",
+      label: t("products.filter.availability"),
+      type: "select",
       options: [
-        { value: 'available', label: t('products.filter.hasAvailable') },
-        { value: 'unavailable', label: t('products.filter.unavailable') },
+        { value: "available", label: t("products.filter.hasAvailable") },
+        { value: "unavailable", label: t("products.filter.unavailable") },
       ],
     },
     {
-      id: 'condition',
-      label: t('products.condition'),
-      type: 'select',
+      id: "condition",
+      label: t("products.condition"),
+      type: "select",
       options: [
-        { value: 'excellent', label: t('products.conditions.excellent') },
-        { value: 'good', label: t('products.conditions.good') },
-        { value: 'fair', label: t('products.conditions.fair') },
-        { value: 'poor', label: t('products.conditions.poor') },
+        { value: "excellent", label: t("products.conditions.excellent") },
+        { value: "good", label: t("products.conditions.good") },
+        { value: "fair", label: t("products.conditions.fair") },
+        { value: "poor", label: t("products.conditions.poor") },
       ],
     },
   ];
 
-  // פונקציות לניהול פילטרים
+  // Functions for managing filters
   const handleFilterAdd = (filterId: string, value: any) => {
-    const filterDef = availableFilters.find(f => f.id === filterId);
+    const filterDef = availableFilters.find((f) => f.id === filterId);
     if (!filterDef) return;
 
     let displayValue = value;
-    if (filterDef.type === 'select' && filterDef.options) {
-      const option = filterDef.options.find(o => o.value === value);
+    if (filterDef.type === "select" && filterDef.options) {
+      const option = filterDef.options.find((o) => o.value === value);
       displayValue = option?.label || value;
     }
 
-    setActiveFilters(prev => [
-      ...prev.filter(f => f.id !== filterId),
+    setActiveFilters((prev) => [
+      ...prev.filter((f) => f.id !== filterId),
       {
         id: filterId,
         value,
@@ -320,18 +347,18 @@ const ProductsPage: React.FC = () => {
   };
 
   const handleFilterRemove = (filterId: string) => {
-    setActiveFilters(prev => prev.filter(f => f.id !== filterId));
+    setActiveFilters((prev) => prev.filter((f) => f.id !== filterId));
     setPage(1);
   };
 
   const handleClearAll = () => {
-    setSearch('');
+    setSearch("");
     setActiveFilters([]);
     setPage(1);
   };
 
   // Debug logging
-  console.log('📦 Products Page Debug:', {
+  console.log("📦 Products Page Debug:", {
     productsData,
     productInstances,
     isLoading,
@@ -342,15 +369,15 @@ const ProductsPage: React.FC = () => {
   });
 
   const getStatusColor = (availableCount: number, totalCount: number) => {
-    if (availableCount === 0) return 'error';
-    if (availableCount <= totalCount * 0.2) return 'warning';
-    return 'success';
+    if (availableCount === 0) return "error";
+    if (availableCount <= totalCount * 0.2) return "warning";
+    return "success";
   };
 
   const getStatusText = (availableCount: number, totalCount: number) => {
-    if (availableCount === 0) return 'אזל מהמלאי';
-    if (availableCount <= totalCount * 0.2) return 'מלאי נמוך';
-    return 'זמין';
+    if (availableCount === 0) return "אזל מהמלאי";
+    if (availableCount <= totalCount * 0.2) return "מלאי נמוך";
+    return "זמין";
   };
 
   const handleAddProduct = () => {
@@ -360,49 +387,53 @@ const ProductsPage: React.FC = () => {
   const handleCloseAddDialog = () => {
     setIsAddDialogOpen(false);
     setNewProduct({
-      name: '',
-      description: '',
-      category: '',
-      manufacturer: '',
-      model: '',
+      name: "",
+      description: "",
+      category: "",
+      manufacturer: "",
+      model: "",
     });
-    setCustomCategory('');
-    setCustomManufacturer('');
+    setCustomCategory("");
+    setCustomManufacturer("");
     setShowCustomCategory(false);
     setShowCustomManufacturer(false);
   };
 
   const handleSaveProduct = async () => {
-    console.log('🔄 Starting product save process...');
-    console.log('📋 Current product state:', newProduct);
-    console.log('🚀 Mutation status:', {
+    console.log("🔄 Starting product save process...");
+    console.log("📋 Current product state:", newProduct);
+    console.log("🚀 Mutation status:", {
       isPending: createProductMutation.isPending,
       isError: createProductMutation.isError,
       error: createProductMutation.error,
     });
 
     try {
-      // ניקוי הדאטה - הסרת שדות ריקים
+      // Clean the data - remove empty fields
       const cleanedProduct: CreateProductDto = {
         name: newProduct.name.trim(),
         category: newProduct.category.trim(),
-        ...(newProduct.description?.trim() && { description: newProduct.description.trim() }),
-        ...(newProduct.manufacturer?.trim() && { manufacturer: newProduct.manufacturer.trim() }),
+        ...(newProduct.description?.trim() && {
+          description: newProduct.description.trim(),
+        }),
+        ...(newProduct.manufacturer?.trim() && {
+          manufacturer: newProduct.manufacturer.trim(),
+        }),
         ...(newProduct.model?.trim() && { model: newProduct.model.trim() }),
       };
 
-      console.log('📤 Sending product data:', cleanedProduct);
+      console.log("📤 Sending product data:", cleanedProduct);
 
       const result = await createProductMutation.mutateAsync(cleanedProduct);
-      console.log('✅ Product created successfully:', result);
+      console.log("✅ Product created successfully:", result);
 
       handleCloseAddDialog();
     } catch (error) {
-      console.error('❌ Error creating product:', error);
+      console.error("❌ Error creating product:", error);
 
-      // הצגת פרטי השגיאה
-      if (error && typeof error === 'object') {
-        console.error('Error details:', {
+      // Display error details
+      if (error && typeof error === "object") {
+        console.error("Error details:", {
           message: (error as any)?.message,
           response: (error as any)?.response?.data,
           status: (error as any)?.response?.status,
@@ -410,42 +441,45 @@ const ProductsPage: React.FC = () => {
         });
       }
 
-      // לא סוגרים את הדיאלוג במקרה של שגיאה
+      // Don't close the dialog in case of error
       // handleCloseAddDialog();
     }
   };
 
-  const handleProductFieldChange = (field: keyof CreateProductDto, value: string) => {
-    console.log('🔄 Product field change:', { field, value });
-    setNewProduct(prev => {
+  const handleProductFieldChange = (
+    field: keyof CreateProductDto,
+    value: string
+  ) => {
+    console.log("🔄 Product field change:", { field, value });
+    setNewProduct((prev) => {
       const updated = { ...prev, [field]: value };
-      console.log('📦 Updated product:', updated);
+      console.log("📦 Updated product:", updated);
       return updated;
     });
   };
 
-  // פונקציה לטיפול בלחיצה על מוצר - מציגה את המופעים שלו
+  // Function to handle clicking on a product - displays its instances
   const handleProductClick = (product: any) => {
-    console.log('🖱️ Product clicked:', product);
+    console.log("🖱️ Product clicked:", product);
     setSelectedProduct(product);
     setIsViewingInstances(true);
   };
 
-  // פונקציה לחזרה לתצוגת המוצרים
+  // Function to return to products view
   const handleBackToProducts = () => {
     setSelectedProduct(null);
     setIsViewingInstances(false);
   };
 
-  // פונקציות עריכת מוצרים
+  // Product edit functions
   const handleEditProduct = (product: any) => {
     setEditingProduct(product);
     setEditProduct({
-      name: product.name || '',
-      description: product.description || '',
-      category: product.category || '',
-      manufacturer: product.manufacturer || '',
-      model: product.model || '',
+      name: product.name || "",
+      description: product.description || "",
+      category: product.category || "",
+      manufacturer: product.manufacturer || "",
+      model: product.model || "",
     });
     setIsEditProductDialogOpen(true);
   };
@@ -461,7 +495,7 @@ const ProductsPage: React.FC = () => {
       setIsEditProductDialogOpen(false);
       setEditingProduct(null);
     } catch (error) {
-      console.error('Failed to update product:', error);
+      console.error("Failed to update product:", error);
     }
   };
 
@@ -469,174 +503,188 @@ const ProductsPage: React.FC = () => {
     setIsEditProductDialogOpen(false);
     setEditingProduct(null);
     setEditProduct({
-      name: '',
-      description: '',
-      category: '',
-      manufacturer: '',
-      model: '',
+      name: "",
+      description: "",
+      category: "",
+      manufacturer: "",
+      model: "",
     });
-    setCustomCategory('');
-    setCustomManufacturer('');
+    setCustomCategory("");
+    setCustomManufacturer("");
     setShowCustomCategory(false);
     setShowCustomManufacturer(false);
   };
 
-  // פונקציות עריכת מופעים
+  // Instance edit functions
   const handleEditInstance = (instance: any) => {
     setEditingInstance(instance);
     setEditInstance({
-      barcode: instance.barcode || '',
-      serialNumber: instance.serialNumber || '',
-      condition: instance.condition || '',
-      location: instance.location || '',
-      notes: instance.notes || '',
+      barcode: instance.barcode || "",
+      serialNumber: instance.serialNumber || "",
+      condition: instance.condition || "",
+      location: instance.location || "",
+      notes: instance.notes || "",
     });
     setIsEditInstanceDialogOpen(true);
   };
 
-  // פונקציה ליצירת ברקוד אוטומטי
+  // Function to generate automatic barcode
   const generateBarcode = () => {
-    if (!selectedProduct) return '';
+    if (!selectedProduct) return "";
 
-    // יצירת קיצור משם המוצר
+    // Create abbreviation from product name
     const productName = selectedProduct.name;
-    let prefix = '';
+    let prefix = "";
 
-    // קיצורים לפי קטגוריה
-    const category = selectedProduct.category?.toLowerCase() || '';
-    if (category.includes('כסא') || category.includes('גלגל')) {
-      prefix = 'WC';
-    } else if (category.includes('הליכ') || category.includes('הליכון')) {
-      prefix = 'WAL';
-    } else if (category.includes('מיט') || category.includes('מטה')) {
-      prefix = 'BED';
-    } else if (category.includes('שמיע')) {
-      prefix = 'HA';
-    } else if (category.includes('ראי')) {
-      prefix = 'VA';
-    } else if (category.includes('רחצ')) {
-      prefix = 'BA';
+    // Abbreviations by category
+    const category = selectedProduct.category?.toLowerCase() || "";
+    if (category.includes("כסא") || category.includes("גלגל")) {
+      prefix = "WC";
+    } else if (category.includes("הליכ") || category.includes("הליכון")) {
+      prefix = "WAL";
+    } else if (category.includes("מיט") || category.includes("מטה")) {
+      prefix = "BED";
+    } else if (category.includes("שמיע")) {
+      prefix = "HA";
+    } else if (category.includes("ראי")) {
+      prefix = "VA";
+    } else if (category.includes("רחצ")) {
+      prefix = "BA";
     } else {
-      // אם לא מצאנו קטגוריה, נשתמש באותיות הראשונות של השם
-      const words = productName.split(' ').filter((word: string) => word.length > 0);
+      // If no category found, use first letters of name
+      const words = productName
+        .split(" ")
+        .filter((word: string) => word.length > 0);
       if (words.length >= 2) {
         prefix = (words[0][0] + words[1][0]).toUpperCase();
       } else if (words.length === 1) {
         prefix = words[0].substring(0, 2).toUpperCase();
       } else {
-        prefix = 'ITEM';
+        prefix = "ITEM";
       }
     }
 
-    // חישוב המספר הרץ על בסיס מופעים קיימים
+    // Calculate running number based on existing instances
     const existingInstances =
-      productInstances?.filter(inst => inst.productId === selectedProduct.id) || [];
-    const nextNumber = String(existingInstances.length + 1).padStart(3, '0');
+      productInstances?.filter(
+        (inst) => inst.productId === selectedProduct.id
+      ) || [];
+    const nextNumber = String(existingInstances.length + 1).padStart(3, "0");
 
     return `${prefix}${nextNumber}`;
   };
 
   const handleGenerateBarcode = () => {
     const suggestedBarcode = generateBarcode();
-    setNewInstance(prev => ({ ...prev, barcode: suggestedBarcode }));
+    setNewInstance((prev) => ({ ...prev, barcode: suggestedBarcode }));
   };
 
-  // פונקציות להוספת מופע חדש
+  // Functions for adding new instance
   const handleAddInstance = () => {
-    console.log('🔄 Adding new instance for product:', selectedProduct);
+    console.log("🔄 Adding new instance for product:", selectedProduct);
     if (selectedProduct && selectedProduct.id) {
       const suggestedBarcode = generateBarcode();
       setNewInstance({
         productId: selectedProduct.id,
-        barcode: suggestedBarcode, // ברקוד אוטומטי
-        serialNumber: '',
-        condition: 'excellent',
-        location: '',
-        notes: '',
+        barcode: suggestedBarcode, // Automatic barcode
+        serialNumber: "",
+        condition: "excellent",
+        location: "",
+        notes: "",
       });
       console.log(
-        '📋 New instance initialized with productId:',
+        "📋 New instance initialized with productId:",
         selectedProduct.id,
-        'and barcode:',
+        "and barcode:",
         suggestedBarcode
       );
       setIsAddInstanceDialogOpen(true);
     } else {
-      console.error('❌ Error: selectedProduct or selectedProduct.id is missing');
-      alert('שגיאה: לא נמצא מוצר נבחר');
+      console.error(
+        "❌ Error: selectedProduct or selectedProduct.id is missing"
+      );
+      alert("שגיאה: לא נמצא מוצר נבחר");
     }
   };
 
   const handleCloseAddInstance = () => {
     setIsAddInstanceDialogOpen(false);
     setNewInstance({
-      productId: '',
-      barcode: '',
-      serialNumber: '',
-      condition: 'excellent',
-      location: '',
-      notes: '',
+      productId: "",
+      barcode: "",
+      serialNumber: "",
+      condition: "excellent",
+      location: "",
+      notes: "",
     });
   };
 
   const handleSaveInstance = async () => {
-    console.log('🔄 Starting instance save process...');
-    console.log('📋 Current instance state:', newInstance);
+    console.log("🔄 Starting instance save process...");
+    console.log("📋 Current instance state:", newInstance);
 
-    // ולידציה שה-productId קיים
+    // Validate that productId exists
     if (!newInstance.productId) {
-      console.error('❌ Error: productId is missing');
-      alert('שגיאה: לא נמצא מזהה מוצר');
+      console.error("❌ Error: productId is missing");
+      alert("שגיאה: לא נמצא מזהה מוצר");
       return;
     }
 
-    // ולידציה שברקוד קיים (שדה חובה)
-    if (!newInstance.barcode || newInstance.barcode.trim() === '') {
-      console.error('❌ Error: barcode is required');
-      alert('שגיאה: ברקוד הוא שדה חובה');
+    // Validate that barcode exists (required field)
+    if (!newInstance.barcode || newInstance.barcode.trim() === "") {
+      console.error("❌ Error: barcode is required");
+      alert("שגיאה: ברקוד הוא שדה חובה");
       return;
     }
 
-    // ניקוי והכנת הדאטה
+    // Clean and prepare the data
     const cleanedInstanceData = {
       productId: newInstance.productId.trim(),
       barcode: newInstance.barcode.trim(),
-      ...(newInstance.serialNumber?.trim() && { serialNumber: newInstance.serialNumber.trim() }),
-      ...(newInstance.condition?.trim() && { condition: newInstance.condition.trim() }),
-      ...(newInstance.location?.trim() && { location: newInstance.location.trim() }),
+      ...(newInstance.serialNumber?.trim() && {
+        serialNumber: newInstance.serialNumber.trim(),
+      }),
+      ...(newInstance.condition?.trim() && {
+        condition: newInstance.condition.trim(),
+      }),
+      ...(newInstance.location?.trim() && {
+        location: newInstance.location.trim(),
+      }),
       ...(newInstance.notes?.trim() && { notes: newInstance.notes.trim() }),
     };
 
-    console.log('🧹 Cleaned instance data:', cleanedInstanceData);
+    console.log("🧹 Cleaned instance data:", cleanedInstanceData);
 
     try {
-      console.log('📤 Sending instance data:', cleanedInstanceData);
-      const result = await createInstanceMutation.mutateAsync(cleanedInstanceData as any);
-      console.log('✅ Instance created successfully:', result);
+      console.log("📤 Sending instance data:", cleanedInstanceData);
+      const result = await createInstanceMutation.mutateAsync(
+        cleanedInstanceData as any
+      );
+      console.log("✅ Instance created successfully:", result);
       handleCloseAddInstance();
     } catch (error) {
-      console.error('❌ Failed to create instance:', error);
+      console.error("❌ Failed to create instance:", error);
 
-      // הצגת פרטי השגיאה
-      if (error && typeof error === 'object') {
+      // Display error details
+      if (error && typeof error === "object") {
         const errorDetails = {
           message: (error as any)?.message,
           status: (error as any)?.response?.status,
           statusText: (error as any)?.response?.statusText,
           data: (error as any)?.response?.data,
         };
-        console.error('Error details:', errorDetails);
+        console.error("Error details:", errorDetails);
 
-        // הצגת הודעת שגיאה מפורטת
-        let errorMessage = 'שגיאה בהוספת המופע';
+        // Display detailed error message
+        let errorMessage = "שגיאה בהוספת המופע";
         if (errorDetails.data?.message) {
           if (Array.isArray(errorDetails.data.message)) {
-            errorMessage += ':\n• ' + errorDetails.data.message.join('\n• ');
+            errorMessage += ":\n• " + errorDetails.data.message.join("\n• ");
           } else {
-            errorMessage += ': ' + errorDetails.data.message;
+            errorMessage += ": " + errorDetails.data.message;
           }
         } else if (errorDetails.message) {
-          errorMessage += ': ' + errorDetails.message;
+          errorMessage += ": " + errorDetails.message;
         }
 
         alert(errorMessage);
@@ -644,17 +692,19 @@ const ProductsPage: React.FC = () => {
     }
   };
 
-  // פונקציה למחיקת מופע
+  // Function to delete instance
   const handleDeleteInstance = async (instance: any) => {
     if (
       window.confirm(
-        `האם אתה בטוח שברצונך למחוק את המופע ${instance.barcode || instance.id.slice(-4)}?`
+        `האם אתה בטוח שברצונך למחוק את המופע ${
+          instance.barcode || instance.id.slice(-4)
+        }?`
       )
     ) {
       try {
         await deleteInstanceMutation.mutateAsync(instance.id);
       } catch (error) {
-        console.error('Failed to delete instance:', error);
+        console.error("Failed to delete instance:", error);
       }
     }
   };
@@ -670,7 +720,7 @@ const ProductsPage: React.FC = () => {
       setIsEditInstanceDialogOpen(false);
       setEditingInstance(null);
     } catch (error) {
-      console.error('Failed to update instance:', error);
+      console.error("Failed to update instance:", error);
     }
   };
 
@@ -678,11 +728,11 @@ const ProductsPage: React.FC = () => {
     setIsEditInstanceDialogOpen(false);
     setEditingInstance(null);
     setEditInstance({
-      barcode: '',
-      serialNumber: '',
-      condition: '',
-      location: '',
-      notes: '',
+      barcode: "",
+      serialNumber: "",
+      condition: "",
+      location: "",
+      notes: "",
     });
   };
 
@@ -690,7 +740,7 @@ const ProductsPage: React.FC = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">
-          {t('products.loadError')} {error.message}
+          {t("products.loadError")} {error.message}
         </Alert>
       </Box>
     );
@@ -698,9 +748,9 @@ const ProductsPage: React.FC = () => {
 
   let products = (productsData as any)?.products || [];
 
-  // יצירת מפה של מופעי מוצרים לפי מוצר (לפני הפילטור)
+  // Create map of product instances by product (before filtering)
   const productInstancesMap = new Map();
-  productInstances?.forEach(instance => {
+  productInstances?.forEach((instance) => {
     if (!productInstancesMap.has(instance.productId)) {
       productInstancesMap.set(instance.productId, { total: 0, available: 0 });
     }
@@ -709,7 +759,7 @@ const ProductsPage: React.FC = () => {
     if (instance.isAvailable) counts.available += 1;
   });
 
-  // סינון המוצרים לפי חיפוש ופילטרים
+  // Filter products by search and filters
   if (search) {
     const searchLower = search.toLowerCase();
     products = products.filter(
@@ -722,45 +772,58 @@ const ProductsPage: React.FC = () => {
     );
   }
 
-  // יישום כל הפילטרים הפעילים
-  activeFilters.forEach(filter => {
-    if (filter.id === 'category') {
-      products = products.filter((product: any) => product.category === filter.value);
-    } else if (filter.id === 'manufacturer') {
-      products = products.filter((product: any) => product.manufacturer === filter.value);
-    } else if (filter.id === 'availability') {
-      // נצטרך לבדוק את מספר המופעים הזמינים
+  // Apply all active filters
+  activeFilters.forEach((filter) => {
+    if (filter.id === "category") {
+      products = products.filter(
+        (product: any) => product.category === filter.value
+      );
+    } else if (filter.id === "manufacturer") {
+      products = products.filter(
+        (product: any) => product.manufacturer === filter.value
+      );
+    } else if (filter.id === "availability") {
+      // Need to check the number of available instances
       products = products.filter((product: any) => {
-        const instanceCounts = productInstancesMap.get(product.id) || { available: 0 };
-        if (filter.value === 'available') {
+        const instanceCounts = productInstancesMap.get(product.id) || {
+          available: 0,
+        };
+        if (filter.value === "available") {
           return instanceCounts.available > 0;
         } else {
           return instanceCounts.available === 0;
         }
       });
-    } else if (filter.id === 'condition') {
-      // נצטרך לבדוק אם יש מופעים במצב מסוים
+    } else if (filter.id === "condition") {
+      // Need to check if there are instances in certain condition
       products = products.filter((product: any) => {
-        const instances = productInstances?.filter(inst => inst.productId === product.id) || [];
+        const instances =
+          productInstances?.filter((inst) => inst.productId === product.id) ||
+          [];
         return instances.some((inst: any) => inst.condition === filter.value);
       });
     }
   });
 
-  // אם נבחר מוצר, מציגים את המופעים שלו
+  // If product selected, display its instances
   if (isViewingInstances && selectedProduct) {
     return (
       <>
         <Box sx={{ p: 3 }}>
           <Box
-            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+            }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
               <IconButton onClick={handleBackToProducts} sx={{ mr: 2 }}>
                 <ArrowBackIcon />
               </IconButton>
               <Typography variant="h4" component="h1" fontWeight="bold">
-                {t('products.instancesTitle')} - {selectedProduct.name}
+                {t("products.instancesTitle")} - {selectedProduct.name}
               </Typography>
             </Box>
             <Button
@@ -769,15 +832,17 @@ const ProductsPage: React.FC = () => {
               onClick={handleAddInstance}
               size="large"
             >
-              {t('products.addInstance')}
+              {t("products.addInstance")}
             </Button>
           </Box>
 
-          {/* כאן נוסיף את תצוגת המופעים */}
+          {/* Here we will add the instances display */}
           <ProductInstancesView
             product={selectedProduct}
             instances={
-              productInstances?.filter(inst => inst.productId === selectedProduct.id) || []
+              productInstances?.filter(
+                (inst) => inst.productId === selectedProduct.id
+              ) || []
             }
             onEditInstance={handleEditInstance}
             onDeleteInstance={handleDeleteInstance}
@@ -792,12 +857,12 @@ const ProductsPage: React.FC = () => {
           fullWidth
         >
           <DialogTitle>
-            {t('products.addInstance')}
+            {t("products.addInstance")}
             <IconButton
               aria-label="close"
               onClick={handleCloseAddInstance}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 right: 8,
                 top: 8,
                 color: COLORS.icon.secondary,
@@ -813,9 +878,14 @@ const ProductsPage: React.FC = () => {
                 <TextField
                   fullWidth
                   required
-                  label={t('products.barcode')}
+                  label={t("products.barcode")}
                   value={newInstance.barcode}
-                  onChange={e => setNewInstance(prev => ({ ...prev, barcode: e.target.value }))}
+                  onChange={(e) =>
+                    setNewInstance((prev) => ({
+                      ...prev,
+                      barcode: e.target.value,
+                    }))
+                  }
                   helperText="שדה חובה - ברקוד ייחודי למופע"
                   InputProps={{
                     endAdornment: (
@@ -834,27 +904,43 @@ const ProductsPage: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t('products.serial_number')}
+                  label={t("products.serial_number")}
                   value={newInstance.serialNumber}
-                  onChange={e =>
-                    setNewInstance(prev => ({ ...prev, serialNumber: e.target.value }))
+                  onChange={(e) =>
+                    setNewInstance((prev) => ({
+                      ...prev,
+                      serialNumber: e.target.value,
+                    }))
                   }
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
-                  <InputLabel>{t('products.condition')}</InputLabel>
+                  <InputLabel>{t("products.condition")}</InputLabel>
                   <Select
                     value={newInstance.condition}
-                    onChange={e => setNewInstance(prev => ({ ...prev, condition: e.target.value }))}
-                    label={t('products.condition')}
+                    onChange={(e) =>
+                      setNewInstance((prev) => ({
+                        ...prev,
+                        condition: e.target.value,
+                      }))
+                    }
+                    label={t("products.condition")}
                   >
-                    <MenuItem value="excellent">{t('products.conditions.excellent')}</MenuItem>
-                    <MenuItem value="good">{t('products.conditions.good')}</MenuItem>
-                    <MenuItem value="fair">{t('products.conditions.fair')}</MenuItem>
-                    <MenuItem value="poor">{t('products.conditions.poor')}</MenuItem>
+                    <MenuItem value="excellent">
+                      {t("products.conditions.excellent")}
+                    </MenuItem>
+                    <MenuItem value="good">
+                      {t("products.conditions.good")}
+                    </MenuItem>
+                    <MenuItem value="fair">
+                      {t("products.conditions.fair")}
+                    </MenuItem>
+                    <MenuItem value="poor">
+                      {t("products.conditions.poor")}
+                    </MenuItem>
                     <MenuItem value="needs-repair">
-                      {t('products.conditions.needs_repair')}
+                      {t("products.conditions.needs_repair")}
                     </MenuItem>
                   </Select>
                 </FormControl>
@@ -862,17 +948,27 @@ const ProductsPage: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t('products.location')}
+                  label={t("products.location")}
                   value={newInstance.location}
-                  onChange={e => setNewInstance(prev => ({ ...prev, location: e.target.value }))}
+                  onChange={(e) =>
+                    setNewInstance((prev) => ({
+                      ...prev,
+                      location: e.target.value,
+                    }))
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label={t('products.notes')}
+                  label={t("products.notes")}
                   value={newInstance.notes}
-                  onChange={e => setNewInstance(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) =>
+                    setNewInstance((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                   multiline
                   rows={3}
                 />
@@ -881,13 +977,21 @@ const ProductsPage: React.FC = () => {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleCloseAddInstance}>{t('common.cancel')}</Button>
+            <Button onClick={handleCloseAddInstance}>
+              {t("common.cancel")}
+            </Button>
             <Button
               onClick={handleSaveInstance}
               variant="contained"
-              disabled={createInstanceMutation.isPending || !newInstance.barcode?.trim()}
+              disabled={
+                createInstanceMutation.isPending || !newInstance.barcode?.trim()
+              }
             >
-              {createInstanceMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+              {createInstanceMutation.isPending ? (
+                <CircularProgress size={20} />
+              ) : (
+                t("common.save")
+              )}
             </Button>
           </DialogActions>
         </Dialog>
@@ -900,12 +1004,12 @@ const ProductsPage: React.FC = () => {
           fullWidth
         >
           <DialogTitle>
-            {t('editInstance')}
+            {t("editInstance")}
             <IconButton
               aria-label="close"
               onClick={handleCloseEditInstance}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 right: 8,
                 top: 8,
                 color: COLORS.icon.secondary,
@@ -920,37 +1024,56 @@ const ProductsPage: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t('products.barcode')}
+                  label={t("products.barcode")}
                   value={editInstance.barcode}
-                  onChange={e => setEditInstance(prev => ({ ...prev, barcode: e.target.value }))}
+                  onChange={(e) =>
+                    setEditInstance((prev) => ({
+                      ...prev,
+                      barcode: e.target.value,
+                    }))
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t('products.serial_number')}
+                  label={t("products.serial_number")}
                   value={editInstance.serialNumber}
-                  onChange={e =>
-                    setEditInstance(prev => ({ ...prev, serialNumber: e.target.value }))
+                  onChange={(e) =>
+                    setEditInstance((prev) => ({
+                      ...prev,
+                      serialNumber: e.target.value,
+                    }))
                   }
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
-                  <InputLabel>{t('products.condition')}</InputLabel>
+                  <InputLabel>{t("products.condition")}</InputLabel>
                   <Select
                     value={editInstance.condition}
-                    onChange={e =>
-                      setEditInstance(prev => ({ ...prev, condition: e.target.value }))
+                    onChange={(e) =>
+                      setEditInstance((prev) => ({
+                        ...prev,
+                        condition: e.target.value,
+                      }))
                     }
-                    label={t('products.condition')}
+                    label={t("products.condition")}
                   >
-                    <MenuItem value="excellent">{t('products.conditions.excellent')}</MenuItem>
-                    <MenuItem value="good">{t('products.conditions.good')}</MenuItem>
-                    <MenuItem value="fair">{t('products.conditions.fair')}</MenuItem>
-                    <MenuItem value="poor">{t('products.conditions.poor')}</MenuItem>
+                    <MenuItem value="excellent">
+                      {t("products.conditions.excellent")}
+                    </MenuItem>
+                    <MenuItem value="good">
+                      {t("products.conditions.good")}
+                    </MenuItem>
+                    <MenuItem value="fair">
+                      {t("products.conditions.fair")}
+                    </MenuItem>
+                    <MenuItem value="poor">
+                      {t("products.conditions.poor")}
+                    </MenuItem>
                     <MenuItem value="needs-repair">
-                      {t('products.conditions.needs_repair')}
+                      {t("products.conditions.needs_repair")}
                     </MenuItem>
                   </Select>
                 </FormControl>
@@ -958,17 +1081,27 @@ const ProductsPage: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t('products.location')}
+                  label={t("products.location")}
                   value={editInstance.location}
-                  onChange={e => setEditInstance(prev => ({ ...prev, location: e.target.value }))}
+                  onChange={(e) =>
+                    setEditInstance((prev) => ({
+                      ...prev,
+                      location: e.target.value,
+                    }))
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label={t('products.notes')}
+                  label={t("products.notes")}
                   value={editInstance.notes}
-                  onChange={e => setEditInstance(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) =>
+                    setEditInstance((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                   multiline
                   rows={3}
                 />
@@ -977,13 +1110,19 @@ const ProductsPage: React.FC = () => {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleCloseEditInstance}>{t('common.cancel')}</Button>
+            <Button onClick={handleCloseEditInstance}>
+              {t("common.cancel")}
+            </Button>
             <Button
               onClick={handleSaveEditedInstance}
               variant="contained"
               disabled={updateInstanceMutation.isPending}
             >
-              {updateInstanceMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+              {updateInstanceMutation.isPending ? (
+                <CircularProgress size={20} />
+              ) : (
+                t("common.save")
+              )}
             </Button>
           </DialogActions>
         </Dialog>
@@ -991,69 +1130,83 @@ const ProductsPage: React.FC = () => {
     );
   }
 
-  // התצוגה הרגילה של רשימת המוצרים
+  // Regular products list view
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Typography variant="h4" component="h1" fontWeight="bold">
-          {t('products.title')}
+          {t("products.title")}
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />} size="large" onClick={handleAddProduct}>
-          {t('products.addProduct')}
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          size="large"
+          onClick={handleAddProduct}
+        >
+          {t("products.addProduct")}
         </Button>
       </Box>
 
       {/* Debug Panel */}
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          {t('products.debug', {
+          {t("products.debug", {
             loading: isLoading,
-            error: error ? (error as any).message || t('common.error') : t('common.no'),
+            error: error
+              ? (error as any).message || t("common.error")
+              : t("common.no"),
             count: products.length,
             instances: productInstances?.length || 0,
           })}
         </Typography>
       </Alert>
 
-      {/* סטטיסטיקות מהירות */}
+      {/* Quick statistics */}
       <StatsGrid
         stats={[
           {
             icon: <InventoryIcon />,
             value: (productsData as any)?.total || 0,
-            label: t('products.stats.totalProducts'),
-            gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            label: t("products.stats.totalProducts"),
+            gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
           },
           {
             icon: <QrCodeIcon />,
             value: productInstances?.length || 0,
-            label: t('products.stats.productInstances'),
-            gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            label: t("products.stats.productInstances"),
+            gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
           },
           {
             icon: <VisibilityIcon />,
-            value: productInstances?.filter(i => i.isAvailable).length || 0,
-            label: t('products.available'),
-            gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            value: productInstances?.filter((i) => i.isAvailable).length || 0,
+            label: t("products.available"),
+            gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
           },
           {
             icon: <InventoryIcon />,
-            value: productInstances?.filter(i => !i.isAvailable).length || 0,
-            label: t('products.borrowed'),
-            gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            value: productInstances?.filter((i) => !i.isAvailable).length || 0,
+            label: t("products.borrowed"),
+            gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
           },
         ]}
       />
 
-      {/* קומפוננטת חיפוש ופילטר */}
+      {/* Search and filter component */}
       <SearchAndFilter
         searchValue={search}
-        onSearchChange={value => {
+        onSearchChange={(value) => {
           setSearch(value);
           setPage(1);
         }}
-        searchPlaceholder={t('products.searchPlaceholder')}
+        searchPlaceholder={t("products.searchPlaceholder")}
         availableFilters={availableFilters}
         activeFilters={activeFilters}
         onFilterAdd={handleFilterAdd}
@@ -1062,17 +1215,17 @@ const ProductsPage: React.FC = () => {
         disabled={isLoading}
       />
 
-      {/* טבלת מוצרים / כרטיסיות למובייל */}
+      {/* Products table / mobile cards */}
       {isMobile ? (
-        // תצוגת כרטיסיות למובייל
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        // Mobile card view
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {isLoading ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Box sx={{ textAlign: "center", py: 4 }}>
               <CircularProgress />
             </Box>
           ) : products.length === 0 ? (
-            <Paper sx={{ p: 3, textAlign: 'center' }}>
-              <Typography>{t('products.noProducts')}</Typography>
+            <Paper sx={{ p: 3, textAlign: "center" }}>
+              <Typography>{t("products.noProducts")}</Typography>
             </Paper>
           ) : (
             products.map((product: any) => {
@@ -1084,18 +1237,21 @@ const ProductsPage: React.FC = () => {
                 <Card
                   key={product.id}
                   sx={{
-                    cursor: 'pointer',
-                    '&:hover': { boxShadow: 4, backgroundColor: COLORS.action.hover },
-                    transition: 'all 0.2s ease-in-out',
+                    cursor: "pointer",
+                    "&:hover": {
+                      boxShadow: 4,
+                      backgroundColor: COLORS.action.hover,
+                    },
+                    transition: "all 0.2s ease-in-out",
                   }}
                   onClick={() => handleProductClick(product)}
                 >
                   <CardContent>
                     <Box
                       sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
                         mb: 2,
                       }}
                     >
@@ -1103,53 +1259,74 @@ const ProductsPage: React.FC = () => {
                         {product.name}
                       </Typography>
                       <Chip
-                        label={getStatusText(instanceCounts.available, instanceCounts.total)}
-                        color={getStatusColor(instanceCounts.available, instanceCounts.total)}
+                        label={getStatusText(
+                          instanceCounts.available,
+                          instanceCounts.total
+                        )}
+                        color={getStatusColor(
+                          instanceCounts.available,
+                          instanceCounts.total
+                        )}
                         size="small"
                       />
                     </Box>
 
                     {product.description && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 1 }}
+                      >
                         {product.description}
                       </Typography>
                     )}
 
                     <Typography variant="body2" sx={{ mb: 1 }}>
-                      <strong>{t('products.category')}:</strong>{' '}
-                      <Chip label={product.category} size="small" variant="outlined" />
+                      <strong>{t("products.category")}:</strong>{" "}
+                      <Chip
+                        label={product.category}
+                        size="small"
+                        variant="outlined"
+                      />
                     </Typography>
 
                     <Grid container spacing={2} sx={{ mt: 1 }}>
                       <Grid item xs={6}>
                         <Typography variant="body2" color="text.secondary">
-                          <strong>{t('products.total_instances')}:</strong> {instanceCounts.total}
+                          <strong>{t("products.total_instances")}:</strong>{" "}
+                          {instanceCounts.total}
                         </Typography>
                       </Grid>
                       <Grid item xs={6}>
                         <Typography variant="body2" color="success.main">
-                          <strong>{t('products.available')}:</strong> {instanceCounts.available}
+                          <strong>{t("products.available")}:</strong>{" "}
+                          {instanceCounts.available}
                         </Typography>
                       </Grid>
                     </Grid>
 
                     {product.manufacturer && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        <strong>{t('products.manufacturer')}:</strong> {product.manufacturer}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 1 }}
+                      >
+                        <strong>{t("products.manufacturer")}:</strong>{" "}
+                        {product.manufacturer}
                       </Typography>
                     )}
                   </CardContent>
 
-                  <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
+                  <CardActions sx={{ justifyContent: "flex-end", pt: 0 }}>
                     <Button
                       size="small"
                       startIcon={<EditIcon />}
-                      onClick={e => {
+                      onClick={(e) => {
                         e.stopPropagation();
                         handleEditProduct(product);
                       }}
                     >
-                      {t('common.edit')}
+                      {t("common.edit")}
                     </Button>
                   </CardActions>
                 </Card>
@@ -1158,25 +1335,31 @@ const ProductsPage: React.FC = () => {
           )}
         </Box>
       ) : (
-        // תצוגת טבלה לדסקטופ
+        // Desktop table view
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>{t('products.productName')}</TableCell>
-                <TableCell>{t('products.category')}</TableCell>
-                <TableCell>{t('products.manufacturer')}</TableCell>
-                <TableCell align="center">{t('products.total_instances')}</TableCell>
-                <TableCell align="center">{t('products.available_instances')}</TableCell>
-                <TableCell align="center">{t('common.status')}</TableCell>
-                <TableCell align="center">{t('common.actions')}</TableCell>
+                <TableCell>{t("products.productName")}</TableCell>
+                <TableCell>{t("products.category")}</TableCell>
+                <TableCell>{t("products.manufacturer")}</TableCell>
+                <TableCell align="center">
+                  {t("products.total_instances")}
+                </TableCell>
+                <TableCell align="center">
+                  {t("products.available_instances")}
+                </TableCell>
+                <TableCell align="center">{t("common.status")}</TableCell>
+                <TableCell align="center">{t("common.actions")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={7} align="center">
-                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", p: 3 }}
+                    >
                       <CircularProgress />
                     </Box>
                   </TableCell>
@@ -1185,13 +1368,15 @@ const ProductsPage: React.FC = () => {
                 <TableRow>
                   <TableCell colSpan={7} align="center">
                     <Typography variant="body2" color="text.secondary">
-                      {t('products.noProducts')}
+                      {t("products.noProducts")}
                     </Typography>
                   </TableCell>
                 </TableRow>
               ) : (
                 products.map((product: any) => {
-                  const instanceCounts = productInstancesMap.get(product.id) || {
+                  const instanceCounts = productInstancesMap.get(
+                    product.id
+                  ) || {
                     total: 0,
                     available: 0,
                   };
@@ -1199,8 +1384,8 @@ const ProductsPage: React.FC = () => {
                     <TableRow
                       key={product.id}
                       sx={{
-                        cursor: 'pointer',
-                        '&:hover': { backgroundColor: COLORS.action.hover },
+                        cursor: "pointer",
+                        "&:hover": { backgroundColor: COLORS.action.hover },
                       }}
                       onClick={() => handleProductClick(product)}
                     >
@@ -1209,13 +1394,21 @@ const ProductsPage: React.FC = () => {
                           {product.name}
                         </Typography>
                         {product.description && (
-                          <Typography variant="caption" color="text.secondary" display="block">
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            display="block"
+                          >
                             {product.description}
                           </Typography>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Chip label={product.category} size="small" variant="outlined" />
+                        <Chip
+                          label={product.category}
+                          size="small"
+                          variant="outlined"
+                        />
                       </TableCell>
                       <TableCell>{product.manufacturer}</TableCell>
                       <TableCell align="center">
@@ -1226,7 +1419,11 @@ const ProductsPage: React.FC = () => {
                       <TableCell align="center">
                         <Typography
                           variant="body2"
-                          color={instanceCounts.available > 0 ? 'success.main' : 'error.main'}
+                          color={
+                            instanceCounts.available > 0
+                              ? "success.main"
+                              : "error.main"
+                          }
                           fontWeight="bold"
                         >
                           {instanceCounts.available}
@@ -1234,16 +1431,22 @@ const ProductsPage: React.FC = () => {
                       </TableCell>
                       <TableCell align="center">
                         <Chip
-                          label={getStatusText(instanceCounts.available, instanceCounts.total)}
-                          color={getStatusColor(instanceCounts.available, instanceCounts.total)}
+                          label={getStatusText(
+                            instanceCounts.available,
+                            instanceCounts.total
+                          )}
+                          color={getStatusColor(
+                            instanceCounts.available,
+                            instanceCounts.total
+                          )}
                           size="small"
                         />
                       </TableCell>
                       <TableCell align="center">
                         <IconButton
                           size="small"
-                          title={t('products.view_instances')}
-                          onClick={e => {
+                          title={t("products.view_instances")}
+                          onClick={(e) => {
                             e.stopPropagation();
                             handleProductClick(product);
                           }}
@@ -1252,8 +1455,8 @@ const ProductsPage: React.FC = () => {
                         </IconButton>
                         <IconButton
                           size="small"
-                          title={t('common.edit')}
-                          onClick={e => {
+                          title={t("common.edit")}
+                          onClick={(e) => {
                             e.stopPropagation();
                             handleEditProduct(product);
                           }}
@@ -1270,13 +1473,15 @@ const ProductsPage: React.FC = () => {
         </TableContainer>
       )}
 
-      {/* דף */}
+      {/* Page */}
       {productsData?.pagination && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            {t('products.pagination', {
+            {t("products.pagination", {
               page: productsData.pagination.page,
-              totalPages: Math.ceil(productsData.pagination.total / productsData.pagination.limit),
+              totalPages: Math.ceil(
+                productsData.pagination.total / productsData.pagination.limit
+              ),
               total: productsData.pagination.total,
             })}
           </Typography>
@@ -1284,14 +1489,19 @@ const ProductsPage: React.FC = () => {
       )}
 
       {/* Add Product Dialog */}
-      <Dialog open={isAddDialogOpen} onClose={handleCloseAddDialog} maxWidth="sm" fullWidth>
+      <Dialog
+        open={isAddDialogOpen}
+        onClose={handleCloseAddDialog}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>
-          {t('products.addProduct')}
+          {t("products.addProduct")}
           <IconButton
             aria-label="close"
             onClick={handleCloseAddDialog}
             sx={{
-              position: 'absolute',
+              position: "absolute",
               right: 8,
               top: 8,
               color: COLORS.icon.secondary,
@@ -1306,56 +1516,60 @@ const ProductsPage: React.FC = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label={t('products.productName')}
+                label={t("products.productName")}
                 value={newProduct.name}
-                onChange={e => handleProductFieldChange('name', e.target.value)}
+                onChange={(e) =>
+                  handleProductFieldChange("name", e.target.value)
+                }
                 required
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label={t('products.description')}
+                label={t("products.description")}
                 value={newProduct.description}
-                onChange={e => handleProductFieldChange('description', e.target.value)}
+                onChange={(e) =>
+                  handleProductFieldChange("description", e.target.value)
+                }
                 multiline
                 rows={3}
               />
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>{t('products.category')}</InputLabel>
+                <InputLabel>{t("products.category")}</InputLabel>
                 <Select
-                  value={showCustomCategory ? 'custom' : newProduct.category}
-                  onChange={e => {
-                    if (e.target.value === 'custom') {
+                  value={showCustomCategory ? "custom" : newProduct.category}
+                  onChange={(e) => {
+                    if (e.target.value === "custom") {
                       setShowCustomCategory(true);
-                      handleProductFieldChange('category', customCategory);
+                      handleProductFieldChange("category", customCategory);
                     } else {
                       setShowCustomCategory(false);
-                      handleProductFieldChange('category', e.target.value);
+                      handleProductFieldChange("category", e.target.value);
                     }
                   }}
-                  label={t('products.category')}
+                  label={t("products.category")}
                 >
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <MenuItem key={category} value={category}>
                       {category}
                     </MenuItem>
                   ))}
                   <MenuItem value="custom">
-                    <em>{t('products.categories.add_new')}</em>
+                    <em>{t("products.categories.add_new")}</em>
                   </MenuItem>
                 </Select>
               </FormControl>
               {showCustomCategory && (
                 <TextField
                   fullWidth
-                  label={t('products.categories.new_category')}
+                  label={t("products.categories.new_category")}
                   value={customCategory}
-                  onChange={e => {
+                  onChange={(e) => {
                     setCustomCategory(e.target.value);
-                    handleProductFieldChange('category', e.target.value);
+                    handleProductFieldChange("category", e.target.value);
                   }}
                   sx={{ mt: 2 }}
                 />
@@ -1365,19 +1579,19 @@ const ProductsPage: React.FC = () => {
               {showCustomManufacturer ? (
                 <TextField
                   fullWidth
-                  label={t('products.manufacturer')}
+                  label={t("products.manufacturer")}
                   value={customManufacturer}
-                  onChange={e => {
+                  onChange={(e) => {
                     setCustomManufacturer(e.target.value);
-                    handleProductFieldChange('manufacturer', e.target.value);
+                    handleProductFieldChange("manufacturer", e.target.value);
                   }}
                   InputProps={{
                     endAdornment: (
                       <IconButton
                         onClick={() => {
                           setShowCustomManufacturer(false);
-                          setCustomManufacturer('');
-                          handleProductFieldChange('manufacturer', '');
+                          setCustomManufacturer("");
+                          handleProductFieldChange("manufacturer", "");
                         }}
                         edge="end"
                         size="small"
@@ -1389,25 +1603,28 @@ const ProductsPage: React.FC = () => {
                 />
               ) : (
                 <FormControl fullWidth>
-                  <InputLabel>{t('products.manufacturer')}</InputLabel>
+                  <InputLabel>{t("products.manufacturer")}</InputLabel>
                   <Select
                     value={newProduct.manufacturer}
-                    onChange={e => {
-                      if (e.target.value === 'custom') {
+                    onChange={(e) => {
+                      if (e.target.value === "custom") {
                         setShowCustomManufacturer(true);
                       } else {
-                        handleProductFieldChange('manufacturer', e.target.value);
+                        handleProductFieldChange(
+                          "manufacturer",
+                          e.target.value
+                        );
                       }
                     }}
-                    label={t('products.manufacturer')}
+                    label={t("products.manufacturer")}
                   >
-                    {manufacturers.map(manufacturer => (
+                    {manufacturers.map((manufacturer) => (
                       <MenuItem key={manufacturer} value={manufacturer}>
                         {manufacturer}
                       </MenuItem>
                     ))}
                     <MenuItem value="custom">
-                      <em>{t('products.manufacturers.add_new')}</em>
+                      <em>{t("products.manufacturers.add_new")}</em>
                     </MenuItem>
                   </Select>
                 </FormControl>
@@ -1416,16 +1633,18 @@ const ProductsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label={t('products.model')}
+                label={t("products.model")}
                 value={newProduct.model}
-                onChange={e => handleProductFieldChange('model', e.target.value)}
+                onChange={(e) =>
+                  handleProductFieldChange("model", e.target.value)
+                }
               />
             </Grid>
           </Grid>
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleCloseAddDialog}>{t('common.cancel')}</Button>
+          <Button onClick={handleCloseAddDialog}>{t("common.cancel")}</Button>
           <Button
             onClick={handleSaveProduct}
             variant="contained"
@@ -1435,7 +1654,11 @@ const ProductsPage: React.FC = () => {
               !newProduct.category.trim()
             }
           >
-            {createProductMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+            {createProductMutation.isPending ? (
+              <CircularProgress size={20} />
+            ) : (
+              t("common.save")
+            )}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1448,12 +1671,12 @@ const ProductsPage: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          {t('editProduct')}
+          {t("editProduct")}
           <IconButton
             aria-label="close"
             onClick={handleCloseEditProduct}
             sx={{
-              position: 'absolute',
+              position: "absolute",
               right: 8,
               top: 8,
               color: COLORS.icon.secondary,
@@ -1468,31 +1691,43 @@ const ProductsPage: React.FC = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label={t('products.productName')}
+                label={t("products.productName")}
                 value={editProduct.name}
-                onChange={e => setEditProduct(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setEditProduct((prev) => ({ ...prev, name: e.target.value }))
+                }
                 required
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label={t('products.description')}
+                label={t("products.description")}
                 value={editProduct.description}
-                onChange={e => setEditProduct(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setEditProduct((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 multiline
                 rows={3}
               />
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>{t('products.category')}</InputLabel>
+                <InputLabel>{t("products.category")}</InputLabel>
                 <Select
                   value={editProduct.category}
-                  onChange={e => setEditProduct(prev => ({ ...prev, category: e.target.value }))}
-                  label={t('products.category')}
+                  onChange={(e) =>
+                    setEditProduct((prev) => ({
+                      ...prev,
+                      category: e.target.value,
+                    }))
+                  }
+                  label={t("products.category")}
                 >
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <MenuItem key={category} value={category}>
                       {category}
                     </MenuItem>
@@ -1502,15 +1737,18 @@ const ProductsPage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel>{t('products.manufacturer')}</InputLabel>
+                <InputLabel>{t("products.manufacturer")}</InputLabel>
                 <Select
                   value={editProduct.manufacturer}
-                  onChange={e =>
-                    setEditProduct(prev => ({ ...prev, manufacturer: e.target.value }))
+                  onChange={(e) =>
+                    setEditProduct((prev) => ({
+                      ...prev,
+                      manufacturer: e.target.value,
+                    }))
                   }
-                  label={t('products.manufacturer')}
+                  label={t("products.manufacturer")}
                 >
-                  {manufacturers.map(manufacturer => (
+                  {manufacturers.map((manufacturer) => (
                     <MenuItem key={manufacturer} value={manufacturer}>
                       {manufacturer}
                     </MenuItem>
@@ -1521,16 +1759,18 @@ const ProductsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label={t('products.model')}
+                label={t("products.model")}
                 value={editProduct.model}
-                onChange={e => setEditProduct(prev => ({ ...prev, model: e.target.value }))}
+                onChange={(e) =>
+                  setEditProduct((prev) => ({ ...prev, model: e.target.value }))
+                }
               />
             </Grid>
           </Grid>
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleCloseEditProduct}>{t('common.cancel')}</Button>
+          <Button onClick={handleCloseEditProduct}>{t("common.cancel")}</Button>
           <Button
             onClick={handleSaveEditedProduct}
             variant="contained"
@@ -1540,7 +1780,11 @@ const ProductsPage: React.FC = () => {
               !editProduct.category?.trim()
             }
           >
-            {updateProductMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
+            {updateProductMutation.isPending ? (
+              <CircularProgress size={20} />
+            ) : (
+              t("common.save")
+            )}
           </Button>
         </DialogActions>
       </Dialog>

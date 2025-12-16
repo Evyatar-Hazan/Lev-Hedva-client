@@ -9,16 +9,16 @@ import {
 const VOLUNTEER_ACTIVITIES_QUERY_KEY = ['volunteer-activities'];
 const VOLUNTEER_STATS_QUERY_KEY = ['volunteer-stats'];
 
-// Hook לקבלת רשימת פעילויות התנדבותיות
+// Hook to get list of volunteer activities
 export const useVolunteerActivities = (params?: VolunteerActivitiesQueryDto) => {
   return useQuery({
     queryKey: [...VOLUNTEER_ACTIVITIES_QUERY_KEY, params],
     queryFn: () => VolunteersClient.getActivities(params),
-    staleTime: 5 * 60 * 1000, // 5 דקות
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
-// Hook לקבלת פעילות התנדבותית בודדת
+// Hook to get single volunteer activity
 export const useVolunteerActivity = (id: string) => {
   return useQuery({
     queryKey: [...VOLUNTEER_ACTIVITIES_QUERY_KEY, id],
@@ -27,7 +27,7 @@ export const useVolunteerActivity = (id: string) => {
   });
 };
 
-// Hook ליצירת פעילות התנדבותית חדשה
+// Hook to create new volunteer activity
 export const useCreateVolunteerActivity = () => {
   const queryClient = useQueryClient();
 
@@ -41,7 +41,7 @@ export const useCreateVolunteerActivity = () => {
   });
 };
 
-// Hook לעדכון פעילות התנדבותית
+// Hook to update volunteer activity
 export const useUpdateVolunteerActivity = () => {
   const queryClient = useQueryClient();
 
@@ -58,7 +58,7 @@ export const useUpdateVolunteerActivity = () => {
   });
 };
 
-// Hook למחיקת פעילות התנדבותית
+// Hook to delete volunteer activity
 export const useDeleteVolunteerActivity = () => {
   const queryClient = useQueryClient();
 
@@ -71,16 +71,16 @@ export const useDeleteVolunteerActivity = () => {
   });
 };
 
-// Hook לקבלת סטטיסטיקות כלליות של התנדבות
+// Hook to get general volunteer statistics
 export const useVolunteerStats = () => {
   return useQuery({
     queryKey: [...VOLUNTEER_STATS_QUERY_KEY, 'general'],
     queryFn: () => VolunteersClient.getVolunteerStats(),
-    staleTime: 10 * 60 * 1000, // 10 דקות
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
-// Hook לקבלת סטטיסטיקות של מתנדב מסוים
+// Hook to get statistics for specific volunteer
 export const useVolunteerStatsByUser = (volunteerId: string) => {
   return useQuery({
     queryKey: [...VOLUNTEER_STATS_QUERY_KEY, 'user', volunteerId],
@@ -90,7 +90,7 @@ export const useVolunteerStatsByUser = (volunteerId: string) => {
   });
 };
 
-// Hook לקבלת דוח מתנדב
+// Hook to get volunteer report
 export const useVolunteerReport = (volunteerId: string, dateFrom?: string, dateTo?: string) => {
   return useQuery({
     queryKey: [...VOLUNTEER_ACTIVITIES_QUERY_KEY, 'report', volunteerId, dateFrom, dateTo],

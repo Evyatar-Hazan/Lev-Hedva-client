@@ -2,19 +2,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UsersClient } from '../api/clients';
 import type { CreateUserDto, UpdateUserDto, UsersQueryDto } from '../lib/types';
 
-// קיי למטמון
+// Cache key
 const USERS_QUERY_KEY = ['users'] as const;
 
-// Hook לקבלת רשימת משתמשים
+// Hook to get list of users
 export const useUsers = (params?: UsersQueryDto) => {
   return useQuery({
     queryKey: [...USERS_QUERY_KEY, params],
     queryFn: () => UsersClient.getUsers(params),
-    staleTime: 5 * 60 * 1000, // 5 דקות
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
-// Hook לקבלת משתמש בודד
+// Hook to get single user
 export const useUser = (id: string) => {
   return useQuery({
     queryKey: [...USERS_QUERY_KEY, id],
@@ -23,20 +23,20 @@ export const useUser = (id: string) => {
   });
 };
 
-// Hook ליצירת משתמש חדש
+// Hook to create new user
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (userData: CreateUserDto) => UsersClient.createUser(userData),
     onSuccess: () => {
-      // רענון הרשימה לאחר יצירה
+      // Refresh the list after creation
       queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
     },
   });
 };
 
-// Hook לעדכון משתמש
+// Hook to update user
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
 
@@ -44,14 +44,14 @@ export const useUpdateUser = () => {
     mutationFn: ({ id, userData }: { id: string; userData: UpdateUserDto }) =>
       UsersClient.updateUser(id, userData),
     onSuccess: (_, variables) => {
-      // עדכון הנתונים במטמון
+      // Update data in cache
       queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, variables.id] });
     },
   });
 };
 
-// Hook למחיקת משתמש
+// Hook to delete user
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
 
@@ -63,13 +63,13 @@ export const useDeleteUser = () => {
   });
 };
 
-// Hook להפעלה/השבתה של משתמש (נתעדכן בעתיד)
+// Hook to enable/disable user (will be updated in the future)
 export const useToggleUserStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
-      // כרגע נעשה עדכון רגיל עד שנוסיף פונקציית הפעלה/השבתה מיוחדת
+      // Currently do a regular update until we add special enable/disable function
       UsersClient.updateUser(id, { isActive }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
@@ -78,7 +78,7 @@ export const useToggleUserStatus = () => {
   });
 };
 
-// Hook לניהול הרשאה בודדת
+// Hook to manage single permission
 export const useAssignPermission = () => {
   const queryClient = useQueryClient();
 
@@ -103,7 +103,7 @@ export const useRevokePermission = () => {
   });
 };
 
-// Hook לקבלת הרשאות של משתמש
+// Hook to get user permissions
 export const useUserPermissions = (userId: string) => {
   return useQuery({
     queryKey: [...USERS_QUERY_KEY, userId, 'permissions'],

@@ -81,7 +81,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
   const [filterInputValue, setFilterInputValue] = useState<any>('');
   const [showFilters, setShowFilters] = useState(true);
 
-  // פילטרים זמינים שעדיין לא הופעלו
+  // Available filters not yet activated
   const availableFiltersToAdd = availableFilters.filter(
     filter => !activeFilters.some(active => active.id === filter.id)
   );
@@ -98,7 +98,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
 
   const handleFilterSelect = (filter: FilterOption) => {
     setSelectedFilterForAdd(filter);
-    // אתחול הערך לפי סוג הפילטר
+    // Initialize value by filter type
     if (filter.type === 'multiselect') {
       setFilterInputValue([]);
     } else if (filter.type === 'autocomplete') {
@@ -110,7 +110,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
 
   const handleFilterApply = () => {
     if (selectedFilterForAdd && filterInputValue !== '' && filterInputValue !== null) {
-      // בדיקה אם זה multiselect ריק
+      // Check if multiselect is empty
       if (Array.isArray(filterInputValue) && filterInputValue.length === 0) {
         return;
       }
@@ -221,7 +221,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
         borderRadius: 2,
       }}
     >
-      {/* שורת חיפוש וכפתורים */}
+      {/* Search bar and buttons */}
       <Box
         sx={{
           display: 'flex',
@@ -230,7 +230,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
           alignItems: isMobile ? 'stretch' : 'center',
         }}
       >
-        {/* שדה חיפוש */}
+        {/* Search field */}
         <TextField
           fullWidth
           size="small"
@@ -260,7 +260,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
           }}
         />
 
-        {/* כפתור הוספת פילטר */}
+        {/* Add filter button */}
         {availableFiltersToAdd.length > 0 && (
           <Button
             variant="outlined"
@@ -281,7 +281,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
           </Button>
         )}
 
-        {/* כפתור הצג/הסתר פילטרים */}
+        {/* Show/hide filters button */}
         {activeFilters.length > 0 && !isMobile && (
           <IconButton
             size="small"
@@ -295,7 +295,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
           </IconButton>
         )}
 
-        {/* כפתור ניקוי הכל */}
+        {/* Clear all button */}
         {showClearAll && hasActiveContent && (
           <Button
             variant="outlined"
@@ -312,7 +312,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
         )}
       </Box>
 
-      {/* תצוגת פילטרים פעילים */}
+      {/* Active filters display */}
       <Collapse in={showFilters && activeFilters.length > 0}>
         <Box
           sx={{
@@ -351,7 +351,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
         </Box>
       </Collapse>
 
-      {/* תפריט הוספת פילטר */}
+      {/* Add filter menu */}
       <Menu
         anchorEl={filterMenuAnchor}
         open={Boolean(filterMenuAnchor)}
@@ -373,7 +373,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
         }}
       >
         {!selectedFilterForAdd ? (
-          // רשימת פילטרים זמינים
+          // List of available filters
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
               {t('common.select_filter')}
@@ -396,7 +396,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             ))}
           </Box>
         ) : (
-          // טופס הוספת ערך לפילטר
+          // Form to add value to filter
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <IconButton size="small" onClick={() => setSelectedFilterForAdd(null)} sx={{ mr: 1 }}>
