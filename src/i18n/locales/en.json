@@ -204,9 +204,13 @@
       "status": "Status",
       "allStatuses": "All Statuses",
       "borrower": "Borrower",
-      "product": "Product",
+      "category": "Category",
       "loanDate": "Loan Date",
       "expectedReturn": "Expected Return Date"
+    },
+    "actions": {
+      "return": "Return",
+      "edit": "Edit"
     },
     "noLoans": "No loans found",
     "loadError": "Error loading loans data:",

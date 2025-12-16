@@ -81,6 +81,18 @@ const LoansPage: React.FC = () => {
   const { data: usersData } = useUsers();
   const { data: productInstancesData } = useProductInstances();
 
+  // חילוץ קטגוריות ייחודיות מהמוצרים
+  const uniqueCategories = React.useMemo(() => {
+    if (!productInstancesData) return [];
+    const categories = new Set<string>();
+    productInstancesData.forEach((instance: any) => {
+      if (instance.product?.category) {
+        categories.add(instance.product.category);
+      }
+    });
+    return Array.from(categories).sort();
+  }, [productInstancesData]);
+
   // הגדרת הפילטרים הזמינים (אחרי קריאת ה-hooks)
   const availableFilters: FilterOption[] = [
     {
@@ -102,14 +114,10 @@ const LoansPage: React.FC = () => {
       getOptionLabel: (option: any) => `${option.firstName} ${option.lastName} (${option.email})`,
     },
     {
-      id: 'product',
-      label: t('loans.filter.product'),
-      type: 'autocomplete',
-      autocompleteOptions: (productInstancesData || []).map((inst: any) => ({
-        ...inst,
-        displayName: `${inst.product?.name || ''} - ${inst.barcode}`,
-      })),
-      getOptionLabel: (option: any) => option.displayName || '',
+      id: 'category',
+      label: t('loans.filter.category'),
+      type: 'select',
+      options: uniqueCategories.map(cat => ({ value: cat, label: cat })),
     },
     {
       id: 'loanDate',
@@ -132,6 +140,12 @@ const LoansPage: React.FC = () => {
     if (filterDef.type === 'select' && filterDef.options) {
       const option = filterDef.options.find(o => o.value === value);
       displayValue = option?.label || value;
+    } else if (filterDef.type === 'autocomplete' && filterDef.getOptionLabel) {
+      // עבור autocomplete, השתמש ב-getOptionLabel להצגת הערך
+      displayValue = filterDef.getOptionLabel(value);
+    } else if (filterDef.type === 'date') {
+      // עבור תאריך, הצג בפורמט קריא
+      displayValue = new Date(value).toLocaleDateString('he-IL');
     }
 
     setActiveFilters(prev => [
@@ -186,8 +200,8 @@ const LoansPage: React.FC = () => {
         });
       } else if (filter.id === 'user') {
         filtered = filtered.filter(loan => loan.userId === filter.value.id);
-      } else if (filter.id === 'product') {
-        filtered = filtered.filter(loan => loan.productInstanceId === filter.value.id);
+      } else if (filter.id === 'category') {
+        filtered = filtered.filter(loan => loan.productInstance?.product?.category === filter.value);
       } else if (filter.id === 'loanDate') {
         const filterDate = new Date(filter.value);
         filtered = filtered.filter(loan => {
@@ -439,7 +453,7 @@ const LoansPage: React.FC = () => {
                     <IconButton 
                       size="small" 
                       color="primary" 
-                      title="החזרה"
+                      title={t('loans.actions.return')}
                       onClick={() => handleReturnLoan(loan.id)}
                       disabled={returnLoanMutation.isPending}
                     >
@@ -449,7 +463,7 @@ const LoansPage: React.FC = () => {
                   <IconButton 
                     size="small" 
                     color="primary" 
-                    title="עריכה"
+                    title={t('loans.actions.edit')}
                     onClick={() => handleEditLoan(loan.id)}
                   >
                     <EditIcon />
@@ -513,7 +527,7 @@ const LoansPage: React.FC = () => {
                         <IconButton 
                           size="small" 
                           color="primary" 
-                          title="החזרה"
+                          title={t('loans.actions.return')}
                           onClick={() => handleReturnLoan(loan.id)}
                           disabled={returnLoanMutation.isPending}
                         >
@@ -523,7 +537,7 @@ const LoansPage: React.FC = () => {
                       <IconButton 
                         size="small" 
                         color="primary" 
-                        title="עריכה"
+                        title={t('loans.actions.edit')}
                         onClick={() => handleEditLoan(loan.id)}
                       >
                         <EditIcon />

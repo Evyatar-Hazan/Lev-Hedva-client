@@ -203,7 +203,15 @@
     },
     "filter": {
       "status": "סטטוס",
-      "allStatuses": "כל הסטטוסים"
+      "allStatuses": "כל הסטטוסים",
+      "borrower": "שואל",
+      "category": "קטגוריה",
+      "loanDate": "תאריך השאלה",
+      "expectedReturn": "תאריך החזרה צפוי"
+    },
+    "actions": {
+      "return": "החזרה",
+      "edit": "עריכה"
     },
     "noLoans": "לא נמצאו השאלות",
     "loadError": "שגיאה בטעינת נתוני ההשאלות:",

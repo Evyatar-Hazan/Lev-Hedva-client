@@ -192,8 +192,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 COLORS.text.onPrimary,
                 0.25
               ),
-              backdropFilter: 'blur(8px)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              backdropFilter: "blur(8px)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             }}
           >
             <img

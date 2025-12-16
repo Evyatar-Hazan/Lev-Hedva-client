@@ -93,12 +93,19 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
   const handleFilterMenuClose = () => {
     setFilterMenuAnchor(null);
     setSelectedFilterForAdd(null);
-    setFilterInputValue('');
+    setFilterInputValue(null);
   };
 
   const handleFilterSelect = (filter: FilterOption) => {
     setSelectedFilterForAdd(filter);
-    setFilterInputValue(filter.type === 'multiselect' ? [] : '');
+    // אתחול הערך לפי סוג הפילטר
+    if (filter.type === 'multiselect') {
+      setFilterInputValue([]);
+    } else if (filter.type === 'autocomplete') {
+      setFilterInputValue(null);
+    } else {
+      setFilterInputValue('');
+    }
   };
 
   const handleFilterApply = () => {
