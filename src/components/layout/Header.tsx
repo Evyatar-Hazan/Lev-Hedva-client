@@ -179,7 +179,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             alignItems: "center",
             gap: { xs: 1, sm: 2 },
             flexGrow: 1,
-            minWidth: 0, // للسماح بالانكماش
+            minWidth: 0, // Ensures flex items can shrink properly
           }}
         >
           <Box

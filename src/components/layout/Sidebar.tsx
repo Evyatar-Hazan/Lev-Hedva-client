@@ -28,6 +28,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
 import { COLORS, colorUtils } from '../../theme/colors';
+import { UserRole } from '../../lib/types';
 
 const drawerWidth = 280;
 
@@ -89,6 +90,14 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       description: t('descriptions.audit'),
     },
   ];
+
+  // Filter menu items based on user role - workers cannot see audit
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (item.path === '/audit' && user?.role === UserRole.WORKER) {
+      return false;
+    }
+    return true;
+  });
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -224,7 +233,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       {/* Navigation Menu */}
       <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
         <List sx={{ px: 2 }}>
-          {menuItems.map((item, index) => {
+          {filteredMenuItems.map((item, index) => {
             const isSelected = location.pathname === item.path;
             return (
               <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>

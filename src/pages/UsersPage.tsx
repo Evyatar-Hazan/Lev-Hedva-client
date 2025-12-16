@@ -55,11 +55,17 @@ import {
 import { UserRole, CreateUserDto } from "../lib/types";
 import { format } from "date-fns";
 import { COLORS } from "../theme/colors";
+import { useAuth } from "../features/auth/hooks";
 
 const UsersPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { user: currentUser } = useAuth();
+  
+  // Check if current user can manage users (create/edit/delete)
+  // Workers can only view users, not manage them
+  const canManageUsers = currentUser?.role === UserRole.ADMIN;
 
   const [search, setSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -362,14 +368,16 @@ const UsersPage: React.FC = () => {
         <Typography variant="h4" component="h1" fontWeight="bold">
           {t("users.title")}
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          size="large"
-          onClick={handleAddUser}
-        >
-          {t("users.addUser")}
-        </Button>
+        {canManageUsers && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            size="large"
+            onClick={handleAddUser}
+          >
+            {t("users.addUser")}
+          </Button>
+        )}
       </Box>
 
       {/* Debug Panel */}
@@ -475,93 +483,8 @@ const UsersPage: React.FC = () => {
                 </CardContent>
 
                 <CardActions sx={{ justifyContent: "flex-end", pt: 0 }}>
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    title="עריכה"
-                    onClick={() => handleEditUser(user)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color={user.isActive ? "warning" : "success"}
-                    title={user.isActive ? "השבתה" : "הפעלה"}
-                    onClick={() =>
-                      handleToggleUserStatus(user.id, user.isActive)
-                    }
-                    disabled={toggleUserStatusMutation.isPending}
-                  >
-                    {user.isActive ? <LockIcon /> : <LockOpenIcon />}
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    title="מחיקה"
-                    onClick={() => handleDeleteUser(user.id)}
-                    disabled={deleteUserMutation.isPending}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </CardActions>
-              </Card>
-            ))
-          )}
-        </Box>
-      ) : (
-        // Desktop table view
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t("users.fullName")}</TableCell>
-                <TableCell>{t("users.email")}</TableCell>
-                <TableCell>{t("users.phone")}</TableCell>
-                <TableCell>{t("users.role")}</TableCell>
-                <TableCell>{t("users.status.label")}</TableCell>
-                <TableCell>{t("users.joinDate")}</TableCell>
-                <TableCell>{t("common.actions")}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7} sx={{ textAlign: "center", py: 4 }}>
-                    <CircularProgress />
-                  </TableCell>
-                </TableRow>
-              ) : filteredUsers?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    {t("users.noUsers")}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredUsers?.map((user: any) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      {user.firstName} {user.lastName}
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone || "-"}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={user.role}
-                        color={getRoleColor(user.role) as any}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={user.isActive ? "פעיל" : "לא פעיל"}
-                        color={getStatusColor(user.isActive) as any}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(user.createdAt), "dd/MM/yyyy")}
-                    </TableCell>
-                    <TableCell>
+                  {canManageUsers && (
+                    <>
                       <IconButton
                         size="small"
                         color="primary"
@@ -590,7 +513,98 @@ const UsersPage: React.FC = () => {
                       >
                         <DeleteIcon />
                       </IconButton>
+                    </>
+                  )}
+                </CardActions>
+              </Card>
+            ))
+          )}
+        </Box>
+      ) : (
+        // Desktop table view
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t("users.fullName")}</TableCell>
+                <TableCell>{t("users.email")}</TableCell>
+                <TableCell>{t("users.phone")}</TableCell>
+                <TableCell>{t("users.role")}</TableCell>
+                <TableCell>{t("users.status.label")}</TableCell>
+                <TableCell>{t("users.joinDate")}</TableCell>
+                {canManageUsers && <TableCell>{t("common.actions")}</TableCell>}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={canManageUsers ? 7 : 6} sx={{ textAlign: "center", py: 4 }}>
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : filteredUsers?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={canManageUsers ? 7 : 6} align="center">
+                    {t("users.noUsers")}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredUsers?.map((user: any) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      {user.firstName} {user.lastName}
                     </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone || "-"}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={user.role}
+                        color={getRoleColor(user.role) as any}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={user.isActive ? "פעיל" : "לא פעיל"}
+                        color={getStatusColor(user.isActive) as any}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(user.createdAt), "dd/MM/yyyy")}
+                    </TableCell>
+                    {canManageUsers && (
+                      <TableCell>
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          title="עריכה"
+                          onClick={() => handleEditUser(user)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          color={user.isActive ? "warning" : "success"}
+                          title={user.isActive ? "השבתה" : "הפעלה"}
+                          onClick={() =>
+                            handleToggleUserStatus(user.id, user.isActive)
+                          }
+                          disabled={toggleUserStatusMutation.isPending}
+                        >
+                          {user.isActive ? <LockIcon /> : <LockOpenIcon />}
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          title="מחיקה"
+                          onClick={() => handleDeleteUser(user.id)}
+                          disabled={deleteUserMutation.isPending}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               )}

@@ -11,13 +11,15 @@ import LoansPage from '../pages/LoansPage';
 import VolunteersPage from '../pages/VolunteersPage';
 import AuditPage from '../pages/AuditPage';
 import ProfilePage from '../pages/ProfilePage';
+import { UserRole } from '../lib/types';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  allowedRoles?: UserRole[];
 }
 
-function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return <div>טוען...</div>;
@@ -25,6 +27,11 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Check if user role is allowed
+  if (allowedRoles && user?.role && !allowedRoles.includes(user.role as UserRole)) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -82,7 +89,7 @@ function AppRoutes() {
       <Route
         path="/audit"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <AuditPage />
           </ProtectedRoute>
         }
