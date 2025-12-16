@@ -424,7 +424,7 @@ const UsersPage: React.FC = () => {
                   )}
 
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    <strong>{t('users.status')}:</strong>{' '}
+                    <strong>{t('users.status.label')}:</strong>{' '}
                     <Chip
                       label={user.isActive ? 'פעיל' : 'לא פעיל'}
                       color={getStatusColor(user.isActive) as any}
@@ -480,7 +480,7 @@ const UsersPage: React.FC = () => {
                 <TableCell>{t('users.email')}</TableCell>
                 <TableCell>{t('users.phone')}</TableCell>
                 <TableCell>{t('users.role')}</TableCell>
-                <TableCell>{t('users.status')}</TableCell>
+                <TableCell>{t('users.status.label')}</TableCell>
                 <TableCell>{t('users.joinDate')}</TableCell>
                 <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
