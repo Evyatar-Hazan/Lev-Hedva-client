@@ -78,11 +78,29 @@ npm install --save-dev eslint-plugin-prettier@^4.0.0 --legacy-peer-deps
 
 - [x] הוספת `.npmrc`
 - [x] עדכון `netlify.toml`
+- [x] הוספת `react-refresh` ל-dependencies
 - [x] Commit ו-Push
+- [x] בדיקת build מקומית ✅
 - [ ] בדיקת build בנטליפיי
 - [ ] בדיקת האתר לאחר deploy
+
+## 🔄 עדכון נוסף
+
+### בעיה נוספת: react-refresh חסר
+אחרי התיקון הראשון, ה-build נכשל עם:
+```
+Error: Cannot find module 'react-refresh'
+```
+
+### פתרון
+הוספת `react-refresh` ל-dependencies (לא devDependencies):
+```bash
+npm install --save react-refresh --legacy-peer-deps
+```
+
+החבילה נדרשת על ידי `@pmmmwh/react-refresh-webpack-plugin` שהוא חלק מ-react-scripts.
 
 ---
 
 **תאריך:** דצמבר 2025  
-**סטטוס:** ✅ תוקן
+**סטטוס:** ✅ תוקן (כולל react-refresh)
