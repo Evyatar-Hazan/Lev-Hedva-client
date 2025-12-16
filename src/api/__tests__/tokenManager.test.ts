@@ -4,7 +4,7 @@ import { TokenManager } from '../tokenManager';
 // Mock localStorage
 const mockLocalStorage = (() => {
   let store: Record<string, string> = {};
-  
+
   return {
     getItem: jest.fn((key: string) => store[key] || null),
     setItem: jest.fn((key: string, value: string) => {
@@ -25,14 +25,12 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 describe('🔐 TokenManager Tests', () => {
-  
   beforeEach(() => {
     mockLocalStorage.clear();
     jest.clearAllMocks();
   });
 
   describe('💾 Token Storage', () => {
-    
     test('should store access token correctly', () => {
       // Arrange
       const accessToken = 'test-access-token';
@@ -84,7 +82,6 @@ describe('🔐 TokenManager Tests', () => {
   });
 
   describe('🗑️ Token Clearing', () => {
-    
     test('should clear all tokens', () => {
       // Arrange
       TokenManager.setTokens('access-token', 'refresh-token');
@@ -108,7 +105,6 @@ describe('🔐 TokenManager Tests', () => {
   });
 
   describe('✅ Token Validation', () => {
-    
     test('should check if token is expired', () => {
       // Arrange - Create a token that expires in the future
       const futureTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
@@ -153,7 +149,6 @@ describe('🔐 TokenManager Tests', () => {
   });
 
   describe('📊 Token Payload', () => {
-    
     test('should extract token payload correctly', () => {
       // Arrange
       const payload = { sub: 'user123', email: 'user@example.com', role: 'admin' };
@@ -184,7 +179,6 @@ describe('🔐 TokenManager Tests', () => {
   });
 
   describe('🔄 Token Refresh', () => {
-    
     test('should update tokens during refresh', () => {
       // Arrange
       TokenManager.setTokens('old-access', 'old-refresh');
@@ -201,14 +195,13 @@ describe('🔐 TokenManager Tests', () => {
   });
 
   describe('🔒 Security Considerations', () => {
-    
     test('should not expose tokens in console or errors', () => {
       // Arrange
       const sensitiveToken = 'sensitive-jwt-token-12345';
-      
+
       // Act
       TokenManager.setTokens(sensitiveToken, 'refresh-token');
-      
+
       // Assert - This is a conceptual test
       // In real implementation, ensure tokens are not logged
       expect(sensitiveToken).not.toEqual(expect.stringContaining('console'));
@@ -239,7 +232,6 @@ describe('🔐 TokenManager Tests', () => {
   });
 
   describe('📝 Edge Cases', () => {
-    
     test('should handle empty string tokens', () => {
       // Act
       TokenManager.setTokens('', '');

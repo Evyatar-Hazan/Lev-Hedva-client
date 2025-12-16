@@ -93,7 +93,7 @@
     "serverUrl": "שרת: http://localhost:3001",
     "debug": "דיבוג:",
     "users": "משתמשים",
-    "products": "מוצרים", 
+    "products": "מוצרים",
     "activeLoans": "השאלות פעילות",
     "overdue": "איחורים",
     "debugInfo": "משתמשים: {{userCount}}, מוצרים: {{productCount}}, הלוואות: {{activeLoans}}"
@@ -191,13 +191,13 @@
     "status": {
       "label": "סטטוס",
       "active": "פעיל",
-      "overdue": "איחור", 
+      "overdue": "איחור",
       "returned": "הוחזר",
       "lost": "אבד"
     },
     "stats": {
       "activeLoans": "השאלות פעילות",
-      "overdue": "איחורים", 
+      "overdue": "איחורים",
       "returned": "הוחזרו",
       "lost": "אבדו"
     },
@@ -276,7 +276,7 @@
       "needs_repair": "זקוק לתיקון",
       "excellent": "מצוין",
       "good": "טוב",
-      "fair": "בינוני", 
+      "fair": "בינוני",
       "poor": "גרוע"
     },
     "manufacturers": {
@@ -321,7 +321,7 @@
     "roles": {
       "all": "כל התפקידים",
       "admin": "מנהל מערכת",
-      "manager": "מנהל", 
+      "manager": "מנהל",
       "volunteer": "מתנדב",
       "user": "משתמש"
     },
@@ -353,7 +353,7 @@
       "all": "כל הפעילויות",
       "delivery": "משלוח",
       "home_visit": "ביקור בית",
-      "phone_call": "שיחה טלפונית", 
+      "phone_call": "שיחה טלפונית",
       "maintenance": "תחזוקה",
       "other": "אחר"
     },
@@ -383,7 +383,7 @@
     "searchPlaceholder": "חיפוש ביומן ביקורת...",
     "time": "זמן",
     "user": "משתמש",
-    "action": "פעולה", 
+    "action": "פעולה",
     "entity": "ישות",
     "description": "תיאור",
     "ipAddress": "כתובת IP",

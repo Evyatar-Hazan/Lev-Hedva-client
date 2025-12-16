@@ -1,10 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LoansClient } from '../api/clients/loans.client';
-import { 
-  CreateLoanDto, 
-  UpdateLoanDto, 
-  LoansQueryDto
-} from '../lib/types';
+import { CreateLoanDto, UpdateLoanDto, LoansQueryDto } from '../lib/types';
 
 const LOANS_QUERY_KEY = ['loans'];
 
@@ -31,16 +27,14 @@ export const useCreateLoan = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (loanData: CreateLoanDto) => 
-      LoansClient.createLoan(loanData),
+    mutationFn: (loanData: CreateLoanDto) => LoansClient.createLoan(loanData),
     onSuccess: () => {
       // רענון נתוני השאלות
       queryClient.invalidateQueries({ queryKey: LOANS_QUERY_KEY });
       // רענון כל נתוני המוצרים (כולל מופעים)
-      queryClient.invalidateQueries({ 
-        predicate: (query) => 
-          query.queryKey[0] === 'products' || 
-          query.queryKey[0] === 'product-instances'
+      queryClient.invalidateQueries({
+        predicate: query =>
+          query.queryKey[0] === 'products' || query.queryKey[0] === 'product-instances',
       });
       // רענון סטטיסטיקות השאלות
       queryClient.invalidateQueries({ queryKey: ['loanStats'] });
@@ -53,7 +47,7 @@ export const useUpdateLoan = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, loanData }: { id: string; loanData: UpdateLoanDto }) => 
+    mutationFn: ({ id, loanData }: { id: string; loanData: UpdateLoanDto }) =>
       LoansClient.updateLoan(id, loanData),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: LOANS_QUERY_KEY });
@@ -73,10 +67,9 @@ export const useReturnLoan = () => {
       queryClient.invalidateQueries({ queryKey: LOANS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: [...LOANS_QUERY_KEY, id] });
       // רענון כל נתוני המוצרים (כולל מופעים)
-      queryClient.invalidateQueries({ 
-        predicate: (query) => 
-          query.queryKey[0] === 'products' || 
-          query.queryKey[0] === 'product-instances'
+      queryClient.invalidateQueries({
+        predicate: query =>
+          query.queryKey[0] === 'products' || query.queryKey[0] === 'product-instances',
       });
       // רענון סטטיסטיקות השאלות
       queryClient.invalidateQueries({ queryKey: ['loanStats'] });

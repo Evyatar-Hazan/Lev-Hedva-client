@@ -23,7 +23,9 @@ const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
           <Grid item xs={6} sm={6} md={3} key={index}>
             <StatsCard
               icon={stat.icon}
-              value={stat.loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : stat.value}
+              value={
+                stat.loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : stat.value
+              }
               label={stat.label}
               gradient={stat.gradient}
               onClick={stat.onClick}

@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Container, 
-  Paper, 
-  Typography, 
-  Box, 
-  Alert
-} from '@mui/material';
+import { Container, Paper, Typography, Box, Alert } from '@mui/material';
 import { Button, Input } from '../components/ui';
 import { useAuth } from '../features/auth/hooks';
 import { useTranslation } from 'react-i18next';
@@ -55,7 +49,7 @@ function LoginPage() {
             disabled={isLoading}
             dir="ltr"
           />
-          
+
           <Input
             fullWidth
             label={t('auth.password')}

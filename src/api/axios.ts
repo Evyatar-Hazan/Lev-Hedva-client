@@ -15,21 +15,21 @@ const apiClient = axios.create({
 
 // Add request interceptor to include auth token
 apiClient.interceptors.request.use(
-  (config) => {
+  config => {
     const token = TokenManager.getAccessToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     // Debug logging for API requests
     console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     if (config.data) {
       console.log('📦 Request Data:', config.data);
     }
-    
+
     return config;
   },
-  (error) => {
+  error => {
     console.error('❌ Request Error:', error);
     return Promise.reject(error);
   }
@@ -37,14 +37,22 @@ apiClient.interceptors.request.use(
 
 // Add response interceptor for debugging
 apiClient.interceptors.response.use(
-  (response) => {
-    console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status}`);
+  response => {
+    console.log(
+      `✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${
+        response.status
+      }`
+    );
     console.log('📄 Response Data:', response.data);
     return response;
   },
-  (error) => {
+  error => {
     if (error.response) {
-      console.error(`❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url} - ${error.response.status}`);
+      console.error(
+        `❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url} - ${
+          error.response.status
+        }`
+      );
       console.error('📄 Error Data:', error.response.data);
     } else if (error.request) {
       console.error('🔌 Network Error - No response received:', error.message);

@@ -1,20 +1,22 @@
 import { apiClient } from '../axios';
-import { 
+import {
   AuditLog,
   AuditLogResponseDto,
-  CreateAuditLogDto, 
-  AuditLogsQueryDto, 
-  AuditPaginatedResponse
+  CreateAuditLogDto,
+  AuditLogsQueryDto,
+  AuditPaginatedResponse,
 } from '../../lib/types';
 
 export class AuditClient {
   private static readonly BASE_PATH = '/audit';
 
-  static async getAuditLogs(query?: AuditLogsQueryDto): Promise<AuditPaginatedResponse<AuditLogResponseDto>> {
+  static async getAuditLogs(
+    query?: AuditLogsQueryDto
+  ): Promise<AuditPaginatedResponse<AuditLogResponseDto>> {
     const params = new URLSearchParams();
-    
+
     if (query) {
-      (Object.keys(query) as Array<keyof AuditLogsQueryDto>).forEach((key) => {
+      (Object.keys(query) as Array<keyof AuditLogsQueryDto>).forEach(key => {
         const value = query[key];
         if (value !== undefined) {
           params.append(key, String(value));
@@ -55,7 +57,11 @@ export class AuditClient {
     return response.data;
   }
 
-  static async getUserActivity(userId: string, dateFrom?: string, dateTo?: string): Promise<AuditLogResponseDto[]> {
+  static async getUserActivity(
+    userId: string,
+    dateFrom?: string,
+    dateTo?: string
+  ): Promise<AuditLogResponseDto[]> {
     const params = new URLSearchParams();
     if (dateFrom) params.append('dateFrom', dateFrom);
     if (dateTo) params.append('dateTo', dateTo);

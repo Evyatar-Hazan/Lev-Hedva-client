@@ -21,18 +21,13 @@ const createWrapper = () => {
       mutations: { retry: false },
     },
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => {
-    return React.createElement(
-      QueryClientProvider,
-      { client: queryClient },
-      children
-    );
+    return React.createElement(QueryClientProvider, { client: queryClient }, children);
   };
 };
 
 describe('🔐 useAuth Hook Tests', () => {
-  
   beforeEach(() => {
     jest.clearAllMocks();
     // Mock console to avoid noise in tests
@@ -45,7 +40,6 @@ describe('🔐 useAuth Hook Tests', () => {
   });
 
   describe('🏁 Initialization', () => {
-    
     test('should initialize with not authenticated state', () => {
       // Arrange
       mockTokenManager.getAccessToken.mockReturnValue(null);
@@ -66,7 +60,7 @@ describe('🔐 useAuth Hook Tests', () => {
       // Arrange
       const mockToken = 'valid-jwt-token';
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
-      
+
       mockTokenManager.getAccessToken.mockReturnValue(mockToken);
       mockAuthClient.getCurrentUser.mockResolvedValue(mockUser);
 
@@ -82,13 +76,12 @@ describe('🔐 useAuth Hook Tests', () => {
   });
 
   describe('🔐 Login Functionality', () => {
-    
     test('should login successfully with valid credentials', async () => {
       // Arrange
       const mockCredentials = { email: 'test@example.com', password: 'password123' };
       const mockTokens = { accessToken: 'new-access-token', refreshToken: 'new-refresh-token' };
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
-      
+
       mockAuthClient.login.mockResolvedValue(mockTokens);
       mockAuthClient.getCurrentUser.mockResolvedValue(mockUser);
 
@@ -103,7 +96,10 @@ describe('🔐 useAuth Hook Tests', () => {
 
       // Assert
       expect(mockAuthClient.login).toHaveBeenCalledWith(mockCredentials);
-      expect(mockTokenManager.setTokens).toHaveBeenCalledWith(mockTokens.accessToken, mockTokens.refreshToken);
+      expect(mockTokenManager.setTokens).toHaveBeenCalledWith(
+        mockTokens.accessToken,
+        mockTokens.refreshToken
+      );
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.user).toEqual(mockUser);
       expect(result.current.error).toBeNull();
@@ -136,7 +132,9 @@ describe('🔐 useAuth Hook Tests', () => {
     test('should set loading state during login', async () => {
       // Arrange
       let resolveLogin: (value: any) => void;
-      const loginPromise = new Promise(resolve => { resolveLogin = resolve; });
+      const loginPromise = new Promise(resolve => {
+        resolveLogin = resolve;
+      });
       mockAuthClient.login.mockReturnValue(loginPromise);
 
       // Act
@@ -166,7 +164,6 @@ describe('🔐 useAuth Hook Tests', () => {
   });
 
   describe('🚪 Logout Functionality', () => {
-    
     test('should logout successfully', async () => {
       // Arrange
       mockTokenManager.getAccessToken.mockReturnValue('existing-token');
@@ -210,7 +207,6 @@ describe('🔐 useAuth Hook Tests', () => {
   });
 
   describe('🔄 Token Refresh', () => {
-    
     test('should refresh token when needed', async () => {
       // This test would depend on your specific token refresh implementation
       // For now, we'll skip it as the exact implementation might vary
@@ -219,12 +215,11 @@ describe('🔐 useAuth Hook Tests', () => {
   });
 
   describe('👤 User Data', () => {
-    
     test('should fetch user data when token exists', async () => {
       // Arrange
       const mockToken = 'valid-token';
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
-      
+
       mockTokenManager.getAccessToken.mockReturnValue(mockToken);
       mockAuthClient.getCurrentUser.mockResolvedValue(mockUser);
 
@@ -262,7 +257,6 @@ describe('🔐 useAuth Hook Tests', () => {
   });
 
   describe('⚠️ Error Handling', () => {
-    
     test('should clear error on successful operation', async () => {
       // Arrange
       const { result } = renderHook(() => useAuth(), {

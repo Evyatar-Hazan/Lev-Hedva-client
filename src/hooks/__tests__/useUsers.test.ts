@@ -18,20 +18,17 @@ const createWrapper = () => {
       mutations: { retry: false },
     },
   });
-  
-  return ({ children }: { children: React.ReactNode }) => (
-    React.createElement(QueryClientProvider, { client: queryClient }, children)
-  );
+
+  return ({ children }: { children: React.ReactNode }) =>
+    React.createElement(QueryClientProvider, { client: queryClient }, children);
 };
 
 describe('👥 useUsers Hook Tests', () => {
-  
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('📋 Users List', () => {
-    
     test('should fetch users successfully', async () => {
       // Arrange
       const mockUsers = [
@@ -47,11 +44,11 @@ describe('👥 useUsers Hook Tests', () => {
 
       // Assert
       expect(result.current.isLoading).toBe(true);
-      
+
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
-      
+
       expect(result.current.data).toEqual(mockUsers);
       expect(result.current.error).toBeNull();
     });
@@ -70,16 +67,14 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
-      
+
       expect(result.current.data).toBeUndefined();
       expect(result.current.error).toBeTruthy();
     });
 
     test('should support filtering', async () => {
       // Arrange
-      const mockUsers = [
-        { id: '1', email: 'admin@example.com', name: 'Admin User' },
-      ];
+      const mockUsers = [{ id: '1', email: 'admin@example.com', name: 'Admin User' }];
       const filters = { role: 'admin', status: 'active' };
       mockedUsersClient.getUsers.mockResolvedValue(mockUsers);
 
@@ -92,7 +87,7 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
-      
+
       expect(mockedUsersClient.getUsers).toHaveBeenCalledWith(filters);
       expect(result.current.data).toEqual(mockUsers);
     });
@@ -117,13 +112,12 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
-      
+
       expect(mockedUsersClient.getUsers).toHaveBeenCalledWith(paginationParams);
     });
   });
 
   describe('➕ Create User', () => {
-    
     test('should create user successfully', async () => {
       // Arrange
       const newUser = { email: 'new@example.com', name: 'New User', password: 'password123' };
@@ -136,7 +130,7 @@ describe('👥 useUsers Hook Tests', () => {
       });
 
       expect(result.current.mutate).toBeDefined();
-      
+
       // Trigger the mutation
       result.current.mutate(newUser);
 
@@ -144,7 +138,7 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
-      
+
       expect(mockedUsersClient.createUser).toHaveBeenCalledWith(newUser);
       expect(result.current.data).toEqual(createdUser);
     });
@@ -166,7 +160,7 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
       });
-      
+
       expect(result.current.error).toBeTruthy();
     });
 
@@ -175,7 +169,7 @@ describe('👥 useUsers Hook Tests', () => {
       const newUser = { email: 'success@example.com', name: 'Success User', password: 'pass' };
       const createdUser = { id: '5', ...newUser };
       const onSuccess = jest.fn();
-      
+
       mockedUsersClient.createUser.mockResolvedValue(createdUser);
 
       // Act
@@ -189,19 +183,18 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
-      
+
       expect(onSuccess).toHaveBeenCalledWith(createdUser, newUser, expect.any(Object));
     });
   });
 
   describe('✏️ Update User', () => {
-    
     test('should update user successfully', async () => {
       // Arrange
       const userId = '1';
       const updateData = { name: 'Updated Name' };
       const updatedUser = { id: userId, email: 'user@example.com', name: 'Updated Name' };
-      
+
       mockedUsersClient.updateUser.mockResolvedValue(updatedUser);
 
       // Act
@@ -215,7 +208,7 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
-      
+
       expect(mockedUsersClient.updateUser).toHaveBeenCalledWith(userId, updateData);
       expect(result.current.data).toEqual(updatedUser);
     });
@@ -225,7 +218,7 @@ describe('👥 useUsers Hook Tests', () => {
       const userId = 'nonexistent';
       const updateData = { name: 'New Name' };
       const mockError = new Error('User not found');
-      
+
       mockedUsersClient.updateUser.mockRejectedValue(mockError);
 
       // Act
@@ -239,7 +232,7 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
       });
-      
+
       expect(result.current.error).toBeTruthy();
     });
 
@@ -249,7 +242,7 @@ describe('👥 useUsers Hook Tests', () => {
       const updateData = { name: 'Name' };
       const mockError = new Error('Update failed');
       const onError = jest.fn();
-      
+
       mockedUsersClient.updateUser.mockRejectedValue(mockError);
 
       // Act
@@ -263,13 +256,16 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
       });
-      
-      expect(onError).toHaveBeenCalledWith(mockError, { id: userId, data: updateData }, expect.any(Object));
+
+      expect(onError).toHaveBeenCalledWith(
+        mockError,
+        { id: userId, data: updateData },
+        expect.any(Object)
+      );
     });
   });
 
   describe('🗑️ Delete User', () => {
-    
     test('should delete user successfully', async () => {
       // Arrange
       const userId = '1';
@@ -286,7 +282,7 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
-      
+
       expect(mockedUsersClient.deleteUser).toHaveBeenCalledWith(userId);
     });
 
@@ -294,7 +290,7 @@ describe('👥 useUsers Hook Tests', () => {
       // Arrange
       const userId = 'protected-user';
       const mockError = new Error('Cannot delete protected user');
-      
+
       mockedUsersClient.deleteUser.mockRejectedValue(mockError);
 
       // Act
@@ -308,7 +304,7 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
       });
-      
+
       expect(result.current.error).toBeTruthy();
     });
 
@@ -316,7 +312,7 @@ describe('👥 useUsers Hook Tests', () => {
       // Arrange
       const userId = '1';
       const onSuccess = jest.fn();
-      
+
       mockedUsersClient.deleteUser.mockResolvedValue(undefined);
 
       // Act
@@ -330,13 +326,12 @@ describe('👥 useUsers Hook Tests', () => {
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
-      
+
       expect(onSuccess).toHaveBeenCalledWith(undefined, userId, expect.any(Object));
     });
   });
 
   describe('🔄 Cache Management', () => {
-    
     test('should invalidate cache after successful create', async () => {
       // This test would require more advanced setup to test query invalidation
       // For now, we'll assume that the hook properly invalidates the users list cache
@@ -353,7 +348,6 @@ describe('👥 useUsers Hook Tests', () => {
   });
 
   describe('⚡ Performance', () => {
-    
     test('should not make unnecessary API calls', async () => {
       // Arrange
       const mockUsers = [{ id: '1', email: 'user@example.com', name: 'User' }];
@@ -363,7 +357,7 @@ describe('👥 useUsers Hook Tests', () => {
       const { result: result1 } = renderHook(() => useUsers(), {
         wrapper: createWrapper(),
       });
-      
+
       const { result: result2 } = renderHook(() => useUsers(), {
         wrapper: createWrapper(),
       });
@@ -383,14 +377,15 @@ describe('👥 useUsers Hook Tests', () => {
   });
 
   describe('🎭 Loading States', () => {
-    
     test('should show proper loading states for mutations', async () => {
       // Arrange
       const newUser = { email: 'test@example.com', name: 'Test', password: 'pass' };
-      
+
       // Create a promise that we can control
       let resolveCreate: (value: any) => void;
-      const createPromise = new Promise(resolve => { resolveCreate = resolve; });
+      const createPromise = new Promise(resolve => {
+        resolveCreate = resolve;
+      });
       mockedUsersClient.createUser.mockReturnValue(createPromise);
 
       // Act

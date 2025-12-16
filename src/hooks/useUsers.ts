@@ -28,8 +28,7 @@ export const useCreateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userData: CreateUserDto) => 
-      UsersClient.createUser(userData),
+    mutationFn: (userData: CreateUserDto) => UsersClient.createUser(userData),
     onSuccess: () => {
       // רענון הרשימה לאחר יצירה
       queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
@@ -42,7 +41,7 @@ export const useUpdateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, userData }: { id: string; userData: UpdateUserDto }) => 
+    mutationFn: ({ id, userData }: { id: string; userData: UpdateUserDto }) =>
       UsersClient.updateUser(id, userData),
     onSuccess: (_, variables) => {
       // עדכון הנתונים במטמון
@@ -69,7 +68,7 @@ export const useToggleUserStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) => 
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
       // כרגע נעשה עדכון רגיל עד שנוסיף פונקציית הפעלה/השבתה מיוחדת
       UsersClient.updateUser(id, { isActive }),
     onSuccess: (_, variables) => {
@@ -84,7 +83,7 @@ export const useAssignPermission = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, permissionId }: { userId: string; permissionId: string }) => 
+    mutationFn: ({ userId, permissionId }: { userId: string; permissionId: string }) =>
       UsersClient.assignPermission(userId, permissionId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, variables.userId] });
@@ -96,7 +95,7 @@ export const useRevokePermission = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, permissionId }: { userId: string; permissionId: string }) => 
+    mutationFn: ({ userId, permissionId }: { userId: string; permissionId: string }) =>
       UsersClient.revokePermission(userId, permissionId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, variables.userId] });

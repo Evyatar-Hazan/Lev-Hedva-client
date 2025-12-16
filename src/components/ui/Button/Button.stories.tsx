@@ -3,7 +3,7 @@ import { Meta, Story } from '@storybook/react';
 import { useTranslation } from 'react-i18next';
 import Button, { ButtonProps } from './Button';
 
-const ButtonWithTranslation: React.FC<ButtonProps> = (args) => {
+const ButtonWithTranslation: React.FC<ButtonProps> = args => {
   const { t } = useTranslation();
   return <Button {...args}>{t('common.clickHere')}</Button>;
 };
@@ -13,7 +13,7 @@ export default {
   component: Button,
 } as Meta<typeof Button>;
 
-const Template: Story<ButtonProps> = (args) => <ButtonWithTranslation {...args} />;
+const Template: Story<ButtonProps> = args => <ButtonWithTranslation {...args} />;
 
 export const Primary = Template.bind({});
 Primary.args = {

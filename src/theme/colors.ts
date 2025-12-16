@@ -8,15 +8,15 @@
 export const BRAND_COLORS = {
   // צבע ראשי - האדום המרכזי של הלוגו
   PRIMARY: '#DA2037',
-  
+
   // וריאציות של הצבע הראשי
   PRIMARY_DARK: '#B51A2D',
   PRIMARY_LIGHT: '#F05467',
-  
+
   // צבעי טקסט בסיסיים
   TEXT_PRIMARY: '#000000',
   TEXT_ON_PRIMARY: '#FFFFFF',
-  
+
   // צבעי רקע
   BACKGROUND: '#FFFFFF',
   BACKGROUND_SOFT: '#F4F4F4',
@@ -31,15 +31,15 @@ export const COLORS = {
     light: BRAND_COLORS.PRIMARY_LIGHT,
     contrast: BRAND_COLORS.TEXT_ON_PRIMARY,
   },
-  
+
   // צבע משני - גוון כחול מקצועי שמתאים לאדום
   secondary: {
     main: '#1976d2',
-    dark: '#1565c0', 
+    dark: '#1565c0',
     light: '#42a5f5',
     contrast: BRAND_COLORS.TEXT_ON_PRIMARY,
   },
-  
+
   // צבעי רקע
   background: {
     default: BRAND_COLORS.BACKGROUND,
@@ -48,7 +48,7 @@ export const COLORS = {
     subtle: '#F8F9FA',
     overlay: 'rgba(0, 0, 0, 0.5)',
   },
-  
+
   // צבעי טקסט
   text: {
     primary: BRAND_COLORS.TEXT_PRIMARY,
@@ -59,7 +59,7 @@ export const COLORS = {
     link: BRAND_COLORS.PRIMARY,
     linkHover: BRAND_COLORS.PRIMARY_DARK,
   },
-  
+
   // צבעי גבולות
   border: {
     light: '#E0E0E0',
@@ -67,26 +67,26 @@ export const COLORS = {
     dark: '#757575',
     focus: BRAND_COLORS.PRIMARY,
   },
-  
+
   // צבעי מצבים
   status: {
     success: '#4CAF50',
     successLight: '#A5D6A7',
     successDark: '#388E3C',
-    
+
     error: '#F44336',
     errorLight: '#EF9A9A',
     errorDark: '#D32F2F',
-    
+
     warning: '#FF9800',
     warningLight: '#FFB74D',
     warningDark: '#F57C00',
-    
+
     info: '#2196F3',
     infoLight: '#64B5F6',
     infoDark: '#1976D2',
   },
-  
+
   // צבעי אינטראקציה
   action: {
     hover: 'rgba(218, 32, 55, 0.04)', // הובר בהיר על בסיס הצבע הראשי
@@ -96,11 +96,11 @@ export const COLORS = {
     disabledBackground: 'rgba(0, 0, 0, 0.12)',
     focus: 'rgba(218, 32, 55, 0.12)',
   },
-  
+
   // צבעי גרייסקייל
   grey: {
     50: '#FAFAFA',
-    100: '#F5F5F5', 
+    100: '#F5F5F5',
     200: '#EEEEEE',
     300: '#E0E0E0',
     400: '#BDBDBD',
@@ -110,7 +110,7 @@ export const COLORS = {
     800: '#424242',
     900: '#212121',
   },
-  
+
   // צבעי רכיבי UI ספציפיים
   button: {
     // כפתור ראשי
@@ -119,20 +119,20 @@ export const COLORS = {
     primaryBackgroundDisabled: '#BDBDBD',
     primaryText: BRAND_COLORS.TEXT_ON_PRIMARY,
     primaryTextDisabled: 'rgba(255, 255, 255, 0.5)',
-    
-    // כפתור משני  
+
+    // כפתור משני
     secondaryBackground: 'transparent',
     secondaryBackgroundHover: 'rgba(218, 32, 55, 0.04)',
     secondaryBorder: BRAND_COLORS.PRIMARY,
     secondaryText: BRAND_COLORS.PRIMARY,
     secondaryTextHover: BRAND_COLORS.PRIMARY_DARK,
-    
+
     // כפתור רגיל
     defaultBackground: '#F5F5F5',
     defaultBackgroundHover: '#EEEEEE',
     defaultText: BRAND_COLORS.TEXT_PRIMARY,
   },
-  
+
   // צבעי שדות קלט
   input: {
     background: BRAND_COLORS.BACKGROUND,
@@ -145,7 +145,7 @@ export const COLORS = {
     label: '#616161',
     disabled: '#F5F5F5',
   },
-  
+
   // צבעי כרטיסים
   card: {
     background: BRAND_COLORS.BACKGROUND,
@@ -153,7 +153,7 @@ export const COLORS = {
     shadowHover: 'rgba(0, 0, 0, 0.15)',
     border: '#F0F0F0',
   },
-  
+
   // צבעי ניווט
   navigation: {
     background: BRAND_COLORS.BACKGROUND,
@@ -163,7 +163,7 @@ export const COLORS = {
     border: '#F0F0F0',
     shadow: 'rgba(0, 0, 0, 0.1)',
   },
-  
+
   // צבעי טבלאות
   table: {
     headerBackground: BRAND_COLORS.BACKGROUND_SOFT,
@@ -173,7 +173,7 @@ export const COLORS = {
     rowBackgroundHover: 'rgba(218, 32, 55, 0.04)',
     border: '#E0E0E0',
   },
-  
+
   // צבעי אייקונים
   icon: {
     default: '#757575',
@@ -204,14 +204,14 @@ export const colorUtils = {
    * יוצר צבע עם שקיפות
    */
   withOpacity,
-  
+
   /**
    * מחזיר את הצבע הראשי עם שקיפות
    */
   primaryWithOpacity: (opacity: number): string => {
     return withOpacity(BRAND_COLORS.PRIMARY, opacity);
   },
-  
+
   /**
    * מחזיר צבע הובר לצבע נתון
    */
@@ -223,17 +223,17 @@ export const colorUtils = {
     // אחרת החזר עם שקיפות
     return withOpacity(baseColor, 0.8);
   },
-  
+
   /**
    * יוצר גרדיינט ראשי מודרני
    */
   primaryGradient: `linear-gradient(135deg, ${BRAND_COLORS.PRIMARY} 0%, ${BRAND_COLORS.PRIMARY_DARK} 100%)`,
-  
+
   /**
    * יוצר גרדיינט עדין לרקע
    */
   backgroundGradient: `linear-gradient(135deg, ${BRAND_COLORS.BACKGROUND} 0%, ${BRAND_COLORS.BACKGROUND_SOFT} 100%)`,
-  
+
   /**
    * צלליות מודרניות
    */
@@ -254,7 +254,7 @@ export const COLORS_WITH_UTILS = {
 // ייצוא הצבעים הבסיסיים למען נוחות
 export const {
   primary,
-  secondary, 
+  secondary,
   background,
   text,
   border,

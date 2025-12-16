@@ -8,7 +8,7 @@ import {
   IconButton,
   Typography,
   Box,
-  Divider
+  Divider,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
@@ -56,14 +56,7 @@ const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth={size}
-      fullWidth
-      dir="rtl"
-      {...props}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth={size} fullWidth dir="rtl" {...props}>
       {title && (
         <>
           <DialogTitle>
@@ -72,12 +65,7 @@ const Modal: React.FC<ModalProps> = ({
                 {title}
               </Typography>
               {showCloseButton && (
-                <IconButton
-                  onClick={onClose}
-                  size="small"
-                  aria-label="סגור"
-                  sx={{ ml: 1 }}
-                >
+                <IconButton onClick={onClose} size="small" aria-label="סגור" sx={{ ml: 1 }}>
                   <Close />
                 </IconButton>
               )}
@@ -86,19 +74,13 @@ const Modal: React.FC<ModalProps> = ({
           <Divider />
         </>
       )}
-      
-      {children && (
-        <DialogContent>
-          {children}
-        </DialogContent>
-      )}
-      
+
+      {children && <DialogContent>{children}</DialogContent>}
+
       {actions && (
         <>
           <Divider />
-          <DialogActions sx={{ p: 2 }}>
-            {actions}
-          </DialogActions>
+          <DialogActions sx={{ p: 2 }}>{actions}</DialogActions>
         </>
       )}
     </Dialog>

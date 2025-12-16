@@ -83,7 +83,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
 
   // פילטרים זמינים שעדיין לא הופעלו
   const availableFiltersToAdd = availableFilters.filter(
-    (filter) => !activeFilters.some((active) => active.id === filter.id)
+    filter => !activeFilters.some(active => active.id === filter.id)
   );
 
   const handleFilterMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -123,7 +123,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
     if (onClearAll) {
       onClearAll();
     } else {
-      activeFilters.forEach((filter) => onFilterRemove(filter.id));
+      activeFilters.forEach(filter => onFilterRemove(filter.id));
     }
     onSearchChange('');
   };
@@ -138,10 +138,10 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             <InputLabel>{selectedFilterForAdd.label}</InputLabel>
             <Select
               value={filterInputValue}
-              onChange={(e) => setFilterInputValue(e.target.value)}
+              onChange={e => setFilterInputValue(e.target.value)}
               label={selectedFilterForAdd.label}
             >
-              {selectedFilterForAdd.options?.map((option) => (
+              {selectedFilterForAdd.options?.map(option => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -158,12 +158,10 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             size="small"
             sx={{ mt: 2 }}
             options={selectedFilterForAdd.options || []}
-            getOptionLabel={(option) => option.label}
+            getOptionLabel={option => option.label}
             value={filterInputValue}
             onChange={(_, newValue) => setFilterInputValue(newValue)}
-            renderInput={(params) => (
-              <TextField {...params} label={selectedFilterForAdd.label} />
-            )}
+            renderInput={params => <TextField {...params} label={selectedFilterForAdd.label} />}
           />
         );
 
@@ -174,12 +172,10 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             size="small"
             sx={{ mt: 2 }}
             options={selectedFilterForAdd.autocompleteOptions || []}
-            getOptionLabel={selectedFilterForAdd.getOptionLabel || ((option) => String(option))}
+            getOptionLabel={selectedFilterForAdd.getOptionLabel || (option => String(option))}
             value={filterInputValue}
             onChange={(_, newValue) => setFilterInputValue(newValue)}
-            renderInput={(params) => (
-              <TextField {...params} label={selectedFilterForAdd.label} />
-            )}
+            renderInput={params => <TextField {...params} label={selectedFilterForAdd.label} />}
           />
         );
 
@@ -191,7 +187,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             type="date"
             label={selectedFilterForAdd.label}
             value={filterInputValue}
-            onChange={(e) => setFilterInputValue(e.target.value)}
+            onChange={e => setFilterInputValue(e.target.value)}
             sx={{ mt: 2 }}
             InputLabelProps={{ shrink: true }}
           />
@@ -206,7 +202,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             label={selectedFilterForAdd.label}
             placeholder={selectedFilterForAdd.placeholder}
             value={filterInputValue}
-            onChange={(e) => setFilterInputValue(e.target.value)}
+            onChange={e => setFilterInputValue(e.target.value)}
             sx={{ mt: 2 }}
           />
         );
@@ -239,7 +235,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
           fullWidth
           size="small"
           value={searchValue}
-          onChange={(e) => onSearchChange(e.target.value)}
+          onChange={e => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder || t('common.search')}
           disabled={disabled}
           InputProps={{
@@ -250,11 +246,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             ),
             endAdornment: searchValue && (
               <InputAdornment position="end">
-                <IconButton
-                  size="small"
-                  onClick={() => onSearchChange('')}
-                  edge="end"
-                >
+                <IconButton size="small" onClick={() => onSearchChange('')} edge="end">
                   <CloseIcon fontSize="small" />
                 </IconButton>
               </InputAdornment>
@@ -330,7 +322,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             gap: 1,
           }}
         >
-          {activeFilters.map((filter) => (
+          {activeFilters.map(filter => (
             <Chip
               key={filter.id}
               label={
@@ -338,9 +330,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
                   <Typography variant="caption" sx={{ fontWeight: 600 }}>
                     {filter.label}:
                   </Typography>
-                  <Typography variant="caption">
-                    {filter.displayValue}
-                  </Typography>
+                  <Typography variant="caption">{filter.displayValue}</Typography>
                 </Box>
               }
               onDelete={() => onFilterRemove(filter.id)}
@@ -388,7 +378,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
               {t('common.select_filter')}
             </Typography>
-            {availableFiltersToAdd.map((filter) => (
+            {availableFiltersToAdd.map(filter => (
               <MenuItem
                 key={filter.id}
                 onClick={() => handleFilterSelect(filter)}
@@ -409,11 +399,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
           // טופס הוספת ערך לפילטר
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <IconButton
-                size="small"
-                onClick={() => setSelectedFilterForAdd(null)}
-                sx={{ mr: 1 }}
-              >
+              <IconButton size="small" onClick={() => setSelectedFilterForAdd(null)} sx={{ mr: 1 }}>
                 <CloseIcon fontSize="small" />
               </IconButton>
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
@@ -424,18 +410,17 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             {renderFilterInput()}
 
             <Box sx={{ display: 'flex', gap: 1, mt: 3 }}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={handleFilterMenuClose}
-              >
+              <Button fullWidth variant="outlined" onClick={handleFilterMenuClose}>
                 {t('common.cancel')}
               </Button>
               <Button
                 fullWidth
                 variant="contained"
                 onClick={handleFilterApply}
-                disabled={!filterInputValue || (Array.isArray(filterInputValue) && filterInputValue.length === 0)}
+                disabled={
+                  !filterInputValue ||
+                  (Array.isArray(filterInputValue) && filterInputValue.length === 0)
+                }
               >
                 {t('common.apply')}
               </Button>

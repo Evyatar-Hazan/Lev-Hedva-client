@@ -1,10 +1,5 @@
 import React from 'react';
-import { 
-  TextField, 
-  TextFieldProps, 
-  InputAdornment,
-  IconButton 
-} from '@mui/material';
+import { TextField, TextFieldProps, InputAdornment, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export interface InputProps extends Omit<TextFieldProps, 'variant'> {
@@ -68,11 +63,15 @@ const Input: React.FC<InputProps> = ({
         </InputAdornment>
       );
     }
-    return endAdornment ? <InputAdornment position="end">{endAdornment}</InputAdornment> : undefined;
+    return endAdornment ? (
+      <InputAdornment position="end">{endAdornment}</InputAdornment>
+    ) : undefined;
   };
 
   const getStartAdornment = () => {
-    return startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : undefined;
+    return startAdornment ? (
+      <InputAdornment position="start">{startAdornment}</InputAdornment>
+    ) : undefined;
   };
 
   return (

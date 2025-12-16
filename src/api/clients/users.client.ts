@@ -1,22 +1,23 @@
 import { apiClient } from '../axios';
-import { 
-  User, 
-  CreateUserDto, 
-  UpdateUserDto, 
-  UsersQueryDto, 
-  PaginatedResponse, 
+import {
+  User,
+  CreateUserDto,
+  UpdateUserDto,
+  UsersQueryDto,
   ApiResponse,
-  UserPermission
+  UserPermission,
 } from '../../lib/types';
 
 export class UsersClient {
   private static readonly BASE_PATH = '/users';
 
-  static async getUsers(query?: UsersQueryDto): Promise<{users: User[], total: number, page: number, limit: number, totalPages: number}> {
+  static async getUsers(
+    query?: UsersQueryDto
+  ): Promise<{ users: User[]; total: number; page: number; limit: number; totalPages: number }> {
     const params = new URLSearchParams();
-    
+
     if (query) {
-      (Object.keys(query) as Array<keyof UsersQueryDto>).forEach((key) => {
+      (Object.keys(query) as Array<keyof UsersQueryDto>).forEach(key => {
         const value = query[key];
         if (value !== undefined) {
           params.append(key, String(value));
@@ -24,12 +25,16 @@ export class UsersClient {
       });
     }
 
-    const response = await apiClient.get<{users: User[], total: number, page: number, limit: number, totalPages: number}>(
-      `${this.BASE_PATH}?${params.toString()}`
-    );
-    
+    const response = await apiClient.get<{
+      users: User[];
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    }>(`${this.BASE_PATH}?${params.toString()}`);
+
     console.log('👥 Users API Response:', response.data);
-    
+
     // החזרת הנתונים כפי שהם מהשרת
     return response.data;
   }

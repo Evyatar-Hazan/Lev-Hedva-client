@@ -1,10 +1,5 @@
 import { apiClient } from '../axios';
-import { 
-  Loan, 
-  CreateLoanDto, 
-  UpdateLoanDto, 
-  LoansQueryDto
-} from '../../lib/types';
+import { Loan, CreateLoanDto, UpdateLoanDto, LoansQueryDto } from '../../lib/types';
 
 // Define the response interface to match server response
 interface LoansListResponse {
@@ -21,8 +16,8 @@ interface LoanStatsResponse {
   totalReturnedLoans: number;
   totalLostItems: number;
   averageLoanDuration: number;
-  loansByCategory: { category: string; count: number; }[];
-  overdueByUser: { userId: string; userName: string; count: number; }[];
+  loansByCategory: { category: string; count: number }[];
+  overdueByUser: { userId: string; userName: string; count: number }[];
 }
 
 export class LoansClient {
@@ -30,9 +25,9 @@ export class LoansClient {
 
   static async getLoans(query?: LoansQueryDto): Promise<LoansListResponse> {
     const params = new URLSearchParams();
-    
+
     if (query) {
-      (Object.keys(query) as Array<keyof LoansQueryDto>).forEach((key) => {
+      (Object.keys(query) as Array<keyof LoansQueryDto>).forEach(key => {
         const value = query[key];
         if (value !== undefined) {
           params.append(key, String(value));

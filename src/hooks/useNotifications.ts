@@ -49,10 +49,8 @@ export const useNotifications = () => {
     if (loansData?.loans) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
-      const todayLoans = loansData.loans.filter(loan => 
-        new Date(loan.createdAt) >= today
-      );
+
+      const todayLoans = loansData.loans.filter(loan => new Date(loan.createdAt) >= today);
 
       if (todayLoans.length > 0) {
         notifs.push({

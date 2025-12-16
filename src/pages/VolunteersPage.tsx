@@ -45,7 +45,11 @@ import {
 } from '@mui/icons-material';
 import SearchAndFilter, { FilterOption, ActiveFilter } from '../components/SearchAndFilter';
 import StatsGrid from '../components/StatsGrid';
-import { useVolunteerActivities, useCreateVolunteerActivity, useUpdateVolunteerActivity } from '../hooks';
+import {
+  useVolunteerActivities,
+  useCreateVolunteerActivity,
+  useUpdateVolunteerActivity,
+} from '../hooks';
 import { useUsers } from '../hooks/useUsers';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
@@ -55,7 +59,7 @@ const VolunteersPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+
   const [search, setSearch] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [page, setPage] = useState(1);
@@ -66,18 +70,23 @@ const VolunteersPage: React.FC = () => {
     activityType: '',
     description: '',
     hours: '',
-    date: ''
+    date: '',
   });
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
-  
+
   // שימוש בהוכים החדשים
-  const { data: activitiesData, isLoading, error, refetch } = useVolunteerActivities({ 
+  const {
+    data: activitiesData,
+    isLoading,
+    error,
+    refetch,
+  } = useVolunteerActivities({
     page,
-    limit: 20
+    limit: 20,
   });
-  
+
   const { data: usersData } = useUsers();
   const createActivityMutation = useCreateVolunteerActivity();
   const updateActivityMutation = useUpdateVolunteerActivity();
@@ -152,23 +161,35 @@ const VolunteersPage: React.FC = () => {
 
   const getActivityTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
-      case 'delivery': return 'primary';
-      case 'home_visit': return 'secondary';
-      case 'phone_call': return 'info';
-      case 'maintenance': return 'warning';
-      case 'other': return 'default';
-      default: return 'default';
+      case 'delivery':
+        return 'primary';
+      case 'home_visit':
+        return 'secondary';
+      case 'phone_call':
+        return 'info';
+      case 'maintenance':
+        return 'warning';
+      case 'other':
+        return 'default';
+      default:
+        return 'default';
     }
   };
 
   const getActivityTypeText = (type: string) => {
     switch (type.toLowerCase()) {
-      case 'delivery': return 'משלוח';
-      case 'home_visit': return 'ביקור בית';
-      case 'phone_call': return 'שיחה טלפונית';
-      case 'maintenance': return 'תחזוקה';
-      case 'other': return 'אחר';
-      default: return type;
+      case 'delivery':
+        return 'משלוח';
+      case 'home_visit':
+        return 'ביקור בית';
+      case 'phone_call':
+        return 'שיחה טלפונית';
+      case 'maintenance':
+        return 'תחזוקה';
+      case 'other':
+        return 'אחר';
+      default:
+        return type;
     }
   };
 
@@ -183,7 +204,7 @@ const VolunteersPage: React.FC = () => {
       activityType: '',
       description: '',
       hours: '',
-      date: ''
+      date: '',
     });
     setSubmitError(null);
     setSelectedActivity(null);
@@ -198,11 +219,11 @@ const VolunteersPage: React.FC = () => {
           activityType: newActivity.activityType,
           description: newActivity.description,
           hours: parseInt(newActivity.hours),
-          date: new Date(newActivity.date).toISOString()
+          date: new Date(newActivity.date).toISOString(),
         };
         await updateActivityMutation.mutateAsync({
           id: selectedActivity.id,
-          activityData
+          activityData,
         });
       } else {
         // יצירת פעילות חדשה - עם volunteerId
@@ -211,11 +232,11 @@ const VolunteersPage: React.FC = () => {
           activityType: newActivity.activityType,
           description: newActivity.description,
           hours: parseInt(newActivity.hours),
-          date: new Date(newActivity.date).toISOString()
+          date: new Date(newActivity.date).toISOString(),
         };
         await createActivityMutation.mutateAsync(activityData);
       }
-      
+
       handleCloseDialog();
     } catch (error: any) {
       console.error('Error submitting activity:', error);
@@ -235,7 +256,7 @@ const VolunteersPage: React.FC = () => {
       activityType: activity.activityType,
       description: activity.description,
       hours: activity.hours.toString(),
-      date: activity.date.split('T')[0] // Format date for input
+      date: activity.date.split('T')[0], // Format date for input
     });
     setIsAddDialogOpen(true);
   };
@@ -265,10 +286,13 @@ const VolunteersPage: React.FC = () => {
   const filteredActivities = activities.filter(activity => {
     // סינון לפי חיפוש
     const searchLower = search.toLowerCase();
-    const matchesSearch = !search || 
+    const matchesSearch =
+      !search ||
       activity.description.toLowerCase().includes(searchLower) ||
       activity.activityType.toLowerCase().includes(searchLower) ||
-      `${activity.volunteer?.firstName} ${activity.volunteer?.lastName}`.toLowerCase().includes(searchLower);
+      `${activity.volunteer?.firstName} ${activity.volunteer?.lastName}`
+        .toLowerCase()
+        .includes(searchLower);
 
     // יישום כל הפילטרים הפעילים
     const matchesFilters = activeFilters.every(filter => {
@@ -299,7 +323,7 @@ const VolunteersPage: React.FC = () => {
         volunteer: activity.volunteer,
         totalActivities: 0,
         totalHours: 0,
-        latestActivity: activity.createdAt
+        latestActivity: activity.createdAt,
       });
     }
     const stats = volunteerStats.get(volunteerName);
@@ -316,11 +340,7 @@ const VolunteersPage: React.FC = () => {
           {t('volunteers.title')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={() => refetch()}
-          >
+          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={() => refetch()}>
             {t('common.refresh')}
           </Button>
           <Button
@@ -335,39 +355,46 @@ const VolunteersPage: React.FC = () => {
       </Box>
 
       {/* סטטיסטיקות מהירות */}
-      <StatsGrid stats={[
-        {
-          icon: <VolunteerIcon />,
-          value: volunteerStatsArray.length,
-          label: t('volunteers.stats.activeVolunteers'),
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        },
-        {
-          icon: <EventIcon />,
-          value: activitiesData?.pagination?.total || 0,
-          label: t('volunteers.stats.yearActivities'),
-          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        },
-        {
-          icon: <TimeIcon />,
-          value: volunteerStatsArray.reduce((sum, v) => sum + v.totalHours, 0),
-          label: t('volunteers.stats.totalHours'),
-          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        },
-        {
-          icon: <StarIcon />,
-          value: volunteerStatsArray.length > 0 
-            ? Math.round(volunteerStatsArray.reduce((sum, v) => sum + v.totalHours, 0) / volunteerStatsArray.length * 10) / 10
-            : 0,
-          label: t('volunteers.stats.avgHoursPerVolunteer'),
-          gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        },
-      ]} />
+      <StatsGrid
+        stats={[
+          {
+            icon: <VolunteerIcon />,
+            value: volunteerStatsArray.length,
+            label: t('volunteers.stats.activeVolunteers'),
+            gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          },
+          {
+            icon: <EventIcon />,
+            value: activitiesData?.pagination?.total || 0,
+            label: t('volunteers.stats.yearActivities'),
+            gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          },
+          {
+            icon: <TimeIcon />,
+            value: volunteerStatsArray.reduce((sum, v) => sum + v.totalHours, 0),
+            label: t('volunteers.stats.totalHours'),
+            gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          },
+          {
+            icon: <StarIcon />,
+            value:
+              volunteerStatsArray.length > 0
+                ? Math.round(
+                    (volunteerStatsArray.reduce((sum, v) => sum + v.totalHours, 0) /
+                      volunteerStatsArray.length) *
+                      10
+                  ) / 10
+                : 0,
+            label: t('volunteers.stats.avgHoursPerVolunteer'),
+            gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+          },
+        ]}
+      />
 
       {/* קומפוננטת חיפוש ופילטר */}
       <SearchAndFilter
         searchValue={search}
-        onSearchChange={(value) => {
+        onSearchChange={value => {
           setSearch(value);
           setPage(1);
         }}
@@ -398,7 +425,8 @@ const VolunteersPage: React.FC = () => {
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                     <Avatar sx={{ width: 40, height: 40, bgcolor: COLORS.primary.main }}>
-                      {activity.volunteer?.firstName?.[0]}{activity.volunteer?.lastName?.[0]}
+                      {activity.volunteer?.firstName?.[0]}
+                      {activity.volunteer?.lastName?.[0]}
                     </Avatar>
                     <Box sx={{ flexGrow: 1 }}>
                       <Typography variant="h6" component="div">
@@ -408,31 +436,37 @@ const VolunteersPage: React.FC = () => {
                         {activity.volunteer?.email}
                       </Typography>
                     </Box>
-                    <Chip 
+                    <Chip
                       label={getActivityTypeText(activity.activityType)}
                       color={getActivityTypeColor(activity.activityType)}
                       size="small"
                     />
                   </Box>
-                  
+
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    <strong>{t('volunteers.description')}:</strong> {activity.description || 'אין תיאור'}
+                    <strong>{t('volunteers.description')}:</strong>{' '}
+                    {activity.description || 'אין תיאור'}
                   </Typography>
-                  
+
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    <strong>{t('volunteers.date')}:</strong> {format(new Date(activity.date), 'dd/MM/yyyy', { locale: he })}
+                    <strong>{t('volunteers.date')}:</strong>{' '}
+                    {format(new Date(activity.date), 'dd/MM/yyyy', { locale: he })}
                   </Typography>
-                  
+
                   <Typography variant="body2" color="text.secondary">
                     <strong>{t('volunteers.hours')}:</strong> {activity.hours || 0}
                   </Typography>
                 </CardContent>
-                
+
                 <CardActions sx={{ justifyContent: 'flex-end' }}>
                   <IconButton size="small" title="צפה" onClick={() => handleViewActivity(activity)}>
                     <VisibilityIcon />
                   </IconButton>
-                  <IconButton size="small" title="ערוך" onClick={() => handleEditActivity(activity)}>
+                  <IconButton
+                    size="small"
+                    title="ערוך"
+                    onClick={() => handleEditActivity(activity)}
+                  >
                     <EditIcon />
                   </IconButton>
                 </CardActions>
@@ -477,7 +511,8 @@ const VolunteersPage: React.FC = () => {
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Avatar sx={{ width: 32, height: 32, bgcolor: COLORS.primary.main }}>
-                          {activity.volunteer?.firstName?.[0]}{activity.volunteer?.lastName?.[0]}
+                          {activity.volunteer?.firstName?.[0]}
+                          {activity.volunteer?.lastName?.[0]}
                         </Avatar>
                         <Box>
                           <Typography variant="subtitle2" fontWeight="bold">
@@ -490,16 +525,14 @@ const VolunteersPage: React.FC = () => {
                       </Box>
                     </TableCell>
                     <TableCell>
-                      <Chip 
+                      <Chip
                         label={getActivityTypeText(activity.activityType)}
                         color={getActivityTypeColor(activity.activityType)}
                         size="small"
                       />
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">
-                        {activity.description || 'אין תיאור'}
-                      </Typography>
+                      <Typography variant="body2">{activity.description || 'אין תיאור'}</Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
@@ -512,10 +545,18 @@ const VolunteersPage: React.FC = () => {
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" title="צפה" onClick={() => handleViewActivity(activity)}>
+                      <IconButton
+                        size="small"
+                        title="צפה"
+                        onClick={() => handleViewActivity(activity)}
+                      >
                         <VisibilityIcon />
                       </IconButton>
-                      <IconButton size="small" title="ערוך" onClick={() => handleEditActivity(activity)}>
+                      <IconButton
+                        size="small"
+                        title="ערוך"
+                        onClick={() => handleEditActivity(activity)}
+                      >
                         <EditIcon />
                       </IconButton>
                     </TableCell>
@@ -530,7 +571,7 @@ const VolunteersPage: React.FC = () => {
       {/* פגינציה */}
       {activitiesData?.pagination && activitiesData.pagination.totalPages > 1 && (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, gap: 2 }}>
-          <Pagination 
+          <Pagination
             count={Math.ceil(activitiesData.pagination.total / activitiesData.pagination.limit)}
             page={activitiesData.pagination.page}
             onChange={handlePageChange}
@@ -540,10 +581,12 @@ const VolunteersPage: React.FC = () => {
             showLastButton
           />
           <Typography variant="body2" color="text.secondary">
-            {t('volunteers.pagination', { 
-              page: activitiesData.pagination.page, 
-              totalPages: Math.ceil(activitiesData.pagination.total / activitiesData.pagination.limit),
-              total: activitiesData.pagination.total 
+            {t('volunteers.pagination', {
+              page: activitiesData.pagination.page,
+              totalPages: Math.ceil(
+                activitiesData.pagination.total / activitiesData.pagination.limit
+              ),
+              total: activitiesData.pagination.total,
             })}
           </Typography>
         </Box>
@@ -563,31 +606,29 @@ const VolunteersPage: React.FC = () => {
           <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Autocomplete
               options={usersData?.users || []}
-              getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+              getOptionLabel={option => `${option.firstName} ${option.lastName}`}
               value={usersData?.users?.find(u => u.id === newActivity.volunteerId) || null}
               onChange={(event, value) => {
                 setNewActivity(prev => ({
                   ...prev,
-                  volunteerId: value?.id || ''
+                  volunteerId: value?.id || '',
                 }));
               }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t('volunteers.volunteer')}
-                  required
-                />
+              renderInput={params => (
+                <TextField {...params} label={t('volunteers.volunteer')} required />
               )}
             />
-            
+
             <FormControl fullWidth required>
               <InputLabel>{t('volunteers.activityType')}</InputLabel>
               <Select
                 value={newActivity.activityType}
-                onChange={(e) => setNewActivity(prev => ({
-                  ...prev,
-                  activityType: e.target.value
-                }))}
+                onChange={e =>
+                  setNewActivity(prev => ({
+                    ...prev,
+                    activityType: e.target.value,
+                  }))
+                }
                 label={t('volunteers.activityType')}
               >
                 <MenuItem value="delivery">{getActivityTypeText('delivery')}</MenuItem>
@@ -601,10 +642,12 @@ const VolunteersPage: React.FC = () => {
             <TextField
               label={t('volunteers.description')}
               value={newActivity.description}
-              onChange={(e) => setNewActivity(prev => ({
-                ...prev,
-                description: e.target.value
-              }))}
+              onChange={e =>
+                setNewActivity(prev => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               multiline
               rows={3}
               required
@@ -614,10 +657,12 @@ const VolunteersPage: React.FC = () => {
               label={t('volunteers.hours')}
               type="number"
               value={newActivity.hours}
-              onChange={(e) => setNewActivity(prev => ({
-                ...prev,
-                hours: e.target.value
-              }))}
+              onChange={e =>
+                setNewActivity(prev => ({
+                  ...prev,
+                  hours: e.target.value,
+                }))
+              }
               required
             />
 
@@ -625,10 +670,12 @@ const VolunteersPage: React.FC = () => {
               label={t('volunteers.date')}
               type="date"
               value={newActivity.date}
-              onChange={(e) => setNewActivity(prev => ({
-                ...prev,
-                date: e.target.value
-              }))}
+              onChange={e =>
+                setNewActivity(prev => ({
+                  ...prev,
+                  date: e.target.value,
+                }))
+              }
               InputLabelProps={{
                 shrink: true,
               }}
@@ -637,16 +684,24 @@ const VolunteersPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>
-            {t('common.cancel')}
-          </Button>
-          <Button 
-            variant="contained" 
+          <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
+          <Button
+            variant="contained"
             onClick={handleSubmitActivity}
-            disabled={!newActivity.volunteerId || !newActivity.activityType || 
-                     !newActivity.description || !newActivity.hours || !newActivity.date ||
-                     createActivityMutation.isPending || updateActivityMutation.isPending}
-            startIcon={(createActivityMutation.isPending || updateActivityMutation.isPending) ? <CircularProgress size={20} /> : null}
+            disabled={
+              !newActivity.volunteerId ||
+              !newActivity.activityType ||
+              !newActivity.description ||
+              !newActivity.hours ||
+              !newActivity.date ||
+              createActivityMutation.isPending ||
+              updateActivityMutation.isPending
+            }
+            startIcon={
+              createActivityMutation.isPending || updateActivityMutation.isPending ? (
+                <CircularProgress size={20} />
+              ) : null
+            }
           >
             {selectedActivity ? t('common.save') : t('common.add')}
           </Button>
@@ -661,11 +716,13 @@ const VolunteersPage: React.FC = () => {
             <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <TextField
                 label={t('volunteers.volunteer')}
-                value={`${selectedActivity.volunteer?.firstName || ''} ${selectedActivity.volunteer?.lastName || ''}`}
+                value={`${selectedActivity.volunteer?.firstName || ''} ${
+                  selectedActivity.volunteer?.lastName || ''
+                }`}
                 InputProps={{ readOnly: true }}
                 variant="outlined"
               />
-              
+
               <TextField
                 label={t('volunteers.activityType')}
                 value={getActivityTypeText(selectedActivity.activityType)}
@@ -695,10 +752,12 @@ const VolunteersPage: React.FC = () => {
                 InputProps={{ readOnly: true }}
                 variant="outlined"
               />
-              
+
               <TextField
                 label={t('volunteers.createdAt')}
-                value={format(new Date(selectedActivity.createdAt), 'dd/MM/yyyy HH:mm', { locale: he })}
+                value={format(new Date(selectedActivity.createdAt), 'dd/MM/yyyy HH:mm', {
+                  locale: he,
+                })}
                 InputProps={{ readOnly: true }}
                 variant="outlined"
               />
@@ -706,11 +765,9 @@ const VolunteersPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseViewDialog}>
-            {t('common.close')}
-          </Button>
-          <Button 
-            variant="contained" 
+          <Button onClick={handleCloseViewDialog}>{t('common.close')}</Button>
+          <Button
+            variant="contained"
             onClick={() => {
               handleCloseViewDialog();
               handleEditActivity(selectedActivity);

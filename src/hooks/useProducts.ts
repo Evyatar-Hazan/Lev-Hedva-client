@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProductsClient } from '../api/clients/products.client';
 import {
-  CreateProductDto, 
-  UpdateProductDto, 
+  CreateProductDto,
+  UpdateProductDto,
   CreateProductInstanceDto,
   UpdateProductInstanceDto,
-  ProductsQueryDto 
+  ProductsQueryDto,
 } from '../lib/types';
 
 const PRODUCTS_QUERY_KEY = ['products'];
@@ -34,8 +34,7 @@ export const useCreateProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (productData: CreateProductDto) => 
-      ProductsClient.createProduct(productData),
+    mutationFn: (productData: CreateProductDto) => ProductsClient.createProduct(productData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ['product-categories'] });
@@ -49,7 +48,7 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, productData }: { id: string; productData: UpdateProductDto }) => 
+    mutationFn: ({ id, productData }: { id: string; productData: UpdateProductDto }) =>
       ProductsClient.updateProduct(id, productData),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });
@@ -98,7 +97,7 @@ export const useCreateProductInstance = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (instanceData: CreateProductInstanceDto) => 
+    mutationFn: (instanceData: CreateProductInstanceDto) =>
       ProductsClient.createProductInstance(instanceData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PRODUCT_INSTANCES_QUERY_KEY });
@@ -112,7 +111,7 @@ export const useUpdateProductInstance = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, instanceData }: { id: string; instanceData: UpdateProductInstanceDto }) => 
+    mutationFn: ({ id, instanceData }: { id: string; instanceData: UpdateProductInstanceDto }) =>
       ProductsClient.updateProductInstance(id, instanceData),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: PRODUCT_INSTANCES_QUERY_KEY });

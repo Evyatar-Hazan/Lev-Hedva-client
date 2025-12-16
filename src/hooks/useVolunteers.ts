@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { VolunteersClient } from '../api/clients/volunteers.client';
-import { 
-  CreateVolunteerActivityDto, 
-  UpdateVolunteerActivityDto, 
-  VolunteerActivitiesQueryDto 
+import {
+  CreateVolunteerActivityDto,
+  UpdateVolunteerActivityDto,
+  VolunteerActivitiesQueryDto,
 } from '../lib/types';
 
 const VOLUNTEER_ACTIVITIES_QUERY_KEY = ['volunteer-activities'];
@@ -32,7 +32,7 @@ export const useCreateVolunteerActivity = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (activityData: CreateVolunteerActivityDto) => 
+    mutationFn: (activityData: CreateVolunteerActivityDto) =>
       VolunteersClient.createActivity(activityData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VOLUNTEER_ACTIVITIES_QUERY_KEY });
@@ -46,11 +46,13 @@ export const useUpdateVolunteerActivity = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, activityData }: { id: string; activityData: UpdateVolunteerActivityDto }) => 
+    mutationFn: ({ id, activityData }: { id: string; activityData: UpdateVolunteerActivityDto }) =>
       VolunteersClient.updateActivity(id, activityData),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: VOLUNTEER_ACTIVITIES_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: [...VOLUNTEER_ACTIVITIES_QUERY_KEY, variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: [...VOLUNTEER_ACTIVITIES_QUERY_KEY, variables.id],
+      });
       queryClient.invalidateQueries({ queryKey: VOLUNTEER_STATS_QUERY_KEY });
     },
   });
@@ -89,11 +91,7 @@ export const useVolunteerStatsByUser = (volunteerId: string) => {
 };
 
 // Hook לקבלת דוח מתנדב
-export const useVolunteerReport = (
-  volunteerId: string, 
-  dateFrom?: string, 
-  dateTo?: string
-) => {
+export const useVolunteerReport = (volunteerId: string, dateFrom?: string, dateTo?: string) => {
   return useQuery({
     queryKey: [...VOLUNTEER_ACTIVITIES_QUERY_KEY, 'report', volunteerId, dateFrom, dateTo],
     queryFn: () => VolunteersClient.getVolunteerReport(volunteerId, dateFrom, dateTo),

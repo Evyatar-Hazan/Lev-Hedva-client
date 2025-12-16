@@ -42,19 +42,34 @@ import {
 } from '@mui/icons-material';
 import SearchAndFilter, { FilterOption, ActiveFilter } from '../components/SearchAndFilter';
 import StatsGrid from '../components/StatsGrid';
-import { useProducts, useProductInstances, useCreateProduct, useUpdateProduct, useUpdateProductInstance, useCreateProductInstance, useDeleteProductInstance, useProductCategories, useProductManufacturers } from '../hooks';
-import { CreateProductDto, UpdateProductDto, UpdateProductInstanceDto, CreateProductInstanceDto } from '../lib/types';
+import {
+  useProducts,
+  useProductInstances,
+  useCreateProduct,
+  useUpdateProduct,
+  useUpdateProductInstance,
+  useCreateProductInstance,
+  useDeleteProductInstance,
+  useProductCategories,
+  useProductManufacturers,
+} from '../hooks';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  UpdateProductInstanceDto,
+  CreateProductInstanceDto,
+} from '../lib/types';
 import { COLORS } from '../theme/colors';
 
 // רכיב פשוט לתצוגת מופעים
-const ProductInstancesView: React.FC<{ 
-  product: any; 
-  instances: any[]; 
+const ProductInstancesView: React.FC<{
+  product: any;
+  instances: any[];
   onEditInstance: (instance: any) => void;
   onDeleteInstance: (instance: any) => void;
 }> = ({ product, instances, onEditInstance, onDeleteInstance }) => {
   const { t } = useTranslation();
-  
+
   if (!instances || instances.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 8 }}>
@@ -72,15 +87,15 @@ const ProductInstancesView: React.FC<{
   return (
     <Box>
       <Grid container spacing={3}>
-        {instances.map((instance) => (
+        {instances.map(instance => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={instance.id}>
-            <Card 
-              sx={{ 
+            <Card
+              sx={{
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 '&:hover': { boxShadow: 4 },
-                transition: 'box-shadow 0.2s ease-in-out'
+                transition: 'box-shadow 0.2s ease-in-out',
               }}
             >
               <CardContent sx={{ flexGrow: 1 }}>
@@ -90,25 +105,20 @@ const ProductInstancesView: React.FC<{
                     {instance.barcode || `מופע ${instance.id.slice(-4)}`}
                   </Typography>
                 </Box>
-                
+
                 {instance.serialNumber && (
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     <strong>{t('products.serial_number')}:</strong> {instance.serialNumber}
                   </Typography>
                 )}
-                
+
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Typography variant="body2" color="text.secondary">
                     <strong>{t('products.condition')}:</strong>
                   </Typography>
-                  <Chip
-                    label={instance.condition}
-                    size="small"
-                    variant="outlined"
-                    sx={{ ml: 1 }}
-                  />
+                  <Chip label={instance.condition} size="small" variant="outlined" sx={{ ml: 1 }} />
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Typography variant="body2" color="text.secondary">
                     <strong>{t('products.status')}:</strong>
@@ -120,38 +130,42 @@ const ProductInstancesView: React.FC<{
                     sx={{ ml: 1 }}
                   />
                 </Box>
-                
+
                 {instance.location && (
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     <strong>{t('products.location')}:</strong> {instance.location}
                   </Typography>
                 )}
-                
+
                 {instance.notes && (
-                  <Typography variant="body2" color="text.secondary" sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical'
-                  }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                    }}
+                  >
                     <strong>{t('products.notes')}:</strong> {instance.notes}
                   </Typography>
                 )}
               </CardContent>
-              
+
               <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                <Button 
-                  size="small" 
+                <Button
+                  size="small"
                   startIcon={<EditIcon />}
                   onClick={() => onEditInstance(instance)}
                   variant="outlined"
                 >
                   {t('common.edit')}
                 </Button>
-                <Button 
-                  size="small" 
-                  color="error" 
+                <Button
+                  size="small"
+                  color="error"
                   startIcon={<CloseIcon />}
                   onClick={() => onDeleteInstance(instance)}
                   variant="outlined"
@@ -171,21 +185,21 @@ const ProductsPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+
   const [search, setSearch] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [page, setPage] = useState(1);
-  
+
   // משתנים לקטגוריות חדשות
   const [customCategory, setCustomCategory] = useState('');
   const [customManufacturer, setCustomManufacturer] = useState('');
   const [showCustomCategory, setShowCustomCategory] = useState(false);
   const [showCustomManufacturer, setShowCustomManufacturer] = useState(false);
-  
+
   // משתנים לניהול תצוגה
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isViewingInstances, setIsViewingInstances] = useState(false);
-  
+
   // דיאלוגי פעולות מוצרים
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isAddInstanceDialogOpen, setIsAddInstanceDialogOpen] = useState(false);
@@ -193,7 +207,7 @@ const ProductsPage: React.FC = () => {
   const [isEditInstanceDialogOpen, setIsEditInstanceDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [editingInstance, setEditingInstance] = useState<any>(null);
-  
+
   const [newProduct, setNewProduct] = useState<CreateProductDto>({
     name: '',
     description: '',
@@ -201,7 +215,7 @@ const ProductsPage: React.FC = () => {
     manufacturer: '',
     model: '',
   });
-  
+
   const [newInstance, setNewInstance] = useState<CreateProductInstanceDto>({
     productId: '',
     barcode: '',
@@ -210,7 +224,7 @@ const ProductsPage: React.FC = () => {
     location: '',
     notes: '',
   });
-  
+
   const [editProduct, setEditProduct] = useState<UpdateProductDto>({
     name: '',
     description: '',
@@ -218,7 +232,7 @@ const ProductsPage: React.FC = () => {
     manufacturer: '',
     model: '',
   });
-  
+
   const [editInstance, setEditInstance] = useState<UpdateProductInstanceDto>({
     barcode: '',
     serialNumber: '',
@@ -226,13 +240,17 @@ const ProductsPage: React.FC = () => {
     location: '',
     notes: '',
   });
-  
+
   // שימוש בהוכים
-  const { data: productsData, isLoading, error } = useProducts({ 
+  const {
+    data: productsData,
+    isLoading,
+    error,
+  } = useProducts({
     page,
-    limit: 100 // מספר גבוה יותר למוצרים רבים
+    limit: 100, // מספר גבוה יותר למוצרים רבים
   });
-  
+
   const createProductMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
   const updateInstanceMutation = useUpdateProductInstance();
@@ -320,7 +338,7 @@ const ProductsPage: React.FC = () => {
     error,
     search,
     activeFilters,
-    page
+    page,
   });
 
   const getStatusColor = (availableCount: number, totalCount: number) => {
@@ -357,12 +375,12 @@ const ProductsPage: React.FC = () => {
   const handleSaveProduct = async () => {
     console.log('🔄 Starting product save process...');
     console.log('📋 Current product state:', newProduct);
-    console.log('🚀 Mutation status:', { 
-      isPending: createProductMutation.isPending, 
+    console.log('🚀 Mutation status:', {
+      isPending: createProductMutation.isPending,
       isError: createProductMutation.isError,
-      error: createProductMutation.error 
+      error: createProductMutation.error,
     });
-    
+
     try {
       // ניקוי הדאטה - הסרת שדות ריקים
       const cleanedProduct: CreateProductDto = {
@@ -372,26 +390,26 @@ const ProductsPage: React.FC = () => {
         ...(newProduct.manufacturer?.trim() && { manufacturer: newProduct.manufacturer.trim() }),
         ...(newProduct.model?.trim() && { model: newProduct.model.trim() }),
       };
-      
+
       console.log('📤 Sending product data:', cleanedProduct);
-      
+
       const result = await createProductMutation.mutateAsync(cleanedProduct);
       console.log('✅ Product created successfully:', result);
-      
+
       handleCloseAddDialog();
     } catch (error) {
       console.error('❌ Error creating product:', error);
-      
+
       // הצגת פרטי השגיאה
       if (error && typeof error === 'object') {
         console.error('Error details:', {
           message: (error as any)?.message,
           response: (error as any)?.response?.data,
           status: (error as any)?.response?.status,
-          request: (error as any)?.request
+          request: (error as any)?.request,
         });
       }
-      
+
       // לא סוגרים את הדיאלוג במקרה של שגיאה
       // handleCloseAddDialog();
     }
@@ -434,11 +452,11 @@ const ProductsPage: React.FC = () => {
 
   const handleSaveEditedProduct = async () => {
     if (!editingProduct?.id) return;
-    
+
     try {
       await updateProductMutation.mutateAsync({
         id: editingProduct.id,
-        productData: editProduct
+        productData: editProduct,
       });
       setIsEditProductDialogOpen(false);
       setEditingProduct(null);
@@ -479,11 +497,11 @@ const ProductsPage: React.FC = () => {
   // פונקציה ליצירת ברקוד אוטומטי
   const generateBarcode = () => {
     if (!selectedProduct) return '';
-    
+
     // יצירת קיצור משם המוצר
     const productName = selectedProduct.name;
     let prefix = '';
-    
+
     // קיצורים לפי קטגוריה
     const category = selectedProduct.category?.toLowerCase() || '';
     if (category.includes('כסא') || category.includes('גלגל')) {
@@ -509,11 +527,12 @@ const ProductsPage: React.FC = () => {
         prefix = 'ITEM';
       }
     }
-    
+
     // חישוב המספר הרץ על בסיס מופעים קיימים
-    const existingInstances = productInstances?.filter(inst => inst.productId === selectedProduct.id) || [];
+    const existingInstances =
+      productInstances?.filter(inst => inst.productId === selectedProduct.id) || [];
     const nextNumber = String(existingInstances.length + 1).padStart(3, '0');
-    
+
     return `${prefix}${nextNumber}`;
   };
 
@@ -535,7 +554,12 @@ const ProductsPage: React.FC = () => {
         location: '',
         notes: '',
       });
-      console.log('📋 New instance initialized with productId:', selectedProduct.id, 'and barcode:', suggestedBarcode);
+      console.log(
+        '📋 New instance initialized with productId:',
+        selectedProduct.id,
+        'and barcode:',
+        suggestedBarcode
+      );
       setIsAddInstanceDialogOpen(true);
     } else {
       console.error('❌ Error: selectedProduct or selectedProduct.id is missing');
@@ -558,21 +582,21 @@ const ProductsPage: React.FC = () => {
   const handleSaveInstance = async () => {
     console.log('🔄 Starting instance save process...');
     console.log('📋 Current instance state:', newInstance);
-    
+
     // ולידציה שה-productId קיים
     if (!newInstance.productId) {
       console.error('❌ Error: productId is missing');
       alert('שגיאה: לא נמצא מזהה מוצר');
       return;
     }
-    
+
     // ולידציה שברקוד קיים (שדה חובה)
     if (!newInstance.barcode || newInstance.barcode.trim() === '') {
       console.error('❌ Error: barcode is required');
       alert('שגיאה: ברקוד הוא שדה חובה');
       return;
     }
-    
+
     // ניקוי והכנת הדאטה
     const cleanedInstanceData = {
       productId: newInstance.productId.trim(),
@@ -582,9 +606,9 @@ const ProductsPage: React.FC = () => {
       ...(newInstance.location?.trim() && { location: newInstance.location.trim() }),
       ...(newInstance.notes?.trim() && { notes: newInstance.notes.trim() }),
     };
-    
+
     console.log('🧹 Cleaned instance data:', cleanedInstanceData);
-    
+
     try {
       console.log('📤 Sending instance data:', cleanedInstanceData);
       const result = await createInstanceMutation.mutateAsync(cleanedInstanceData as any);
@@ -592,7 +616,7 @@ const ProductsPage: React.FC = () => {
       handleCloseAddInstance();
     } catch (error) {
       console.error('❌ Failed to create instance:', error);
-      
+
       // הצגת פרטי השגיאה
       if (error && typeof error === 'object') {
         const errorDetails = {
@@ -602,7 +626,7 @@ const ProductsPage: React.FC = () => {
           data: (error as any)?.response?.data,
         };
         console.error('Error details:', errorDetails);
-        
+
         // הצגת הודעת שגיאה מפורטת
         let errorMessage = 'שגיאה בהוספת המופע';
         if (errorDetails.data?.message) {
@@ -614,7 +638,7 @@ const ProductsPage: React.FC = () => {
         } else if (errorDetails.message) {
           errorMessage += ': ' + errorDetails.message;
         }
-        
+
         alert(errorMessage);
       }
     }
@@ -622,7 +646,11 @@ const ProductsPage: React.FC = () => {
 
   // פונקציה למחיקת מופע
   const handleDeleteInstance = async (instance: any) => {
-    if (window.confirm(`האם אתה בטוח שברצונך למחוק את המופע ${instance.barcode || instance.id.slice(-4)}?`)) {
+    if (
+      window.confirm(
+        `האם אתה בטוח שברצונך למחוק את המופע ${instance.barcode || instance.id.slice(-4)}?`
+      )
+    ) {
       try {
         await deleteInstanceMutation.mutateAsync(instance.id);
       } catch (error) {
@@ -633,11 +661,11 @@ const ProductsPage: React.FC = () => {
 
   const handleSaveEditedInstance = async () => {
     if (!editingInstance?.id) return;
-    
+
     try {
       await updateInstanceMutation.mutateAsync({
         id: editingInstance.id,
-        instanceData: editInstance
+        instanceData: editInstance,
       });
       setIsEditInstanceDialogOpen(false);
       setEditingInstance(null);
@@ -669,7 +697,7 @@ const ProductsPage: React.FC = () => {
   }
 
   let products = (productsData as any)?.products || [];
-  
+
   // יצירת מפה של מופעי מוצרים לפי מוצר (לפני הפילטור)
   const productInstancesMap = new Map();
   productInstances?.forEach(instance => {
@@ -680,19 +708,20 @@ const ProductsPage: React.FC = () => {
     counts.total += 1;
     if (instance.isAvailable) counts.available += 1;
   });
-  
+
   // סינון המוצרים לפי חיפוש ופילטרים
   if (search) {
     const searchLower = search.toLowerCase();
-    products = products.filter((product: any) => 
-      product.name?.toLowerCase().includes(searchLower) ||
-      product.description?.toLowerCase().includes(searchLower) ||
-      product.category?.toLowerCase().includes(searchLower) ||
-      product.manufacturer?.toLowerCase().includes(searchLower) ||
-      product.model?.toLowerCase().includes(searchLower)
+    products = products.filter(
+      (product: any) =>
+        product.name?.toLowerCase().includes(searchLower) ||
+        product.description?.toLowerCase().includes(searchLower) ||
+        product.category?.toLowerCase().includes(searchLower) ||
+        product.manufacturer?.toLowerCase().includes(searchLower) ||
+        product.model?.toLowerCase().includes(searchLower)
     );
   }
-  
+
   // יישום כל הפילטרים הפעילים
   activeFilters.forEach(filter => {
     if (filter.id === 'category') {
@@ -717,13 +746,15 @@ const ProductsPage: React.FC = () => {
       });
     }
   });
-  
+
   // אם נבחר מוצר, מציגים את המופעים שלו
   if (isViewingInstances && selectedProduct) {
     return (
       <>
         <Box sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box
+            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}
+          >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <IconButton onClick={handleBackToProducts} sx={{ mr: 2 }}>
                 <ArrowBackIcon />
@@ -741,19 +772,21 @@ const ProductsPage: React.FC = () => {
               {t('products.addInstance')}
             </Button>
           </Box>
-          
+
           {/* כאן נוסיף את תצוגת המופעים */}
-          <ProductInstancesView 
-            product={selectedProduct} 
-            instances={productInstances?.filter(inst => inst.productId === selectedProduct.id) || []}
+          <ProductInstancesView
+            product={selectedProduct}
+            instances={
+              productInstances?.filter(inst => inst.productId === selectedProduct.id) || []
+            }
             onEditInstance={handleEditInstance}
             onDeleteInstance={handleDeleteInstance}
           />
         </Box>
 
         {/* Add Instance Dialog */}
-        <Dialog 
-          open={isAddInstanceDialogOpen} 
+        <Dialog
+          open={isAddInstanceDialogOpen}
           onClose={handleCloseAddInstance}
           maxWidth="sm"
           fullWidth
@@ -773,7 +806,7 @@ const ProductsPage: React.FC = () => {
               <CloseIcon />
             </IconButton>
           </DialogTitle>
-          
+
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
               <Grid item xs={12} sm={6}>
@@ -782,7 +815,7 @@ const ProductsPage: React.FC = () => {
                   required
                   label={t('products.barcode')}
                   value={newInstance.barcode}
-                  onChange={(e) => setNewInstance(prev => ({ ...prev, barcode: e.target.value }))}
+                  onChange={e => setNewInstance(prev => ({ ...prev, barcode: e.target.value }))}
                   helperText="שדה חובה - ברקוד ייחודי למופע"
                   InputProps={{
                     endAdornment: (
@@ -794,7 +827,7 @@ const ProductsPage: React.FC = () => {
                       >
                         <QrCodeIcon />
                       </IconButton>
-                    )
+                    ),
                   }}
                 />
               </Grid>
@@ -803,7 +836,9 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.serial_number')}
                   value={newInstance.serialNumber}
-                  onChange={(e) => setNewInstance(prev => ({ ...prev, serialNumber: e.target.value }))}
+                  onChange={e =>
+                    setNewInstance(prev => ({ ...prev, serialNumber: e.target.value }))
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -811,14 +846,16 @@ const ProductsPage: React.FC = () => {
                   <InputLabel>{t('products.condition')}</InputLabel>
                   <Select
                     value={newInstance.condition}
-                    onChange={(e) => setNewInstance(prev => ({ ...prev, condition: e.target.value }))}
+                    onChange={e => setNewInstance(prev => ({ ...prev, condition: e.target.value }))}
                     label={t('products.condition')}
                   >
                     <MenuItem value="excellent">{t('products.conditions.excellent')}</MenuItem>
                     <MenuItem value="good">{t('products.conditions.good')}</MenuItem>
                     <MenuItem value="fair">{t('products.conditions.fair')}</MenuItem>
                     <MenuItem value="poor">{t('products.conditions.poor')}</MenuItem>
-                    <MenuItem value="needs-repair">{t('products.conditions.needs_repair')}</MenuItem>
+                    <MenuItem value="needs-repair">
+                      {t('products.conditions.needs_repair')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -827,7 +864,7 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.location')}
                   value={newInstance.location}
-                  onChange={(e) => setNewInstance(prev => ({ ...prev, location: e.target.value }))}
+                  onChange={e => setNewInstance(prev => ({ ...prev, location: e.target.value }))}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -835,19 +872,17 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.notes')}
                   value={newInstance.notes}
-                  onChange={(e) => setNewInstance(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={e => setNewInstance(prev => ({ ...prev, notes: e.target.value }))}
                   multiline
                   rows={3}
                 />
               </Grid>
             </Grid>
           </DialogContent>
-          
+
           <DialogActions>
-            <Button onClick={handleCloseAddInstance}>
-              {t('common.cancel')}
-            </Button>
-            <Button 
+            <Button onClick={handleCloseAddInstance}>{t('common.cancel')}</Button>
+            <Button
               onClick={handleSaveInstance}
               variant="contained"
               disabled={createInstanceMutation.isPending || !newInstance.barcode?.trim()}
@@ -858,8 +893,8 @@ const ProductsPage: React.FC = () => {
         </Dialog>
 
         {/* Edit Instance Dialog */}
-        <Dialog 
-          open={isEditInstanceDialogOpen} 
+        <Dialog
+          open={isEditInstanceDialogOpen}
           onClose={handleCloseEditInstance}
           maxWidth="sm"
           fullWidth
@@ -879,7 +914,7 @@ const ProductsPage: React.FC = () => {
               <CloseIcon />
             </IconButton>
           </DialogTitle>
-          
+
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
               <Grid item xs={12} sm={6}>
@@ -887,7 +922,7 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.barcode')}
                   value={editInstance.barcode}
-                  onChange={(e) => setEditInstance(prev => ({ ...prev, barcode: e.target.value }))}
+                  onChange={e => setEditInstance(prev => ({ ...prev, barcode: e.target.value }))}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -895,7 +930,9 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.serial_number')}
                   value={editInstance.serialNumber}
-                  onChange={(e) => setEditInstance(prev => ({ ...prev, serialNumber: e.target.value }))}
+                  onChange={e =>
+                    setEditInstance(prev => ({ ...prev, serialNumber: e.target.value }))
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -903,14 +940,18 @@ const ProductsPage: React.FC = () => {
                   <InputLabel>{t('products.condition')}</InputLabel>
                   <Select
                     value={editInstance.condition}
-                    onChange={(e) => setEditInstance(prev => ({ ...prev, condition: e.target.value }))}
+                    onChange={e =>
+                      setEditInstance(prev => ({ ...prev, condition: e.target.value }))
+                    }
                     label={t('products.condition')}
                   >
                     <MenuItem value="excellent">{t('products.conditions.excellent')}</MenuItem>
                     <MenuItem value="good">{t('products.conditions.good')}</MenuItem>
                     <MenuItem value="fair">{t('products.conditions.fair')}</MenuItem>
                     <MenuItem value="poor">{t('products.conditions.poor')}</MenuItem>
-                    <MenuItem value="needs-repair">{t('products.conditions.needs_repair')}</MenuItem>
+                    <MenuItem value="needs-repair">
+                      {t('products.conditions.needs_repair')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -919,7 +960,7 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.location')}
                   value={editInstance.location}
-                  onChange={(e) => setEditInstance(prev => ({ ...prev, location: e.target.value }))}
+                  onChange={e => setEditInstance(prev => ({ ...prev, location: e.target.value }))}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -927,19 +968,17 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.notes')}
                   value={editInstance.notes}
-                  onChange={(e) => setEditInstance(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={e => setEditInstance(prev => ({ ...prev, notes: e.target.value }))}
                   multiline
                   rows={3}
                 />
               </Grid>
             </Grid>
           </DialogContent>
-          
+
           <DialogActions>
-            <Button onClick={handleCloseEditInstance}>
-              {t('common.cancel')}
-            </Button>
-            <Button 
+            <Button onClick={handleCloseEditInstance}>{t('common.cancel')}</Button>
+            <Button
               onClick={handleSaveEditedInstance}
               variant="contained"
               disabled={updateInstanceMutation.isPending}
@@ -960,12 +999,7 @@ const ProductsPage: React.FC = () => {
         <Typography variant="h4" component="h1" fontWeight="bold">
           {t('products.title')}
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          size="large"
-          onClick={handleAddProduct}
-        >
+        <Button variant="contained" startIcon={<AddIcon />} size="large" onClick={handleAddProduct}>
           {t('products.addProduct')}
         </Button>
       </Box>
@@ -973,47 +1007,49 @@ const ProductsPage: React.FC = () => {
       {/* Debug Panel */}
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          {t('products.debug', { 
-            loading: isLoading, 
-            error: error ? (error as any).message || t('common.error') : t('common.no'), 
-            count: products.length, 
-            instances: productInstances?.length || 0 
+          {t('products.debug', {
+            loading: isLoading,
+            error: error ? (error as any).message || t('common.error') : t('common.no'),
+            count: products.length,
+            instances: productInstances?.length || 0,
           })}
         </Typography>
       </Alert>
 
       {/* סטטיסטיקות מהירות */}
-      <StatsGrid stats={[
-        {
-          icon: <InventoryIcon />,
-          value: (productsData as any)?.total || 0,
-          label: t('products.stats.totalProducts'),
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        },
-        {
-          icon: <QrCodeIcon />,
-          value: productInstances?.length || 0,
-          label: t('products.stats.productInstances'),
-          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        },
-        {
-          icon: <VisibilityIcon />,
-          value: productInstances?.filter(i => i.isAvailable).length || 0,
-          label: t('products.available'),
-          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        },
-        {
-          icon: <InventoryIcon />,
-          value: productInstances?.filter(i => !i.isAvailable).length || 0,
-          label: t('products.borrowed'),
-          gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        },
-      ]} />
+      <StatsGrid
+        stats={[
+          {
+            icon: <InventoryIcon />,
+            value: (productsData as any)?.total || 0,
+            label: t('products.stats.totalProducts'),
+            gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          },
+          {
+            icon: <QrCodeIcon />,
+            value: productInstances?.length || 0,
+            label: t('products.stats.productInstances'),
+            gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          },
+          {
+            icon: <VisibilityIcon />,
+            value: productInstances?.filter(i => i.isAvailable).length || 0,
+            label: t('products.available'),
+            gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          },
+          {
+            icon: <InventoryIcon />,
+            value: productInstances?.filter(i => !i.isAvailable).length || 0,
+            label: t('products.borrowed'),
+            gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+          },
+        ]}
+      />
 
       {/* קומפוננטת חיפוש ופילטר */}
       <SearchAndFilter
         searchValue={search}
-        onSearchChange={(value) => {
+        onSearchChange={value => {
           setSearch(value);
           setPage(1);
         }}
@@ -1040,19 +1076,29 @@ const ProductsPage: React.FC = () => {
             </Paper>
           ) : (
             products.map((product: any) => {
-              const instanceCounts = productInstancesMap.get(product.id) || { total: 0, available: 0 };
+              const instanceCounts = productInstancesMap.get(product.id) || {
+                total: 0,
+                available: 0,
+              };
               return (
-                <Card 
+                <Card
                   key={product.id}
-                  sx={{ 
-                    cursor: 'pointer', 
+                  sx={{
+                    cursor: 'pointer',
                     '&:hover': { boxShadow: 4, backgroundColor: COLORS.action.hover },
-                    transition: 'all 0.2s ease-in-out'
+                    transition: 'all 0.2s ease-in-out',
                   }}
                   onClick={() => handleProductClick(product)}
                 >
                   <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        mb: 2,
+                      }}
+                    >
                       <Typography variant="h6" fontWeight="bold">
                         {product.name}
                       </Typography>
@@ -1062,22 +1108,18 @@ const ProductsPage: React.FC = () => {
                         size="small"
                       />
                     </Box>
-                    
+
                     {product.description && (
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         {product.description}
                       </Typography>
                     )}
-                    
+
                     <Typography variant="body2" sx={{ mb: 1 }}>
                       <strong>{t('products.category')}:</strong>{' '}
-                      <Chip 
-                        label={product.category}
-                        size="small"
-                        variant="outlined"
-                      />
+                      <Chip label={product.category} size="small" variant="outlined" />
                     </Typography>
-                    
+
                     <Grid container spacing={2} sx={{ mt: 1 }}>
                       <Grid item xs={6}>
                         <Typography variant="body2" color="text.secondary">
@@ -1090,19 +1132,19 @@ const ProductsPage: React.FC = () => {
                         </Typography>
                       </Grid>
                     </Grid>
-                    
+
                     {product.manufacturer && (
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                         <strong>{t('products.manufacturer')}:</strong> {product.manufacturer}
                       </Typography>
                     )}
                   </CardContent>
-                  
+
                   <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
                     <Button
                       size="small"
                       startIcon={<EditIcon />}
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleEditProduct(product);
                       }}
@@ -1149,13 +1191,16 @@ const ProductsPage: React.FC = () => {
                 </TableRow>
               ) : (
                 products.map((product: any) => {
-                  const instanceCounts = productInstancesMap.get(product.id) || { total: 0, available: 0 };
+                  const instanceCounts = productInstancesMap.get(product.id) || {
+                    total: 0,
+                    available: 0,
+                  };
                   return (
-                    <TableRow 
+                    <TableRow
                       key={product.id}
-                      sx={{ 
-                        cursor: 'pointer', 
-                        '&:hover': { backgroundColor: COLORS.action.hover }
+                      sx={{
+                        cursor: 'pointer',
+                        '&:hover': { backgroundColor: COLORS.action.hover },
                       }}
                       onClick={() => handleProductClick(product)}
                     >
@@ -1170,11 +1215,7 @@ const ProductsPage: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Chip 
-                          label={product.category}
-                          size="small"
-                          variant="outlined"
-                        />
+                        <Chip label={product.category} size="small" variant="outlined" />
                       </TableCell>
                       <TableCell>{product.manufacturer}</TableCell>
                       <TableCell align="center">
@@ -1183,8 +1224,8 @@ const ProductsPage: React.FC = () => {
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
-                        <Typography 
-                          variant="body2" 
+                        <Typography
+                          variant="body2"
                           color={instanceCounts.available > 0 ? 'success.main' : 'error.main'}
                           fontWeight="bold"
                         >
@@ -1199,20 +1240,20 @@ const ProductsPage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton 
-                          size="small" 
+                        <IconButton
+                          size="small"
                           title={t('products.view_instances')}
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             handleProductClick(product);
                           }}
                         >
                           <QrCodeIcon />
                         </IconButton>
-                        <IconButton 
-                          size="small" 
+                        <IconButton
+                          size="small"
                           title={t('common.edit')}
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             handleEditProduct(product);
                           }}
@@ -1233,22 +1274,17 @@ const ProductsPage: React.FC = () => {
       {productsData?.pagination && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            {t('products.pagination', { 
-              page: productsData.pagination.page, 
+            {t('products.pagination', {
+              page: productsData.pagination.page,
               totalPages: Math.ceil(productsData.pagination.total / productsData.pagination.limit),
-              total: productsData.pagination.total 
+              total: productsData.pagination.total,
             })}
           </Typography>
         </Box>
       )}
 
       {/* Add Product Dialog */}
-      <Dialog 
-        open={isAddDialogOpen} 
-        onClose={handleCloseAddDialog}
-        maxWidth="sm"
-        fullWidth
-      >
+      <Dialog open={isAddDialogOpen} onClose={handleCloseAddDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
           {t('products.addProduct')}
           <IconButton
@@ -1264,7 +1300,7 @@ const ProductsPage: React.FC = () => {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        
+
         <DialogContent>
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12}>
@@ -1272,7 +1308,7 @@ const ProductsPage: React.FC = () => {
                 fullWidth
                 label={t('products.productName')}
                 value={newProduct.name}
-                onChange={(e) => handleProductFieldChange('name', e.target.value)}
+                onChange={e => handleProductFieldChange('name', e.target.value)}
                 required
               />
             </Grid>
@@ -1281,7 +1317,7 @@ const ProductsPage: React.FC = () => {
                 fullWidth
                 label={t('products.description')}
                 value={newProduct.description}
-                onChange={(e) => handleProductFieldChange('description', e.target.value)}
+                onChange={e => handleProductFieldChange('description', e.target.value)}
                 multiline
                 rows={3}
               />
@@ -1291,7 +1327,7 @@ const ProductsPage: React.FC = () => {
                 <InputLabel>{t('products.category')}</InputLabel>
                 <Select
                   value={showCustomCategory ? 'custom' : newProduct.category}
-                  onChange={(e) => {
+                  onChange={e => {
                     if (e.target.value === 'custom') {
                       setShowCustomCategory(true);
                       handleProductFieldChange('category', customCategory);
@@ -1303,7 +1339,9 @@ const ProductsPage: React.FC = () => {
                   label={t('products.category')}
                 >
                   {categories.map(category => (
-                    <MenuItem key={category} value={category}>{category}</MenuItem>
+                    <MenuItem key={category} value={category}>
+                      {category}
+                    </MenuItem>
                   ))}
                   <MenuItem value="custom">
                     <em>{t('products.categories.add_new')}</em>
@@ -1315,7 +1353,7 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.categories.new_category')}
                   value={customCategory}
-                  onChange={(e) => {
+                  onChange={e => {
                     setCustomCategory(e.target.value);
                     handleProductFieldChange('category', e.target.value);
                   }}
@@ -1329,7 +1367,7 @@ const ProductsPage: React.FC = () => {
                   fullWidth
                   label={t('products.manufacturer')}
                   value={customManufacturer}
-                  onChange={(e) => {
+                  onChange={e => {
                     setCustomManufacturer(e.target.value);
                     handleProductFieldChange('manufacturer', e.target.value);
                   }}
@@ -1346,7 +1384,7 @@ const ProductsPage: React.FC = () => {
                       >
                         <CloseIcon />
                       </IconButton>
-                    )
+                    ),
                   }}
                 />
               ) : (
@@ -1354,7 +1392,7 @@ const ProductsPage: React.FC = () => {
                   <InputLabel>{t('products.manufacturer')}</InputLabel>
                   <Select
                     value={newProduct.manufacturer}
-                    onChange={(e) => {
+                    onChange={e => {
                       if (e.target.value === 'custom') {
                         setShowCustomManufacturer(true);
                       } else {
@@ -1380,20 +1418,22 @@ const ProductsPage: React.FC = () => {
                 fullWidth
                 label={t('products.model')}
                 value={newProduct.model}
-                onChange={(e) => handleProductFieldChange('model', e.target.value)}
+                onChange={e => handleProductFieldChange('model', e.target.value)}
               />
             </Grid>
           </Grid>
         </DialogContent>
-        
+
         <DialogActions>
-          <Button onClick={handleCloseAddDialog}>
-            {t('common.cancel')}
-          </Button>
-          <Button 
+          <Button onClick={handleCloseAddDialog}>{t('common.cancel')}</Button>
+          <Button
             onClick={handleSaveProduct}
             variant="contained"
-            disabled={createProductMutation.isPending || !newProduct.name.trim() || !newProduct.category.trim()}
+            disabled={
+              createProductMutation.isPending ||
+              !newProduct.name.trim() ||
+              !newProduct.category.trim()
+            }
           >
             {createProductMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
           </Button>
@@ -1401,8 +1441,8 @@ const ProductsPage: React.FC = () => {
       </Dialog>
 
       {/* Edit Product Dialog */}
-      <Dialog 
-        open={isEditProductDialogOpen} 
+      <Dialog
+        open={isEditProductDialogOpen}
         onClose={handleCloseEditProduct}
         maxWidth="sm"
         fullWidth
@@ -1422,7 +1462,7 @@ const ProductsPage: React.FC = () => {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        
+
         <DialogContent>
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12}>
@@ -1430,7 +1470,7 @@ const ProductsPage: React.FC = () => {
                 fullWidth
                 label={t('products.productName')}
                 value={editProduct.name}
-                onChange={(e) => setEditProduct(prev => ({ ...prev, name: e.target.value }))}
+                onChange={e => setEditProduct(prev => ({ ...prev, name: e.target.value }))}
                 required
               />
             </Grid>
@@ -1439,7 +1479,7 @@ const ProductsPage: React.FC = () => {
                 fullWidth
                 label={t('products.description')}
                 value={editProduct.description}
-                onChange={(e) => setEditProduct(prev => ({ ...prev, description: e.target.value }))}
+                onChange={e => setEditProduct(prev => ({ ...prev, description: e.target.value }))}
                 multiline
                 rows={3}
               />
@@ -1449,11 +1489,13 @@ const ProductsPage: React.FC = () => {
                 <InputLabel>{t('products.category')}</InputLabel>
                 <Select
                   value={editProduct.category}
-                  onChange={(e) => setEditProduct(prev => ({ ...prev, category: e.target.value }))}
+                  onChange={e => setEditProduct(prev => ({ ...prev, category: e.target.value }))}
                   label={t('products.category')}
                 >
                   {categories.map(category => (
-                    <MenuItem key={category} value={category}>{category}</MenuItem>
+                    <MenuItem key={category} value={category}>
+                      {category}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -1463,7 +1505,9 @@ const ProductsPage: React.FC = () => {
                 <InputLabel>{t('products.manufacturer')}</InputLabel>
                 <Select
                   value={editProduct.manufacturer}
-                  onChange={(e) => setEditProduct(prev => ({ ...prev, manufacturer: e.target.value }))}
+                  onChange={e =>
+                    setEditProduct(prev => ({ ...prev, manufacturer: e.target.value }))
+                  }
                   label={t('products.manufacturer')}
                 >
                   {manufacturers.map(manufacturer => (
@@ -1479,20 +1523,22 @@ const ProductsPage: React.FC = () => {
                 fullWidth
                 label={t('products.model')}
                 value={editProduct.model}
-                onChange={(e) => setEditProduct(prev => ({ ...prev, model: e.target.value }))}
+                onChange={e => setEditProduct(prev => ({ ...prev, model: e.target.value }))}
               />
             </Grid>
           </Grid>
         </DialogContent>
-        
+
         <DialogActions>
-          <Button onClick={handleCloseEditProduct}>
-            {t('common.cancel')}
-          </Button>
-          <Button 
+          <Button onClick={handleCloseEditProduct}>{t('common.cancel')}</Button>
+          <Button
             onClick={handleSaveEditedProduct}
             variant="contained"
-            disabled={updateProductMutation.isPending || !editProduct.name?.trim() || !editProduct.category?.trim()}
+            disabled={
+              updateProductMutation.isPending ||
+              !editProduct.name?.trim() ||
+              !editProduct.category?.trim()
+            }
           >
             {updateProductMutation.isPending ? <CircularProgress size={20} /> : t('common.save')}
           </Button>

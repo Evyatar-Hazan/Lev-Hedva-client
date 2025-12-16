@@ -84,7 +84,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initAuth = async () => {
       const token = TokenManager.getAccessToken();
-      
+
       if (!token) {
         dispatch({ type: 'AUTH_LOGOUT' });
         return;
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Check if token is expired
       if (TokenManager.isTokenExpired(token)) {
         const refreshToken = TokenManager.getRefreshToken();
-        
+
         if (!refreshToken) {
           TokenManager.clearTokens();
           dispatch({ type: 'AUTH_LOGOUT' });
@@ -160,11 +160,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     clearError,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {

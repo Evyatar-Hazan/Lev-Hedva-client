@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Toolbar, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { COLORS } from '../../theme/colors';
@@ -10,8 +10,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSidebarToggle = () => {
     setSidebarOpen(!sidebarOpen);
@@ -24,9 +22,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Header onMenuClick={handleSidebarToggle} />
-      
+
       <Sidebar open={sidebarOpen} onClose={handleSidebarClose} />
-      
+
       <Box
         component="main"
         sx={{
@@ -38,10 +36,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           position: 'relative',
         }}
       >
-        <Toolbar 
-          sx={{ 
+        <Toolbar
+          sx={{
             minHeight: { xs: 56, sm: 64 },
-          }} 
+          }}
         />
         <Box
           sx={{

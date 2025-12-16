@@ -13,7 +13,7 @@ import {
   Box,
   Typography,
   Checkbox,
-  TableSortLabel
+  TableSortLabel,
 } from '@mui/material';
 
 export interface Column<T = any> {
@@ -153,11 +153,11 @@ function Table<T = any>({
                   <Checkbox
                     indeterminate={isIndeterminate}
                     checked={isAllSelected}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    onChange={e => handleSelectAll(e.target.checked)}
                   />
                 </TableCell>
               )}
-              {visibleColumns.map((column) => (
+              {visibleColumns.map(column => (
                 <TableCell
                   key={String(column.key)}
                   align={column.align || 'right'}
@@ -186,8 +186,8 @@ function Table<T = any>({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell 
-                  colSpan={visibleColumns.length + (selectable ? 1 : 0) + (renderActions ? 1 : 0)} 
+                <TableCell
+                  colSpan={visibleColumns.length + (selectable ? 1 : 0) + (renderActions ? 1 : 0)}
                   align="center"
                 >
                   <Box display="flex" justifyContent="center" p={2}>
@@ -197,8 +197,8 @@ function Table<T = any>({
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell 
-                  colSpan={visibleColumns.length + (selectable ? 1 : 0) + (renderActions ? 1 : 0)} 
+                <TableCell
+                  colSpan={visibleColumns.length + (selectable ? 1 : 0) + (renderActions ? 1 : 0)}
                   align="center"
                 >
                   <Box p={2}>
@@ -212,9 +212,9 @@ function Table<T = any>({
               data.map((row, index) => {
                 const rowId = getRowId(row, index);
                 const isSelected = selectedRows.includes(rowId);
-                
+
                 return (
-                  <TableRow 
+                  <TableRow
                     key={rowId}
                     selected={isSelected}
                     hover
@@ -225,22 +225,17 @@ function Table<T = any>({
                       <TableCell padding="checkbox">
                         <Checkbox
                           checked={isSelected}
-                          onChange={(e) => handleRowSelect(rowId, e.target.checked)}
+                          onChange={e => handleRowSelect(rowId, e.target.checked)}
                         />
                       </TableCell>
                     )}
-                    {visibleColumns.map((column) => (
-                      <TableCell 
-                        key={String(column.key)} 
-                        align={column.align || 'right'}
-                      >
+                    {visibleColumns.map(column => (
+                      <TableCell key={String(column.key)} align={column.align || 'right'}>
                         {renderCell(row, column, index)}
                       </TableCell>
                     ))}
                     {renderActions && (
-                      <TableCell align="center">
-                        {renderActions(row, index)}
-                      </TableCell>
+                      <TableCell align="center">{renderActions(row, index)}</TableCell>
                     )}
                   </TableRow>
                 );
@@ -249,7 +244,7 @@ function Table<T = any>({
           </TableBody>
         </MuiTable>
       </TableContainer>
-      
+
       {pagination && (
         <TablePagination
           component="div"
@@ -257,7 +252,7 @@ function Table<T = any>({
           page={page}
           onPageChange={(_, newPage) => onPageChange?.(newPage)}
           rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => onRowsPerPageChange?.(parseInt(e.target.value, 10))}
+          onRowsPerPageChange={e => onRowsPerPageChange?.(parseInt(e.target.value, 10))}
           labelRowsPerPage="שורות בעמוד:"
           labelDisplayedRows={({ from, to, count }) =>
             `${from}-${to} מתוך ${count !== -1 ? count : `יותר מ ${to}`}`

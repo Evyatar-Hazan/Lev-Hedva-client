@@ -1,14 +1,14 @@
 import { apiClient } from '../axios';
-import { 
-  Product, 
+import {
+  Product,
   ProductInstance,
-  CreateProductDto, 
-  UpdateProductDto, 
+  CreateProductDto,
+  UpdateProductDto,
   CreateProductInstanceDto,
   UpdateProductInstanceDto,
-  ProductsQueryDto, 
-  PaginatedResponse, 
-  ApiResponse
+  ProductsQueryDto,
+  PaginatedResponse,
+  ApiResponse,
 } from '../../lib/types';
 
 export class ProductsClient {
@@ -17,9 +17,9 @@ export class ProductsClient {
   // Products CRUD
   static async getProducts(query?: ProductsQueryDto): Promise<PaginatedResponse<Product>> {
     const params = new URLSearchParams();
-    
+
     if (query) {
-      (Object.keys(query) as Array<keyof ProductsQueryDto>).forEach((key) => {
+      (Object.keys(query) as Array<keyof ProductsQueryDto>).forEach(key => {
         const value = query[key];
         if (value !== undefined) {
           params.append(key, String(value));
@@ -59,10 +59,10 @@ export class ProductsClient {
     if (productId) {
       params.append('productId', productId);
     }
-    
+
     const path = `${this.BASE_PATH}/instances${params.toString() ? `?${params.toString()}` : ''}`;
     const response = await apiClient.get<{ instances: ProductInstance[] }>(path);
-    
+
     // Handle different response formats
     if (Array.isArray(response.data)) {
       return response.data;
@@ -78,7 +78,9 @@ export class ProductsClient {
     return response.data;
   }
 
-  static async createProductInstance(instanceData: CreateProductInstanceDto): Promise<ProductInstance> {
+  static async createProductInstance(
+    instanceData: CreateProductInstanceDto
+  ): Promise<ProductInstance> {
     const response = await apiClient.post<ProductInstance>(
       `${this.BASE_PATH}/instances`,
       instanceData
@@ -86,7 +88,10 @@ export class ProductsClient {
     return response.data;
   }
 
-  static async updateProductInstance(id: string, instanceData: UpdateProductInstanceDto): Promise<ProductInstance> {
+  static async updateProductInstance(
+    id: string,
+    instanceData: UpdateProductInstanceDto
+  ): Promise<ProductInstance> {
     const response = await apiClient.put<ProductInstance>(
       `${this.BASE_PATH}/instances/${id}`,
       instanceData
@@ -100,7 +105,9 @@ export class ProductsClient {
   }
 
   static async getAvailableInstances(): Promise<ProductInstance[]> {
-    const response = await apiClient.get<ProductInstance[]>(`${this.BASE_PATH}/instances/available`);
+    const response = await apiClient.get<ProductInstance[]>(
+      `${this.BASE_PATH}/instances/available`
+    );
     return response.data;
   }
 

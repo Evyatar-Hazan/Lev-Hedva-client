@@ -16,7 +16,7 @@ jest.mock('axios');
 
 describe('🔗 API Client Tests', () => {
   const mockTokenManager = TokenManager as jest.Mocked<typeof TokenManager>;
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset console methods
@@ -29,12 +29,11 @@ describe('🔗 API Client Tests', () => {
   });
 
   describe('📡 Request Interceptor', () => {
-    
     test('should add Authorization header when token exists', async () => {
       // Arrange
       const mockToken = 'test-jwt-token';
       mockTokenManager.getAccessToken.mockReturnValue(mockToken);
-      
+
       const mockConfig = {
         method: 'GET',
         url: '/test',
@@ -53,7 +52,7 @@ describe('🔗 API Client Tests', () => {
     test('should not add Authorization header when no token', async () => {
       // Arrange
       mockTokenManager.getAccessToken.mockReturnValue(null);
-      
+
       const mockConfig = {
         method: 'POST',
         url: '/auth/login',
@@ -88,7 +87,6 @@ describe('🔗 API Client Tests', () => {
   });
 
   describe('📥 Response Interceptor', () => {
-    
     test('should log successful responses', async () => {
       // Arrange
       const mockResponse = {
@@ -118,9 +116,15 @@ describe('🔗 API Client Tests', () => {
       // Act & Assert
       const interceptor = apiClient.interceptors.response.handlers[0];
       await expect(interceptor.rejected(mockError)).rejects.toBe(mockError);
-      
-      expect(console.error).toHaveBeenCalledWith('🔌 Network Error - No response received:', mockError.message);
-      expect(console.error).toHaveBeenCalledWith('🌐 Check if server is running on:', expect.any(String));
+
+      expect(console.error).toHaveBeenCalledWith(
+        '🔌 Network Error - No response received:',
+        mockError.message
+      );
+      expect(console.error).toHaveBeenCalledWith(
+        '🌐 Check if server is running on:',
+        expect.any(String)
+      );
     });
 
     test('should handle HTTP errors', async () => {
@@ -136,16 +140,17 @@ describe('🔗 API Client Tests', () => {
       // Act & Assert
       const interceptor = apiClient.interceptors.response.handlers[0];
       await expect(interceptor.rejected(mockError)).rejects.toBe(mockError);
-      
+
       expect(console.error).toHaveBeenCalledWith('❌ API Error: GET /protected - 401');
       expect(console.error).toHaveBeenCalledWith('📄 Error Data:', mockError.response.data);
     });
   });
 
   describe('⚙️ Configuration', () => {
-    
     test('should use correct base URL from environment', () => {
-      expect(apiClient.defaults.baseURL).toBe(process.env.REACT_APP_API_URL || 'http://localhost:3000/api');
+      expect(apiClient.defaults.baseURL).toBe(
+        process.env.REACT_APP_API_URL || 'http://localhost:3000/api'
+      );
     });
 
     test('should have correct timeout', () => {

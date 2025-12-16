@@ -59,12 +59,12 @@ i18n
   });
 
 // Update document direction and language
-i18n.on('languageChanged', (lng) => {
+i18n.on('languageChanged', lng => {
   const isRTL = lng === 'he';
   document.documentElement.lang = lng;
   document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
   document.body.style.direction = isRTL ? 'rtl' : 'ltr';
-  
+
   // Store the language preference
   localStorage.setItem('i18nextLng', lng);
 });

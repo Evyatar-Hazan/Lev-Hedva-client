@@ -21,6 +21,7 @@
     "success": "Success",
     "warning": "Warning",
     "info": "Information",
+    "status": "Status",
     "actions": "Actions",
     "filter": "Filter",
     "refresh": "Refresh",
@@ -145,7 +146,7 @@
       "message": "{{count}} new loans were created today"
     },
     "newProducts": {
-      "title": "New Products", 
+      "title": "New Products",
       "message": "{{count}} new products were added to the system"
     },
     "newUsers": {
@@ -158,7 +159,7 @@
     },
     "viewLoans": "View Loans",
     "viewProducts": "View Products",
-    "viewUsers": "View Users", 
+    "viewUsers": "View Users",
     "viewReport": "View Report",
     "noNotifications": "No new notifications",
     "viewAll": "View All Notifications",
@@ -167,7 +168,7 @@
   "time": {
     "now": "Now",
     "minutesAgo": "{{count}} minutes ago",
-    "hoursAgo": "{{count}} hours ago", 
+    "hoursAgo": "{{count}} hours ago",
     "daysAgo": "{{count}} days ago"
   },
   "loans": {
@@ -241,6 +242,10 @@
     "instancesTitle": "Product Instances",
     "serial_number": "Serial Number",
     "barcode": "Barcode",
+    "condition": "Condition",
+    "location": "Location",
+    "notes": "Notes",
+    "add_first_instance": "Add the first instance to start tracking inventory",
     "editProduct": "Edit Product",
     "editInstance": "Edit Instance",
     "productName": "Product Name",
@@ -380,7 +385,7 @@
     "user": "User",
     "action": "Action",
     "entity": "Entity",
-    "description": "Description", 
+    "description": "Description",
     "ipAddress": "IP Address",
     "stats": {
       "totalActions": "Total Actions",

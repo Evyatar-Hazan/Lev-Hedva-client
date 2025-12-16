@@ -1,12 +1,5 @@
 import React from 'react';
-import { 
-  IconButton, 
-  Menu, 
-  MenuItem, 
-  ListItemIcon, 
-  ListItemText,
-  Tooltip 
-} from '@mui/material';
+import { IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { Language } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +26,6 @@ const LanguageSelector: React.FC = () => {
     { code: 'en', name: 'English', flag: '🇺🇸' },
   ];
 
-
   return (
     <>
       <Tooltip title="Change Language">
@@ -56,7 +48,7 @@ const LanguageSelector: React.FC = () => {
           'aria-labelledby': 'language-button',
         }}
       >
-        {languages.map((language) => (
+        {languages.map(language => (
           <MenuItem
             key={language.code}
             onClick={() => handleLanguageChange(language.code)}

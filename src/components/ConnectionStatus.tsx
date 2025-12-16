@@ -9,7 +9,9 @@ interface ConnectionStatusProps {
 }
 
 export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) => {
-  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'error'>('checking');
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'error'>(
+    'checking'
+  );
   const [errorMessage, setErrorMessage] = useState<string>('');
   const { t } = useTranslation();
 
@@ -17,17 +19,17 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
     const checkConnection = async () => {
       try {
         console.log('🔍 בודק חיבור לשרת...');
-        
+
         // Try to ping the server
         await apiClient.get('/health');
-        
+
         console.log('✅ חיבור לשרת תקין!');
         setConnectionStatus('connected');
       } catch (error: any) {
         console.error('❌ שגיאה בחיבור לשרת:', error);
-        
+
         let message = 'שגיאה לא ידועה';
-        
+
         if (error.code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED')) {
           message = 'השרת לא פועל. אנא ודא שהשרת רץ על http://localhost:3001';
         } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
@@ -37,14 +39,14 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
         } else {
           message = error.message || 'שגיאה בחיבור לשרת';
         }
-        
+
         setErrorMessage(message);
         setConnectionStatus('error');
       }
     };
 
     checkConnection();
-    
+
     // בדיקה מחדש כל 30 שניות אם יש שגיאה
     const interval = setInterval(() => {
       if (connectionStatus === 'error') {
@@ -57,11 +59,11 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
 
   if (connectionStatus === 'checking') {
     return (
-      <Box 
-        display="flex" 
-        flexDirection="column" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
         minHeight="100vh"
         bgcolor={COLORS.background.soft}
       >
@@ -78,11 +80,11 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
 
   if (connectionStatus === 'error') {
     return (
-      <Box 
-        display="flex" 
-        flexDirection="column" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
         minHeight="100vh"
         bgcolor={COLORS.background.soft}
         p={3}
@@ -95,18 +97,21 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ children }) 
             {errorMessage}
           </Typography>
         </Alert>
-        
+
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {t('connection.retryInfo')}
         </Typography>
-        
+
         <Box sx={{ textAlign: 'left', maxWidth: 600 }}>
           <Typography variant="subtitle2" gutterBottom>
             {t('connection.troubleshooting')}
           </Typography>
           <Typography variant="body2" component="ul" sx={{ pl: 2 }}>
             <li>{t('connection.solutions.checkServer')}</li>
-            <li>{t('connection.solutions.runCommand')} <code>{t('connection.solutions.commandText')}</code></li>
+            <li>
+              {t('connection.solutions.runCommand')}{' '}
+              <code>{t('connection.solutions.commandText')}</code>
+            </li>
             <li>{t('connection.solutions.checkEnv')}</li>
             <li>{t('connection.solutions.checkFirewall')}</li>
           </Typography>

@@ -105,12 +105,14 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   };
 
   const drawer = (
-    <Box sx={{ 
-      height: '100%', 
-      display: 'flex', 
-      flexDirection: 'column',
-      marginTop: { xs: '56px', sm: '64px' }, // מקום ל-navbar
-    }}>
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        marginTop: { xs: '56px', sm: '64px' }, // מקום ל-navbar
+      }}
+    >
       {/* Header Section */}
       <Box
         sx={{
@@ -139,7 +141,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             <Close />
           </Box>
         )}
-        
+
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
           <Box
             sx={{
@@ -148,14 +150,14 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               backgroundColor: colorUtils.withOpacity(COLORS.text.onPrimary, 0.15),
             }}
           >
-            <img 
-              src="/logoLevChedva.png" 
-              alt="לב חדוה" 
-              style={{ 
-                height: 32, 
+            <img
+              src="/logoLevChedva.png"
+              alt="לב חדוה"
+              style={{
+                height: 32,
                 width: 'auto',
                 borderRadius: '4px',
-              }} 
+              }}
             />
           </Box>
           <Box>
@@ -167,7 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             </Typography>
           </Box>
         </Box>
-        
+
         {/* User Info */}
         <Box
           sx={{
@@ -189,12 +191,13 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               fontWeight: 600,
             }}
           >
-            {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+            {user?.firstName?.charAt(0)}
+            {user?.lastName?.charAt(0)}
           </Avatar>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography 
-              variant="subtitle2" 
-              sx={{ 
+            <Typography
+              variant="subtitle2"
+              sx={{
                 fontWeight: 600,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -275,7 +278,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
                     }}
                     secondaryTypographyProps={{
                       fontSize: '0.75rem',
-                      sx: { 
+                      sx: {
                         opacity: 0.7,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -324,7 +327,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             }}
           />
         </ListItemButton>
-        
+
         <Typography
           variant="caption"
           sx={{

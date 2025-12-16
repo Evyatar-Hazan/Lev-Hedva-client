@@ -18,7 +18,7 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   WORKER = 'WORKER',
   VOLUNTEER = 'VOLUNTEER',
-  CLIENT = 'CLIENT'
+  CLIENT = 'CLIENT',
 }
 
 // Permission types
@@ -85,7 +85,7 @@ export enum LoanStatus {
   ACTIVE = 'ACTIVE',
   RETURNED = 'RETURNED',
   OVERDUE = 'OVERDUE',
-  LOST = 'LOST'
+  LOST = 'LOST',
 }
 
 // Volunteer Activity types

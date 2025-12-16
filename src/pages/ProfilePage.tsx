@@ -41,7 +41,7 @@ const ProfilePage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  
+
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
@@ -92,10 +92,10 @@ const ProfilePage: React.FC = () => {
     try {
       // TODO: Add API call to update profile
       // await updateProfile(formData);
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setSuccessMessage(t('profile.updateSuccess'));
       setIsEditing(false);
     } catch (error) {
@@ -122,7 +122,7 @@ const ProfilePage: React.FC = () => {
 
     try {
       await AuthClient.changePassword(passwordData.currentPassword, passwordData.newPassword);
-      
+
       setSuccessMessage(t('profile.passwordChangeSuccess'));
       setPasswordData({
         currentPassword: '',
@@ -199,7 +199,8 @@ const ProfilePage: React.FC = () => {
                       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     }}
                   >
-                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                    {user?.firstName?.charAt(0)}
+                    {user?.lastName?.charAt(0)}
                   </Avatar>
                   {isEditing && (
                     <IconButton
@@ -219,11 +220,11 @@ const ProfilePage: React.FC = () => {
                     </IconButton>
                   )}
                 </Box>
-                
+
                 <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
                   {user?.firstName} {user?.lastName}
                 </Typography>
-                
+
                 <Chip
                   label={getRoleLabel(user?.role)}
                   sx={{
@@ -234,7 +235,8 @@ const ProfilePage: React.FC = () => {
                 />
 
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                  {t('profile.memberSince')}: {new Date(user?.createdAt || '').toLocaleDateString('he-IL')}
+                  {t('profile.memberSince')}:{' '}
+                  {new Date(user?.createdAt || '').toLocaleDateString('he-IL')}
                 </Typography>
               </Box>
 
@@ -272,7 +274,14 @@ const ProfilePage: React.FC = () => {
         <Grid item xs={12} md={8}>
           <Card sx={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mb: 3 }}>
             <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 3,
+                }}
+              >
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   {t('profile.personalInfo')}
                 </Typography>
@@ -324,7 +333,7 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t('users.firstName')}
                     value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    onChange={e => setFormData({ ...formData, firstName: e.target.value })}
                     disabled={!isEditing}
                     InputProps={{
                       startAdornment: <Person sx={{ mr: 1, color: 'action.active' }} />,
@@ -337,7 +346,7 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t('users.lastName')}
                     value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    onChange={e => setFormData({ ...formData, lastName: e.target.value })}
                     disabled={!isEditing}
                     InputProps={{
                       startAdornment: <Person sx={{ mr: 1, color: 'action.active' }} />,
@@ -351,7 +360,7 @@ const ProfilePage: React.FC = () => {
                     label={t('users.email')}
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
                     disabled={!isEditing}
                     InputProps={{
                       startAdornment: <Email sx={{ mr: 1, color: 'action.active' }} />,
@@ -364,7 +373,7 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t('users.phone')}
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
                     disabled={!isEditing}
                     InputProps={{
                       startAdornment: <Phone sx={{ mr: 1, color: 'action.active' }} />,
@@ -377,7 +386,7 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t('users.address')}
                     value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    onChange={e => setFormData({ ...formData, address: e.target.value })}
                     disabled={!isEditing}
                     multiline
                     rows={2}
@@ -401,14 +410,21 @@ const ProfilePage: React.FC = () => {
                     type={showPasswords.current ? 'text' : 'password'}
                     label={t('profile.currentPassword')}
                     value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                    onChange={e =>
+                      setPasswordData({ ...passwordData, currentPassword: e.target.value })
+                    }
                     InputProps={{
                       startAdornment: <Lock sx={{ mr: 1, color: 'action.active' }} />,
                       endAdornment: (
                         <InputAdornment position="end">
                           <IconButton
                             aria-label="toggle password visibility"
-                            onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                            onClick={() =>
+                              setShowPasswords({
+                                ...showPasswords,
+                                current: !showPasswords.current,
+                              })
+                            }
                             edge="end"
                           >
                             {showPasswords.current ? <VisibilityOff /> : <Visibility />}
@@ -425,14 +441,18 @@ const ProfilePage: React.FC = () => {
                     type={showPasswords.new ? 'text' : 'password'}
                     label={t('profile.newPassword')}
                     value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    onChange={e =>
+                      setPasswordData({ ...passwordData, newPassword: e.target.value })
+                    }
                     InputProps={{
                       startAdornment: <Lock sx={{ mr: 1, color: 'action.active' }} />,
                       endAdornment: (
                         <InputAdornment position="end">
                           <IconButton
                             aria-label="toggle password visibility"
-                            onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                            onClick={() =>
+                              setShowPasswords({ ...showPasswords, new: !showPasswords.new })
+                            }
                             edge="end"
                           >
                             {showPasswords.new ? <VisibilityOff /> : <Visibility />}
@@ -449,14 +469,21 @@ const ProfilePage: React.FC = () => {
                     type={showPasswords.confirm ? 'text' : 'password'}
                     label={t('profile.confirmPassword')}
                     value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    onChange={e =>
+                      setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+                    }
                     InputProps={{
                       startAdornment: <Lock sx={{ mr: 1, color: 'action.active' }} />,
                       endAdornment: (
                         <InputAdornment position="end">
                           <IconButton
                             aria-label="toggle password visibility"
-                            onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                            onClick={() =>
+                              setShowPasswords({
+                                ...showPasswords,
+                                confirm: !showPasswords.confirm,
+                              })
+                            }
                             edge="end"
                           >
                             {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
@@ -471,7 +498,12 @@ const ProfilePage: React.FC = () => {
                   <Button
                     variant="contained"
                     onClick={handlePasswordChange}
-                    disabled={!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword || isSaving}
+                    disabled={
+                      !passwordData.currentPassword ||
+                      !passwordData.newPassword ||
+                      !passwordData.confirmPassword ||
+                      isSaving
+                    }
                     startIcon={isSaving ? <CircularProgress size={20} /> : <Lock />}
                     sx={{
                       backgroundColor: COLORS.primary.main,
