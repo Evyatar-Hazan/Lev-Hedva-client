@@ -40,8 +40,8 @@ function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
       user.role === UserRole.VOLUNTEER
         ? "/volunteers"
         : user.role === UserRole.CLIENT
-          ? "/loans"
-          : "/dashboard";
+        ? "/loans"
+        : "/dashboard";
     return <Navigate to={redirectTo} replace />;
   }
 
@@ -63,8 +63,8 @@ function AppRoutes() {
                 user?.role === UserRole.VOLUNTEER
                   ? "/volunteers"
                   : user?.role === UserRole.CLIENT
-                    ? "/loans"
-                    : "/dashboard"
+                  ? "/loans"
+                  : "/dashboard"
               }
               replace
             />
@@ -101,11 +101,7 @@ function AppRoutes() {
         path="/loans"
         element={
           <ProtectedRoute
-            allowedRoles={[
-              UserRole.ADMIN,
-              UserRole.WORKER,
-              UserRole.CLIENT,
-            ]}
+            allowedRoles={[UserRole.ADMIN, UserRole.WORKER, UserRole.CLIENT]}
           >
             <LoansPage />
           </ProtectedRoute>
@@ -144,8 +140,8 @@ function AppRoutes() {
                 user?.role === UserRole.VOLUNTEER
                   ? "/volunteers"
                   : user?.role === UserRole.CLIENT
-                    ? "/loans"
-                    : "/dashboard"
+                  ? "/loans"
+                  : "/dashboard"
               }
               replace
             />
