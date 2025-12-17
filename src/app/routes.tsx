@@ -35,13 +35,14 @@ function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
     user?.role &&
     !allowedRoles.includes(user.role as UserRole)
   ) {
-    // Redirect volunteers to their page, others to dashboard
-    return (
-      <Navigate
-        to={user.role === UserRole.VOLUNTEER ? "/volunteers" : "/dashboard"}
-        replace
-      />
-    );
+    // Redirect based on user role
+    const redirectTo =
+      user.role === UserRole.VOLUNTEER
+        ? "/volunteers"
+        : user.role === UserRole.CLIENT
+          ? "/loans"
+          : "/dashboard";
+    return <Navigate to={redirectTo} replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -59,7 +60,11 @@ function AppRoutes() {
             // Redirect based on user role after login
             <Navigate
               to={
-                user?.role === UserRole.VOLUNTEER ? "/volunteers" : "/dashboard"
+                user?.role === UserRole.VOLUNTEER
+                  ? "/volunteers"
+                  : user?.role === UserRole.CLIENT
+                    ? "/loans"
+                    : "/dashboard"
               }
               replace
             />
@@ -95,7 +100,13 @@ function AppRoutes() {
       <Route
         path="/loans"
         element={
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.WORKER]}>
+          <ProtectedRoute
+            allowedRoles={[
+              UserRole.ADMIN,
+              UserRole.WORKER,
+              UserRole.CLIENT,
+            ]}
+          >
             <LoansPage />
           </ProtectedRoute>
         }
@@ -128,7 +139,16 @@ function AppRoutes() {
         path="/"
         element={
           isAuthenticated ? (
-            <Navigate to="/volunteers" replace />
+            <Navigate
+              to={
+                user?.role === UserRole.VOLUNTEER
+                  ? "/volunteers"
+                  : user?.role === UserRole.CLIENT
+                    ? "/loans"
+                    : "/dashboard"
+              }
+              replace
+            />
           ) : (
             <Navigate to="/login" replace />
           )

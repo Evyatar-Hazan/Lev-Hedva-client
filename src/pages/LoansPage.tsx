@@ -53,11 +53,17 @@ import {
 import { useUsers } from "../hooks/useUsers";
 import { useProductInstances } from "../hooks/useProducts";
 import { format } from "date-fns";
+import { useAuth } from "../features/auth/hooks";
+import { UserRole } from "../lib/types";
 
 const LoansPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { user } = useAuth();
+
+  // Check if user is a client (read-only mode)
+  const isClient = user?.role === UserRole.CLIENT;
 
   const [search, setSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -398,45 +404,49 @@ const LoansPage: React.FC = () => {
         <Typography variant="h4" component="h1" fontWeight="bold">
           {t("loans.title")}
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          size="large"
-          onClick={handleCreateLoan}
-        >
-          {t("loans.newLoan")}
-        </Button>
+        {!isClient && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            size="large"
+            onClick={handleCreateLoan}
+          >
+            {t("loans.newLoan")}
+          </Button>
+        )}
       </Box>
 
-      {/* Quick statistics */}
-      <StatsGrid
-        stats={[
-          {
-            icon: <AssignmentIcon />,
-            value: loanStats?.totalActiveLoans || 0,
-            label: t("loans.stats.activeLoans"),
-            gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          },
-          {
-            icon: <UndoIcon />,
-            value: loanStats?.totalOverdueLoans || 0,
-            label: t("loans.stats.overdue"),
-            gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-          },
-          {
-            icon: <PersonIcon />,
-            value: loanStats?.totalReturnedLoans || 0,
-            label: t("loans.stats.returned"),
-            gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-          },
-          {
-            icon: <AssignmentIcon />,
-            value: loanStats?.totalLostItems || 0,
-            label: t("loans.stats.lost"),
-            gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-          },
-        ]}
-      />
+      {/* Quick statistics - only for admin/worker */}
+      {!isClient && (
+        <StatsGrid
+          stats={[
+            {
+              icon: <AssignmentIcon />,
+              value: loanStats?.totalActiveLoans || 0,
+              label: t("loans.stats.activeLoans"),
+              gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            },
+            {
+              icon: <UndoIcon />,
+              value: loanStats?.totalOverdueLoans || 0,
+              label: t("loans.stats.overdue"),
+              gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+            },
+            {
+              icon: <PersonIcon />,
+              value: loanStats?.totalReturnedLoans || 0,
+              label: t("loans.stats.returned"),
+              gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+            },
+            {
+              icon: <AssignmentIcon />,
+              value: loanStats?.totalLostItems || 0,
+              label: t("loans.stats.lost"),
+              gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+            },
+          ]}
+        />
+      )}
 
       {/* Search and filter component */}
       <SearchAndFilter
@@ -514,27 +524,30 @@ const LoansPage: React.FC = () => {
                   </Typography>
                 </CardContent>
 
-                <CardActions sx={{ justifyContent: "flex-end" }}>
-                  {(loan.status === "ACTIVE" || loan.status === "OVERDUE") && (
+                {!isClient && (
+                  <CardActions sx={{ justifyContent: "flex-end" }}>
+                    {(loan.status === "ACTIVE" ||
+                      loan.status === "OVERDUE") && (
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        title={t("loans.actions.return")}
+                        onClick={() => handleReturnLoan(loan.id)}
+                        disabled={returnLoanMutation.isPending}
+                      >
+                        <UndoIcon />
+                      </IconButton>
+                    )}
                     <IconButton
                       size="small"
                       color="primary"
-                      title={t("loans.actions.return")}
-                      onClick={() => handleReturnLoan(loan.id)}
-                      disabled={returnLoanMutation.isPending}
+                      title={t("loans.actions.edit")}
+                      onClick={() => handleEditLoan(loan.id)}
                     >
-                      <UndoIcon />
+                      <EditIcon />
                     </IconButton>
-                  )}
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    title={t("loans.actions.edit")}
-                    onClick={() => handleEditLoan(loan.id)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </CardActions>
+                  </CardActions>
+                )}
               </Card>
             ))
           )}
@@ -550,7 +563,7 @@ const LoansPage: React.FC = () => {
                 <TableCell>{t("loans.loanDate")}</TableCell>
                 <TableCell>{t("loans.returnDate")}</TableCell>
                 <TableCell>{t("common.status")}</TableCell>
-                <TableCell>{t("common.actions")}</TableCell>
+                {!isClient && <TableCell>{t("common.actions")}</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -591,28 +604,30 @@ const LoansPage: React.FC = () => {
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>
-                      {(loan.status === "ACTIVE" ||
-                        loan.status === "OVERDUE") && (
+                    {!isClient && (
+                      <TableCell>
+                        {(loan.status === "ACTIVE" ||
+                          loan.status === "OVERDUE") && (
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            title={t("loans.actions.return")}
+                            onClick={() => handleReturnLoan(loan.id)}
+                            disabled={returnLoanMutation.isPending}
+                          >
+                            <UndoIcon />
+                          </IconButton>
+                        )}
                         <IconButton
                           size="small"
                           color="primary"
-                          title={t("loans.actions.return")}
-                          onClick={() => handleReturnLoan(loan.id)}
-                          disabled={returnLoanMutation.isPending}
+                          title={t("loans.actions.edit")}
+                          onClick={() => handleEditLoan(loan.id)}
                         >
-                          <UndoIcon />
+                          <EditIcon />
                         </IconButton>
-                      )}
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        title={t("loans.actions.edit")}
-                        onClick={() => handleEditLoan(loan.id)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </TableCell>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               )}

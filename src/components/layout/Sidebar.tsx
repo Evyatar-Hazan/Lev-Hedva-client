@@ -101,6 +101,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     if (user?.role === UserRole.VOLUNTEER) {
       return item.path === "/volunteers";
     }
+    // Clients can only see loans page
+    if (user?.role === UserRole.CLIENT) {
+      return item.path === "/loans";
+    }
     return true;
   });
 
