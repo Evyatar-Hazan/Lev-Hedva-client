@@ -91,10 +91,15 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     },
   ];
 
-  // Filter menu items based on user role - workers cannot see audit
+  // Filter menu items based on user role
   const filteredMenuItems = menuItems.filter((item) => {
-    if (item.path === "/audit" && user?.role === UserRole.WORKER) {
+    // Audit - only admins
+    if (item.path === "/audit" && user?.role !== UserRole.ADMIN) {
       return false;
+    }
+    // Volunteers can only see volunteers page
+    if (user?.role === UserRole.VOLUNTEER) {
+      return item.path === "/volunteers";
     }
     return true;
   });
@@ -218,7 +223,15 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             {user?.firstName?.charAt(0)}
             {user?.lastName?.charAt(0)}
           </Avatar>
-          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          <Box
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: 0.5,
+            }}
+          >
             <Typography
               variant="subtitle2"
               sx={{
@@ -232,7 +245,15 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               {user?.firstName} {user?.lastName}
             </Typography>
             <Chip
-              label={user?.role ? t(`sidebar.role${user.role.charAt(0) + user.role.slice(1).toLowerCase()}`) : t("sidebar.roleUser")}
+              label={
+                user?.role
+                  ? t(
+                      `sidebar.role${
+                        user.role.charAt(0) + user.role.slice(1).toLowerCase()
+                      }`
+                    )
+                  : t("sidebar.roleUser")
+              }
               size="small"
               sx={{
                 height: "18px",

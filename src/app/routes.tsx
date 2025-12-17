@@ -35,27 +35,43 @@ function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
     user?.role &&
     !allowedRoles.includes(user.role as UserRole)
   ) {
-    return <Navigate to="/dashboard" replace />;
+    // Redirect volunteers to their page, others to dashboard
+    return (
+      <Navigate
+        to={user.role === UserRole.VOLUNTEER ? "/volunteers" : "/dashboard"}
+        replace
+      />
+    );
   }
 
   return <Layout>{children}</Layout>;
 }
 
 function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <Routes>
       <Route
         path="/login"
         element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />
+          isAuthenticated ? (
+            // Redirect based on user role after login
+            <Navigate
+              to={
+                user?.role === UserRole.VOLUNTEER ? "/volunteers" : "/dashboard"
+              }
+              replace
+            />
+          ) : (
+            <LoginPage />
+          )
         }
       />
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.WORKER]}>
             <DashboardPage />
           </ProtectedRoute>
         }
@@ -63,7 +79,7 @@ function AppRoutes() {
       <Route
         path="/users"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.WORKER]}>
             <UsersPage />
           </ProtectedRoute>
         }
@@ -71,7 +87,7 @@ function AppRoutes() {
       <Route
         path="/products"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.WORKER]}>
             <ProductsPage />
           </ProtectedRoute>
         }
@@ -79,7 +95,7 @@ function AppRoutes() {
       <Route
         path="/loans"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.WORKER]}>
             <LoansPage />
           </ProtectedRoute>
         }
@@ -112,7 +128,7 @@ function AppRoutes() {
         path="/"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate to="/volunteers" replace />
           ) : (
             <Navigate to="/login" replace />
           )
