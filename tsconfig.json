@@ -39,6 +39,7 @@
     "node_modules",
     "build",
     "src/tests",
+    "src/setupTests.ts",
     "src/**/__tests__",
     "**/*.stories.tsx",
     "**/*.stories.ts",
