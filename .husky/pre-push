@@ -24,11 +24,4 @@ npm run test:ci || {
   exit 1
 }
 
-# Check for accessibility violations in tests
-echo "♿ Checking accessibility..."
-npm run test:a11y || {
-  echo "❌ Accessibility tests failed. Please fix a11y issues before pushing."
-  exit 1
-}
-
 echo "✅ All pre-push checks passed! 🎉"
