@@ -1,0 +1,10 @@
+node_modules
+build
+coverage
+.husky
+*.min.js
+*.min.css
+package-lock.json
+.env
+.env.local
+.env.production

@@ -20,7 +20,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
-  "types": ["jest", "@testing-library/jest-dom", "node"],
+    "types": ["jest", "@testing-library/jest-dom", "node"],
     "paths": {
       "@/*": ["*"],
       "@/components/*": ["components/*"],
@@ -46,3 +46,4 @@
     "**/*.spec.ts"
   ]
 }
+

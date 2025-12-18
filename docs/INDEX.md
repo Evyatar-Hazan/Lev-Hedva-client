@@ -6,7 +6,45 @@
 
 ### מדריכים טכניים
 
-- **[I18N-GUIDE.md](../I18N-GUIDE.md)** - מדריך בינלאום (i18n) ותרגומים
+- **[I18N-GUIDE.md](I18N-GUIDE.md)** - מדריך בינלאום (i18n) ותרגומים
+- **[CODE_QUALITY.md](CODE_QUALITY.md)** - סטנדרטים ואיכות קוד
+- **[SETUP_COMPLETE.md](SETUP_COMPLETE.md)** - הגדרות התקנה מלאות
+- **[NETLIFY-BUILD-FIX.md](NETLIFY-BUILD-FIX.md)** - תיקון build ל-Netlify
+
+### מדריכי בדיקות (Testing) 🆕
+
+- **[TESTING-QUICK-START.md](TESTING-QUICK-START.md)** - ⭐ התחל כאן! מדריך מהיר עם דוגמאות
+- **[TESTING.md](TESTING.md)** - מדריך מקיף לכתיבת בדיקות
+- **[TESTING-INFRASTRUCTURE.md](TESTING-INFRASTRUCTURE.md)** - סקירה ארכיטקטונית של תשתית הבדיקות
+- **[CODE-QUALITY-RECOMMENDATIONS.md](CODE-QUALITY-RECOMMENDATIONS.md)** - המלצות לשיפור ו-best practices
+
+## 🧪 תשתית בדיקות (Testing Infrastructure)
+
+### כלים זמינים
+
+- **Jest** - בדיקות יחידה ואינטגרציה
+- **React Testing Library** - בדיקות קומפוננטות
+- **Playwright** - בדיקות E2E
+- **MSW** - חיקוי API
+- **jest-axe** - בדיקות נגישות
+
+### פקודות בדיקה
+
+```bash
+npm test                # מצב watch (פיתוח)
+npm run test:ci         # הרצה אחת (CI)
+npm run test:coverage   # עם כיסוי
+npm run test:a11y       # נגישות בלבד
+npm run test:e2e        # E2E
+npm run validate        # כל הבדיקות
+```
+
+### כלי עזר לבדיקות
+
+- `src/tests/utils/test-utils.tsx` - פונקציות render מותאמות
+- `src/tests/utils/accessibility-helpers.ts` - בדיקות נגישות
+- `src/tests/factories/` - יצירת נתוני בדיקה
+- `src/tests/mocks/` - חיקוי API handlers
 
 ## 🏗️ מבנה הפרויקט
 
