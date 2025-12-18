@@ -38,6 +38,8 @@
   "exclude": [
     "node_modules",
     "build",
+    "src/tests",
+    "src/**/__tests__",
     "**/*.stories.tsx",
     "**/*.stories.ts",
     "**/*.test.tsx",
