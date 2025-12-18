@@ -41,7 +41,10 @@ describe('🔐 TokenManager Tests', () => {
 
       // Assert
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith('lev_hedva_access_token', accessToken);
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('lev_hedva_refresh_token', refreshToken);
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        'lev_hedva_refresh_token',
+        refreshToken
+      );
     });
 
     test('should retrieve access token correctly', () => {
@@ -75,7 +78,7 @@ describe('🔐 TokenManager Tests', () => {
     test('should return null when no token exists', () => {
       // Arrange - ensure localStorage is empty
       mockLocalStorage.getItem.mockReturnValue(null);
-      
+
       // Act
       const accessToken = TokenManager.getAccessToken();
       const refreshToken = TokenManager.getRefreshToken();
@@ -231,7 +234,7 @@ describe('🔐 TokenManager Tests', () => {
       } catch (e) {
         // Expected to be caught if not handled in implementation
       }
-      
+
       expect(mockLocalStorage.setItem).toHaveBeenCalled();
     });
 
@@ -252,7 +255,7 @@ describe('🔐 TokenManager Tests', () => {
     test('should handle empty string tokens', () => {
       // Arrange - mock getItem to return empty strings
       mockLocalStorage.getItem.mockReturnValue('');
-      
+
       // Act
       TokenManager.setTokens('', '');
 

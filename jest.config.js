@@ -37,7 +37,5 @@ module.exports = {
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   testPathIgnorePatterns: ['/node_modules/', '/build/', '/tests/e2e/'],
   coveragePathIgnorePatterns: ['/node_modules/', '/tests/e2e/'],
-  transformIgnorePatterns: [
-    'node_modules/(?!axios)',
-  ],
+  transformIgnorePatterns: ['node_modules/(?!axios)'],
 };
