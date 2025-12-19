@@ -45,12 +45,10 @@ describe('AuthContext', () => {
         await result.current.login('test@example.com', 'password123');
       });
 
-      await waitFor(() => {
-        expect(result.current.user).toEqual(mockResponse.user);
-        expect(result.current.isAuthenticated).toBe(true);
-        expect(result.current.isLoading).toBe(false);
-        expect(result.current.error).toBeNull();
-      });
+      expect(result.current.user).toEqual(mockResponse.user);
+      expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.error).toBeNull();
 
       expect(mockAuthClient.login).toHaveBeenCalledWith({
         email: 'test@example.com',
@@ -76,12 +74,10 @@ describe('AuthContext', () => {
         }
       });
 
-      await waitFor(() => {
-        expect(result.current.user).toBeNull();
-        expect(result.current.isAuthenticated).toBe(false);
-        expect(result.current.isLoading).toBe(false);
-        expect(result.current.error).toBe(errorMessage);
-      });
+      expect(result.current.user).toBeNull();
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.error).toBe(errorMessage);
 
       expect(mockTokenManager.setTokens).not.toHaveBeenCalled();
     });
@@ -100,12 +96,10 @@ describe('AuthContext', () => {
         }
       });
 
-      await waitFor(() => {
-        expect(result.current.user).toBeNull();
-        expect(result.current.isAuthenticated).toBe(false);
-        expect(result.current.isLoading).toBe(false);
-        expect(result.current.error).toBe(errorMessage);
-      });
+      expect(result.current.user).toBeNull();
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.error).toBe(errorMessage);
 
       expect(mockTokenManager.setTokens).not.toHaveBeenCalled();
     });
@@ -143,9 +137,7 @@ describe('AuthContext', () => {
       });
 
       // Check loading state is false after login
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
+      expect(result.current.isLoading).toBe(false);
     });
   });
 
@@ -159,11 +151,8 @@ describe('AuthContext', () => {
         await result.current.logout();
       });
 
-      await waitFor(() => {
-        expect(result.current.user).toBeNull();
-        expect(result.current.isAuthenticated).toBe(false);
-      });
-
+      expect(result.current.user).toBeNull();
+      expect(result.current.isAuthenticated).toBe(false);
       expect(mockAuthClient.logout).toHaveBeenCalled();
       expect(mockTokenManager.clearTokens).toHaveBeenCalled();
     });
@@ -177,11 +166,8 @@ describe('AuthContext', () => {
         await result.current.logout();
       });
 
-      await waitFor(() => {
-        expect(result.current.user).toBeNull();
-        expect(result.current.isAuthenticated).toBe(false);
-      });
-
+      expect(result.current.user).toBeNull();
+      expect(result.current.isAuthenticated).toBe(false);
       expect(mockTokenManager.clearTokens).toHaveBeenCalled();
     });
   });
@@ -201,18 +187,14 @@ describe('AuthContext', () => {
         }
       });
 
-      await waitFor(() => {
-        expect(result.current.error).toBe('Test error');
-      });
+      expect(result.current.error).toBe('Test error');
 
       // Then clear the error
       act(() => {
         result.current.clearError();
       });
 
-      await waitFor(() => {
-        expect(result.current.error).toBeNull();
-      });
+      expect(result.current.error).toBeNull();
     });
   });
 });

@@ -91,6 +91,11 @@
     "precommit": "lint-staged",
     "prepush": "npm run validate"
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!axios)"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",

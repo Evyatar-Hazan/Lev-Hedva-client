@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2019"
-    ],
+    "lib": ["dom", "dom.iterable", "es2019"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -32,14 +28,13 @@
       "@/app/*": ["app/*"]
     }
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "exclude": [
     "node_modules",
     "build",
     "src/tests",
     "src/setupTests.ts",
+    "src/__mocks__",
     "src/**/__tests__",
     "**/*.stories.tsx",
     "**/*.stories.ts",
@@ -49,4 +44,3 @@
     "**/*.spec.ts"
   ]
 }
-
