@@ -128,7 +128,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        marginTop: { xs: '56px', sm: '64px' }, // מקום ל-navbar
+        paddingTop: { xs: '56px', sm: '64px' }, // מקום ל-navbar
+        overflow: 'hidden',
       }}
     >
       {/* Header Section */}
@@ -257,8 +258,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       </Box>
 
       {/* Navigation Menu */}
-      <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
-        <List sx={{ px: 2 }}>
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
+        <List sx={{ px: 2, py: 1 }}>
           {filteredMenuItems.map((item, index) => {
             const isSelected = location.pathname === item.path;
             return (
