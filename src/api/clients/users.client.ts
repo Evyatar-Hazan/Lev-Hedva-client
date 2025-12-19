@@ -4,7 +4,6 @@ import {
   CreateUserDto,
   UpdateUserDto,
   UsersQueryDto,
-  PaginatedResponse,
   ApiResponse,
   UserPermission,
 } from '../../lib/types';
