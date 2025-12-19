@@ -6,13 +6,24 @@ import {
   RefreshTokenDto,
   ApiResponse,
 } from '../../lib/types';
+import { AxiosError } from 'axios';
 
 export class AuthClient {
   private static readonly BASE_PATH = '/auth';
 
   static async login(credentials: LoginDto): Promise<AuthResponseDto> {
-    const response = await apiClient.post<AuthResponseDto>(`${this.BASE_PATH}/login`, credentials);
-    return response.data;
+    try {
+      const response = await apiClient.post<AuthResponseDto>(
+        `${this.BASE_PATH}/login`,
+        credentials
+      );
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw error;
+    }
   }
 
   static async register(userData: RegisterDto): Promise<AuthResponseDto> {
